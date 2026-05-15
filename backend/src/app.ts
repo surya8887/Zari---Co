@@ -26,9 +26,11 @@ app.use(cookieParser());
 //  Router imported here
 
 import authRoutes from "./modules/auth/auth.route.js";
+import userRoutes from "./modules/users/user.route.js";
 import errorMiddleware from "./shared/middlewares/error.middleware.js";
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", userRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorMiddleware);

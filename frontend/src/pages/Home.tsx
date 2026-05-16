@@ -1,10 +1,9 @@
-import React from 'react';
 import Header from '@/components/layout/Header';
 import Hero from '@/features/catalog/components/Hero';
 import JustIn from '@/features/catalog/components/JustIn';
 import FloatingActions from '@/components/common/FloatingActions';
 
-const Home: React.FC = () => {
+const Home = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header with Navigation */}

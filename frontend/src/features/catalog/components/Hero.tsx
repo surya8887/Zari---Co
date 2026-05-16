@@ -1,5 +1,4 @@
 
-
 const Hero = () => {
   return (
     <section className="relative w-full h-[550px] overflow-hidden">

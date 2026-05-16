@@ -1,6 +1,4 @@
-import React from 'react';
 import { Search, User, ShoppingBag, MapPin, Phone, Info } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 const Header = () => {
   return (
@@ -18,7 +16,7 @@ const Header = () => {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex-shrink-0">
-          <img src="/logo.png" alt="Zari & Co Logo" className="h-16 w-auto object-contain" />
+          <img src="/logo.png" alt="Zari & Co Logo" className="h-20 w-auto object-contain" />
         </div>
 
         {/* Search Bar */}

@@ -59,3 +59,28 @@ export const getUserById = async (id: string) => {
 
   return user;
 };
+
+export const deleteUserById = async (id: string) => {
+  const userExists = await prisma.user.findFirst({
+    where: { id, deletedAt: null },
+  });
+
+  if (!userExists) {
+    throw new ApiError(404, "User not found or already deleted");
+  }
+
+  const deletedUser = await prisma.user.update({
+    where: { id },
+    data: { deletedAt: new Date() },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      deletedAt: true,
+    },
+  });
+
+  return deletedUser;
+};

@@ -42,3 +42,13 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
     .status(200)
     .json(new ApiResponse(200, user, "User fetched successfully"));
 });
+
+export const deleteUserById = asyncHandler(async (req: Request, res: Response) => {
+  const { params } = getUserByIdValidation.parse({ params: req.params });
+  const { id } = params;
+  
+  const user = await userService.deleteUserById(id);
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User deleted successfully"));
+});

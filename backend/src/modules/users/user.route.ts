@@ -12,4 +12,6 @@ router.get("/", authenticateUser, authenticateAdmin, userController.getAllUsers)
 // @desc Get single user
 router.get("/:id", authenticateUser, userController.getUserById);
 
+router.delete("/:id", authenticateUser, userController.deleteUserById);
+
 export default router;

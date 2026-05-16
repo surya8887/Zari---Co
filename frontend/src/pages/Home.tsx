@@ -5,6 +5,12 @@ const Home: React.FC = () => {
     <div className="flex flex-col items-center justify-center min-h-screen">
       <h1 className="text-4xl font-bold">Welcome to Zari & Co</h1>
       <p className="mt-4 text-lg bg-red-400">E-commerce Backend Integrated Frontend</p>
+
+      <h1 className="text-4xl font-bold">Chal Na Laude 😂</h1>
+      <br /> <br />
+
+      <h1 className="text-4xl font-bold"><button>Khatam tata bye byee</button> </h1>
+
     </div>
   );
 };

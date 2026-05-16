@@ -1,11 +1,17 @@
-# React + TypeScript + Vite
+# Zari & Co - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A professional, feature-based React application built with TypeScript, Vite, and Tailwind CSS. This project is designed for scalability and maintainability using a modular architecture.
 
-Currently, two official plugins are available:
+## 🚀 Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Framework**: [React 18](https://reactjs.org/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Validation**: [Zod](https://zod.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Routing**: [React Router v6](https://reactrouter.com/)
+- **HTTP Client**: [Axios](https://axios-http.com/)
 
 ## React Compiler
 

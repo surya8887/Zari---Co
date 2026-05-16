@@ -1,0 +1,23 @@
+import api from '../../../api/axios';
+import type { LoginInput, RegisterInput, User } from '../schemas/auth.schema';
+
+export const authService = {
+  async login(credentials: LoginInput): Promise<User> {
+    const { data } = await api.post('/auth/login', credentials);
+    return data.data; 
+  },
+
+  async register(details: RegisterInput): Promise<User> {
+    const { data } = await api.post('/auth/register', details);
+    return data.data;
+  },
+
+  async logout(): Promise<void> {
+    await api.get('/auth/logout');
+  },
+
+  async getMe(): Promise<User> {
+    const { data } = await api.get('/auth/me');
+    return data.data;
+  },
+};

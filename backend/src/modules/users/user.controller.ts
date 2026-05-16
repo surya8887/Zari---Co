@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import * as userService from "./user.service.js";
 import ApiResponse from "../../shared/exceptions/apiResponse.js";
+import { getAllUsersValidation, getUserByIdValidation } from "./user.validation.js";
 
 /**
  * @desc Get all users controller
@@ -9,8 +10,8 @@ import ApiResponse from "../../shared/exceptions/apiResponse.js";
  * @access Private/Admin
  */
 export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 10;
+  const { query } = getAllUsersValidation.parse({ query: req.query });
+  const { page, limit } = query;
 
   const { users, total } = await userService.getAllUsers(page, limit);
   
@@ -33,8 +34,10 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
  * @access Private
  */
 export const getUserById = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const user = await userService.getUserById(id as string);
+  const { params } = getUserByIdValidation.parse({ params: req.params });
+  const { id } = params;
+  
+  const user = await userService.getUserById(id);
   return res
     .status(200)
     .json(new ApiResponse(200, user, "User fetched successfully"));

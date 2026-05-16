@@ -13,69 +13,67 @@ A professional, feature-based React application built with TypeScript, Vite, and
 - **Routing**: [React Router v6](https://reactrouter.com/)
 - **HTTP Client**: [Axios](https://axios-http.com/)
 
-## React Compiler
+## 📂 Project Structure
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+The project follows a **Feature-Based Architecture**, where all logic related to a specific domain (like Auth, Products, Users) is encapsulated within its own feature folder.
 
-Note: This will impact Vite dev & build performances.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── api/                # Global API configuration (Axios instance, interceptors)
+├── app/                # Application-wide setup (Router, Providers)
+├── components/         # Shared UI components (Common, UI, Forms, Layout)
+├── features/           # Domain-driven feature modules (The core of the app)
+│   ├── auth/           # Authentication feature
+│   │   ├── components/ # Auth-specific components
+│   │   ├── hooks/      # Auth-specific hooks (useAuth)
+│   │   ├── pages/      # Auth pages (Login, Register)
+│   │   ├── schemas/    # Zod validation schemas
+│   │   ├── services/   # Auth API services
+│   │   ├── store/      # Auth state management (Zustand)
+│   │   └── types.ts    # Auth-specific types
+├── hooks/              # Global custom hooks
+├── layouts/            # Shared layouts (AuthLayout, DashboardLayout)
+├── lib/                # Third-party library configurations (utils, constants)
+├── pages/              # Static or top-level pages
+├── routes/             # Route guards (ProtectedRoute, PublicRoute)
+├── styles/             # Global styles and Tailwind config
+├── types/              # Global TypeScript interfaces
+└── utils/              # Generic utility functions
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🔐 State Management & Validation
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+We use **Zustand** combined with **Zod** for robust state management. 
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Zod Schemas**: Used for validating API responses and form inputs.
+- **Strict State**: Before updating the global store (e.g., `authStore`), we validate the data against a Zod schema to ensure that only valid data enters the application state. This prevents "silent" bugs caused by unexpected API changes.
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- Node.js (v18+)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file in the root and add the backend URL:
+   ```env
+   VITE_API_URL=http://localhost:5000/api/v1
+   ```
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## 🏗️ Development Guidelines
+
+1. **Features First**: When adding a new module (e.g., Orders), create a new folder in `src/features/orders`.
+2. **Component Library**: Use `src/components/ui` for small, reusable components (buttons, inputs) and `src/components/common` for larger shared components.
+3. **Type Safety**: Always define Zod schemas for API responses and use `z.infer` to generate TypeScript types.
+4. **Hooks over Logic**: Keep components thin by moving business logic into custom hooks within the feature's `hooks/` directory.

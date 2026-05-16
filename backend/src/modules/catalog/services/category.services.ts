@@ -1,16 +1,9 @@
 import prisma from "../../../config/db.js";
 import ApiError from "../../../shared/exceptions/apiError.js";
 
-interface CreateCategoryParams {
-    name: string;
-    slug?: string | undefined;
-    description?: string | undefined;
-    isPublished?: boolean | undefined;
-    parentId?: string | undefined;
-    sortOrder?: number | undefined;
-}
+import type { CreateCategory, UpdateCategory } from "../catalog.type.js";
 
-export const createCategoryService = async ({ name, slug, description, isPublished, parentId, sortOrder }: CreateCategoryParams) => {
+export const createCategoryService = async ({ name, slug, description, isPublished, parentId, sortOrder }: CreateCategory) => {
     // We don't need manual validation here because Zod already validated the inputs in the controller.
     
     const category = await prisma.category.create({
@@ -53,16 +46,7 @@ export const getCategoryById = async (id: string) => {
     return category;
 };
 
-export interface UpdateCategoryParams {
-    name?: string | undefined;
-    slug?: string | undefined;
-    description?: string | undefined;
-    isPublished?: boolean | undefined;
-    parentId?: string | undefined;
-    sortOrder?: number | undefined;
-}
-
-export const updateCategoryById = async (id: string, params: UpdateCategoryParams) => {
+export const updateCategoryById = async (id: string, params: UpdateCategory) => {
     const data: any = {};
     
     if (params.name !== undefined) {

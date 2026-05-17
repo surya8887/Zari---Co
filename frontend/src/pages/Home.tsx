@@ -2,10 +2,11 @@ import Header from '@/components/layout/Header';
 import Hero from '@/features/catalog/components/Hero';
 import JustIn from '@/features/catalog/components/JustIn';
 import FloatingActions from '@/components/common/FloatingActions';
+import { ShieldCheck, RefreshCw, Truck, Award, Star } from 'lucide-react';
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#faf9f6] text-[#2c221e]">
       {/* Header with Navigation */}
       <Header />
 
@@ -13,28 +14,200 @@ const Home = () => {
         {/* Main Hero Section */}
         <Hero />
 
-        {/* 'Just In' Collection Section */}
+        {/* 1. Shop By Category Circular Section (Tanishq/BlueStone inspired) */}
+        <section className="py-16 bg-white select-none">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-12">
+              <p className="text-[#8b7355] font-bold uppercase tracking-[4px] text-[10px] mb-2.5">
+                ✨ Curated Designs
+              </p>
+              <h3 className="text-2xl sm:text-3xl font-serif text-[#4e3a24] font-extrabold italic leading-none">
+                Shop By Category
+              </h3>
+              <div className="w-12 h-0.5 bg-[#8b7355]/40 mx-auto mt-3" />
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-6 sm:gap-10 md:gap-14">
+              {[
+                { name: 'Rings', image: '/images/gold_diamond_ring.png' },
+                { name: 'Earrings', image: '/images/gold_drop_earrings.png' },
+                { name: 'Necklaces', image: '/images/gold_necklace.png' },
+                { name: 'Bangles', image: '/images/gold_bangles.png' },
+                { name: 'Pendants', image: '/images/gold_necklace.png' },
+              ].map((cat, idx) => (
+                <div key={idx} className="flex flex-col items-center group cursor-pointer">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border border-[#8b7355]/15 p-1 bg-[#faf9f6] shadow-sm hover:shadow-md hover:border-[#8b7355] transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
+                    <img 
+                      src={cat.image} 
+                      alt={cat.name} 
+                      className="w-full h-full object-cover rounded-full group-hover:rotate-6 transition-transform duration-500"
+                    />
+                  </div>
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#4e3a24] mt-3 group-hover:text-[#8b7355] transition-colors duration-300">
+                    {cat.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Main 'Just In' Collection Section */}
         <JustIn />
 
-        {/* Additional content could go here (e.g. Collections, Instagram feed) */}
-        <section className="py-20 bg-[#f9f7f4]">
-            <div className="container mx-auto px-4 text-center">
-                <p className="text-[#b09d81] uppercase tracking-[0.3em] text-xs font-bold mb-4">Discover More</p>
-                <h3 className="text-3xl font-serif text-[#6d5b43] italic mb-10">Handcrafted with Love</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="h-64 bg-gray-200 animate-pulse rounded"></div>
-                    <div className="h-64 bg-gray-200 animate-pulse rounded"></div>
-                    <div className="h-64 bg-gray-200 animate-pulse rounded"></div>
-                </div>
+        {/* 2. Brand Heritage Narrative Section */}
+        <section className="py-24 bg-gradient-to-b from-[#faf9f6] to-white relative overflow-hidden select-none">
+          <div className="absolute inset-0 opacity-5 pointer-events-none"
+               style={{backgroundImage: 'radial-gradient(circle at 1px 1px, #8b7355 1px, transparent 0)', backgroundSize: '24px 24px'}}>
+          </div>
+          <div className="container mx-auto px-6 max-w-4xl text-center relative z-10">
+            <div className="flex justify-center mb-6 text-amber-500/80">
+              <Star className="w-4 h-4 fill-current mx-1" />
+              <Star className="w-5 h-5 fill-current mx-1 scale-110 -translate-y-0.5 text-amber-500" />
+              <Star className="w-4 h-4 fill-current mx-1" />
             </div>
+            <p className="text-[#8b7355] font-extrabold uppercase tracking-[5px] text-[10px] mb-3">
+              Established 1996
+            </p>
+            <h3 className="text-3xl sm:text-4xl font-serif text-[#4e3a24] font-extrabold italic mb-6">
+              Our Legacy, Your Story
+            </h3>
+            <div className="w-16 h-px bg-[#8b7355]/50 mx-auto mb-8" />
+            <p className="text-sm font-sans tracking-wide text-neutral-600 leading-relaxed mb-6 max-w-2xl mx-auto">
+              For over three decades, Zari & Co has stood as a beacon of artisanal excellence and purity. 
+              Each creation in our collection is hand-carved by master craftsmen who have kept the age-old heritage 
+              of Indian gold smithery alive. 
+            </p>
+            <p className="text-xs font-serif italic text-[#8b7355] tracking-wider mb-10 block">
+              "We do not merely forge gold; we weave memories that remain timeless."
+            </p>
+            <button className="h-10 border border-[#8b7355] text-[#8b7355] hover:bg-[#8b7355] hover:text-white px-8 rounded-full text-[10px] font-bold uppercase tracking-[2.5px] transition-all duration-300 cursor-pointer shadow-sm active:scale-98">
+              Discover Our Craft
+            </button>
+          </div>
+        </section>
+
+        {/* 3. The Zari Promise (Trust credentials grid) */}
+        <section className="py-16 bg-[#faf9f6] border-t border-b border-[#8b7355]/10 select-none">
+          <div className="container mx-auto px-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                {
+                  icon: <ShieldCheck className="w-8 h-8 text-[#8b7355]" />,
+                  title: '100% Certified Purity',
+                  desc: 'Every piece is BIS Hallmarked and backed by international certifications.'
+                },
+                {
+                  icon: <RefreshCw className="w-8 h-8 text-[#8b7355]" />,
+                  title: 'Lifetime Buyback',
+                  desc: 'Enjoy transparency with our guaranteed buyback values and exchange policies.'
+                },
+                {
+                  icon: <Truck className="w-8 h-8 text-[#8b7355]" />,
+                  title: 'Free Insured Delivery',
+                  desc: 'Your masterpieces are securely packed, fully insured, and shipped for free.'
+                },
+                {
+                  icon: <Award className="w-8 h-8 text-[#8b7355]" />,
+                  title: 'Bespoke Customization',
+                  desc: 'Collaborate with our designers to handcraft custom jewelry of your dreams.'
+                }
+              ].map((p, idx) => (
+                <div key={idx} className="flex flex-col items-center text-center p-4 bg-white rounded-2xl border border-[#8b7355]/5 shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <div className="mb-4 p-3 bg-[#faf9f6] rounded-full border border-[#8b7355]/10">
+                    {p.icon}
+                  </div>
+                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4e3a24] mb-2">
+                    {p.title}
+                  </h4>
+                  <p className="text-[11px] text-neutral-500 tracking-wide max-w-[200px]">
+                    {p.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
       </main>
 
-      {/* Footer (Can be expanded into a full component later) */}
-      <footer className="bg-[#6d5b43] text-white py-12">
-        <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl font-serif italic mb-6">Zari & Co</h2>
-            <p className="text-xs opacity-60 tracking-widest uppercase">© 2026 Zari & Co. All Rights Reserved.</p>
+      {/* Footer (Luxurious, detailed layout) */}
+      <footer className="bg-[#1f1613] text-[#faf9f6] border-t border-[#8b7355]/20 py-16">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+            {/* Column 1: Brand Info */}
+            <div className="flex flex-col gap-4">
+              <h2 className="text-xl font-serif tracking-[0.2em] text-amber-100 font-extrabold uppercase select-none">
+                ZARI & CO
+              </h2>
+              <div className="w-12 h-0.5 bg-[#8b7355]/50" />
+              <p className="text-[11px] text-neutral-400 tracking-wider leading-relaxed">
+                Creators of fine, hand-crafted artisan jewelry. We deliver brilliance and purity across the globe.
+              </p>
+              <div className="text-[10px] text-neutral-500 tracking-wide font-sans mt-2">
+                🇮🇳 Proudly Crafted in India
+              </div>
+            </div>
+
+            {/* Column 2: Collections links */}
+            <div>
+              <h4 className="text-[11px] font-extrabold uppercase tracking-[2.5px] text-amber-100 mb-5">
+                Our Collections
+              </h4>
+              <ul className="flex flex-col gap-2.5 text-[11px] text-[#e0deda] font-medium tracking-wider">
+                <li><a href="#" className="hover:text-amber-200 transition-colors">Aurelia Gold Collection</a></li>
+                <li><a href="#" className="hover:text-amber-200 transition-colors">Marquise Solitaires</a></li>
+                <li><a href="#" className="hover:text-amber-200 transition-colors">Heritage Drop Earrings</a></li>
+                <li><a href="#" className="hover:text-amber-200 transition-colors">Festive Stacked Bangles</a></li>
+              </ul>
+            </div>
+
+            {/* Column 3: Trust & Policies */}
+            <div>
+              <h4 className="text-[11px] font-extrabold uppercase tracking-[2.5px] text-amber-100 mb-5">
+                Customer Services
+              </h4>
+              <ul className="flex flex-col gap-2.5 text-[11px] text-[#e0deda] font-medium tracking-wider">
+                <li><a href="#" className="hover:text-amber-200 transition-colors">Lifetime Exchange & Buyback</a></li>
+                <li><a href="#" className="hover:text-amber-200 transition-colors">Safe & Insured Shipping</a></li>
+                <li><a href="#" className="hover:text-amber-200 transition-colors">Gold Rate Calculator</a></li>
+                <li><a href="#" className="hover:text-amber-200 transition-colors">Virtual Consultations</a></li>
+              </ul>
+            </div>
+
+            {/* Column 4: Newsletter */}
+            <div>
+              <h4 className="text-[11px] font-extrabold uppercase tracking-[2.5px] text-amber-100 mb-5">
+                The Inner Circle
+              </h4>
+              <p className="text-[11px] text-neutral-400 tracking-wider mb-4 leading-relaxed">
+                Join our newsletter to receive exclusive launches, collection sneak peeks, and gold updates.
+              </p>
+              <div className="flex h-9 rounded overflow-hidden border border-[#8b7355]/30">
+                <input 
+                  type="email" 
+                  placeholder="Enter your email" 
+                  className="bg-[#2c221e] border-none text-xs px-4 text-white placeholder-neutral-500 focus:outline-none w-full"
+                />
+                <button className="bg-[#8b7355] hover:bg-[#6e583e] text-white text-[10px] font-extrabold uppercase tracking-widest px-4 transition-colors duration-300 cursor-pointer">
+                  Join
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full h-px bg-[#8b7355]/20 mb-8" />
+
+          {/* Sub-Footer */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 select-none">
+            <p className="text-[10px] text-neutral-500 tracking-[2px] uppercase">
+              © 2026 Zari & Co. Fine Jewelry. All Rights Reserved.
+            </p>
+            <div className="flex gap-6 text-[10px] text-neutral-400 uppercase tracking-widest">
+              <a href="#" className="hover:text-amber-200 transition-colors">Privacy Policy</a>
+              <span>•</span>
+              <a href="#" className="hover:text-amber-200 transition-colors">Terms of Use</a>
+            </div>
+          </div>
         </div>
       </footer>
 

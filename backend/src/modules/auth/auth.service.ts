@@ -31,6 +31,7 @@ export const registerUser = async (
       email: true,
       role: true,
       phone: true,
+      isVerified: true,
     },
   });
   return user;
@@ -57,6 +58,8 @@ export const loginUser = async (email: string, password: string) => {
     firstName: user.firstName,
     lastName: user.lastName,
     role: user.role,
+    phone: user.phone,
+    isVerified: user.isVerified,
   };
 };
 

@@ -4,12 +4,12 @@ import type { LoginInput, RegisterInput, User } from '@/features/auth/validation
 export const authService = {
   async login(credentials: LoginInput): Promise<User> {
     const { data } = await api.post('/auth/login', credentials);
-    return data.data; 
+    return data.data.user; 
   },
 
   async register(details: RegisterInput): Promise<User> {
     const { data } = await api.post('/auth/register', details);
-    return data.data;
+    return data.data.user;
   },
 
   async logout(): Promise<void> {

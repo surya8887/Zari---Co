@@ -48,7 +48,7 @@ export const useAuthStore = create<AuthState>()(
             return { success: false, error: errMsg };
           }
         } catch (err: any) {
-          const errMsg = err.response?.data?.message || "Registration failed";
+          const errMsg = err.response?.data?.errors?.[0]?.message || err.response?.data?.message || "Registration failed";
           set({ error: errMsg });
           return { success: false, error: errMsg };
         } finally {
@@ -71,7 +71,7 @@ export const useAuthStore = create<AuthState>()(
             return { success: false, error: errMsg };
           }
         } catch (err: any) {
-          const errMsg = err.response?.data?.message || "Login failed";
+          const errMsg = err.response?.data?.errors?.[0]?.message || err.response?.data?.message || "Login failed";
           set({ error: errMsg });
           return { success: false, error: errMsg };
         } finally {

@@ -1,14 +1,22 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { useAddressStore } from '@/store/useAddressStore';
 import { useOrderStore } from '@/store/useOrderStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useCartStore } from '@/store/useCartStore';
+
+// DRY Extracted Reusable Components
+import StatsCard from '@/components/common/StatsCard';
+import SectionCard from '@/components/common/SectionCard';
+import FormInput from '@/components/common/FormInput';
+import AddressCard from '@/components/common/AddressCard';
+import OrderCard from '@/components/common/OrderCard';
+
 import { 
   User, Mail, Phone, ShieldCheck, MapPin, ClipboardList, 
-  CreditCard, Bell, Plus, Trash2, Edit2, Check, ArrowRight, ShoppingBag
+  CreditCard, Bell, Plus, Edit2, Check, ArrowRight, ShoppingBag
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -151,6 +159,7 @@ const ProfilePage = () => {
                 return (
                   <button
                     key={tab.id}
+                    type="button"
                     onClick={() => setActiveTab(tab.id as ActiveTab)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-left cursor-pointer transition-all duration-300 ${
                       active
@@ -173,25 +182,17 @@ const ProfilePage = () => {
             {activeTab === 'dashboard' && (
               <div className="flex flex-col gap-6">
                 
-                {/* Stats Row */}
+                {/* Stats Cards Row */}
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm select-none">
-                    <span className="text-[9px] uppercase tracking-widest font-extrabold text-slate-400 block mb-1">Total Orders</span>
-                    <span className="text-xl font-bold font-serif text-slate-800">{orders.length} Placed</span>
-                  </div>
-                  <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm select-none">
-                    <span className="text-[9px] uppercase tracking-widest font-extrabold text-slate-400 block mb-1">Saved Wishlist</span>
-                    <span className="text-xl font-bold font-serif text-slate-800">{wishlistItems.length} Gems</span>
-                  </div>
-                  <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm select-none">
-                    <span className="text-[9px] uppercase tracking-widest font-extrabold text-slate-400 block mb-1">Default Address</span>
-                    <span className="text-[11px] font-bold text-slate-500 line-clamp-1 block mt-1">
-                      {addresses.find((a) => a.isDefault)?.city || 'None Registered'}
-                    </span>
-                  </div>
+                  <StatsCard title="Total Orders" value={`${orders.length} Placed`} />
+                  <StatsCard title="Saved Wishlist" value={`${wishlistItems.length} Gems`} />
+                  <StatsCard 
+                    title="Default Address" 
+                    value={addresses.find((a) => a.isDefault)?.city || 'None Registered'} 
+                  />
                 </div>
 
-                {/* Personal summary card */}
+                {/* Security verified panel */}
                 <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-blue-50 rounded-2xl">
@@ -203,52 +204,37 @@ const ProfilePage = () => {
                     </div>
                   </div>
                   <button 
+                    type="button"
                     onClick={() => setActiveTab('details')}
-                    className="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer"
+                    className="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer focus:outline-none"
                   >
                     Configure Settings
                   </button>
                 </div>
 
                 {/* Recent Orders log */}
-                <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
-                  <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-800 border-b border-slate-50 pb-3 mb-4 select-none">
-                    Recent Orders Summary
-                  </h3>
-
+                <SectionCard title="Recent Orders Summary">
                   {orders.length === 0 ? (
                     <div className="text-center py-6 text-xs text-slate-400 italic">No historical orders found.</div>
                   ) : (
                     <div className="flex flex-col gap-4">
                       {orders.slice(0, 2).map((ord) => (
-                        <div key={ord.id} className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                          <div>
-                            <span className="block text-[10px] font-extrabold text-slate-600">{ord.orderNumber}</span>
-                            <span className="text-[9px] text-slate-400 block mt-0.5">{ord.createdAt}</span>
-                          </div>
-                          <div className="text-right">
-                            <span className="block text-xs font-bold text-slate-800">₹{ord.grandTotal.toLocaleString('en-IN')}</span>
-                            <span className="text-[8px] uppercase tracking-widest text-emerald-700 font-extrabold bg-emerald-50 px-2 py-0.5 rounded mt-1 inline-block">{ord.status}</span>
-                          </div>
-                        </div>
+                        <OrderCard key={ord.id} order={ord} />
                       ))}
                       <button 
+                        type="button"
                         onClick={() => setActiveTab('orders')}
-                        className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1.5 justify-center mt-2 cursor-pointer"
+                        className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1.5 justify-center mt-2 cursor-pointer focus:outline-none"
                       >
                         View All Orders History
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   )}
-                </div>
+                </SectionCard>
 
-                {/* Wishlist quick carousels */}
-                <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
-                  <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-800 border-b border-slate-50 pb-3 mb-4 select-none">
-                    Wishlist Shortcut Vault
-                  </h3>
-
+                {/* Wishlist shortcut vault */}
+                <SectionCard title="Wishlist Shortcut Vault">
                   {wishlistItems.length === 0 ? (
                     <div className="text-center py-6 text-xs text-slate-400 italic">
                       Your vault is currently empty.
@@ -261,8 +247,9 @@ const ProfilePage = () => {
                           <h4 className="text-[10px] font-bold text-slate-700 line-clamp-1">{prod.name}</h4>
                           <span className="text-[10px] text-blue-600 font-semibold block mt-1">₹{prod.price.toLocaleString('en-IN')}</span>
                           <button
+                            type="button"
                             onClick={() => handleWishlistMoveToBag(prod)}
-                            className="mt-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-1.5 cursor-pointer text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5"
+                            className="mt-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-1.5 cursor-pointer text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5 focus:outline-none"
                           >
                             <ShoppingBag className="w-3 h-3" />
                             <span>Add Bag</span>
@@ -271,94 +258,60 @@ const ProfilePage = () => {
                       ))}
                     </div>
                   )}
-                </div>
+                </SectionCard>
               </div>
             )}
 
             {/* 2. Personal Details Edit Tab */}
             {activeTab === 'details' && (
-              <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
-                <div className="flex justify-between items-center border-b border-slate-50 pb-3 mb-5 select-none">
-                  <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-800">
-                    Personal Details Card
-                  </h3>
-                  {!isEditingInfo && (
-                    <button
-                      onClick={() => setIsEditingInfo(true)}
-                      className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                      Edit Info
-                    </button>
-                  )}
-                </div>
-
+              <SectionCard
+                title="Personal Details Card"
+                action={!isEditingInfo && (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingInfo(true)}
+                    className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer focus:outline-none"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    Edit Info
+                  </button>
+                )}
+              >
                 <form onSubmit={handleUpdateInfo} className="flex flex-col gap-5 max-w-xl">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block mb-1.5">First Name</label>
-                      <input
-                        type="text"
-                        disabled={!isEditingInfo}
-                        required
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        className={`w-full border rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none ${
-                          isEditingInfo 
-                            ? 'bg-slate-50 border-blue-300 focus:border-blue-500' 
-                            : 'bg-neutral-100/50 border-neutral-200 cursor-not-allowed text-slate-500'
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block mb-1.5">Last Name</label>
-                      <input
-                        type="text"
-                        disabled={!isEditingInfo}
-                        required
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        className={`w-full border rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none ${
-                          isEditingInfo 
-                            ? 'bg-slate-50 border-blue-300 focus:border-blue-500' 
-                            : 'bg-neutral-100/50 border-neutral-200 cursor-not-allowed text-slate-500'
-                        }`}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block mb-1.5 flex items-center gap-1.5">
-                      <Mail className="w-3.5 h-3.5 text-blue-600" />
-                      Verified Email Address
-                    </label>
-                    <input
-                      type="email"
-                      disabled
-                      value={user.email}
-                      className="w-full bg-neutral-100/50 border border-neutral-200 rounded-xl p-2.5 text-xs text-slate-400 cursor-not-allowed focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block mb-1.5 flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5 text-blue-600" />
-                      Contact Number
-                    </label>
-                    <input
-                      type="tel"
+                    <FormInput
+                      label="First Name"
                       disabled={!isEditingInfo}
                       required
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className={`w-full border rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none ${
-                        isEditingInfo 
-                          ? 'bg-slate-50 border-blue-300 focus:border-blue-500' 
-                          : 'bg-neutral-100/50 border-neutral-200 cursor-not-allowed text-slate-500'
-                      }`}
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
+
+                    <FormInput
+                      label="Last Name"
+                      disabled={!isEditingInfo}
+                      required
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
                     />
                   </div>
+
+                  <FormInput
+                    label="Verified Email Address"
+                    disabled
+                    value={user.email}
+                    onChange={() => {}}
+                    icon={<Mail className="w-3.5 h-3.5 text-blue-600" />}
+                  />
+
+                  <FormInput
+                    label="Contact Number"
+                    disabled={!isEditingInfo}
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    icon={<Phone className="w-3.5 h-3.5 text-blue-600" />}
+                  />
 
                   {isEditingInfo && (
                     <div className="flex gap-3 mt-3 select-none">
@@ -376,7 +329,7 @@ const ProfilePage = () => {
                       </button>
                       <button
                         type="submit"
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-sm focus:outline-none"
                       >
                         <Check className="w-4 h-4" />
                         Save Changes
@@ -384,93 +337,69 @@ const ProfilePage = () => {
                     </div>
                   )}
                 </form>
-              </div>
+              </SectionCard>
             )}
 
             {/* 3. Address Management Tab */}
             {activeTab === 'addresses' && (
-              <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
-                <div className="flex justify-between items-center border-b border-slate-50 pb-3 mb-5 select-none">
-                  <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-800">
-                    Address Management Section
-                  </h3>
+              <SectionCard
+                title="Address Management Section"
+                action={
                   <button
+                    type="button"
                     onClick={() => setShowAddressForm(!showAddressForm)}
-                    className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer focus:outline-none"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     New Delivery
                   </button>
-                </div>
-
-                {/* Form */}
+                }
+              >
+                {/* Add Address Form inside card */}
                 {showAddressForm && (
                   <form onSubmit={handleAddAddress} className="flex flex-col gap-4 bg-slate-50 p-5 rounded-2xl border border-dashed border-blue-200 mb-6 select-none animate-fadeIn">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block mb-1.5">Recipient Full Name</label>
-                        <input
-                          type="text"
-                          required
-                          value={addrFullName}
-                          onChange={(e) => setAddrFullName(e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block mb-1.5">Contact phone</label>
-                        <input
-                          type="tel"
-                          required
-                          value={addrPhone}
-                          onChange={(e) => setAddrPhone(e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block mb-1.5">Address Details (Street, Building)</label>
-                      <input
-                        type="text"
+                      <FormInput
+                        label="Recipient Full Name"
                         required
-                        value={addrLine1}
-                        onChange={(e) => setAddrLine1(e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
+                        value={addrFullName}
+                        onChange={(e) => setAddrFullName(e.target.value)}
+                      />
+                      <FormInput
+                        label="Contact Phone"
+                        type="tel"
+                        required
+                        value={addrPhone}
+                        onChange={(e) => setAddrPhone(e.target.value)}
                       />
                     </div>
 
+                    <FormInput
+                      label="Address Details (Street, Building)"
+                      required
+                      value={addrLine1}
+                      onChange={(e) => setAddrLine1(e.target.value)}
+                    />
+
                     <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <label className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block mb-1.5">City</label>
-                        <input
-                          type="text"
-                          required
-                          value={addrCity}
-                          onChange={(e) => setAddrCity(e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block mb-1.5">State</label>
-                        <input
-                          type="text"
-                          required
-                          value={addrState}
-                          onChange={(e) => setAddrState(e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block mb-1.5">Zip Code</label>
-                        <input
-                          type="text"
-                          required
-                          value={addrZip}
-                          onChange={(e) => setAddrZip(e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
-                        />
-                      </div>
+                      <FormInput
+                        label="City"
+                        required
+                        value={addrCity}
+                        onChange={(e) => setAddrCity(e.target.value)}
+                      />
+                      <FormInput
+                        label="State"
+                        required
+                        value={addrState}
+                        onChange={(e) => setAddrState(e.target.value)}
+                      />
+                      <FormInput
+                        label="Zip Code"
+                        required
+                        value={addrZip}
+                        onChange={(e) => setAddrZip(e.target.value)}
+                      />
                     </div>
 
                     <div className="flex gap-3 justify-end mt-2">
@@ -491,13 +420,14 @@ const ProfilePage = () => {
                   </form>
                 )}
 
-                {/* List */}
+                {/* Addresses Grid list */}
                 {addresses.length === 0 ? (
                   <div className="text-center py-10 border border-dashed border-slate-200 rounded-2xl select-none">
                     <p className="text-xs text-slate-400 italic mb-4">No shipping addresses found.</p>
                     <button
+                      type="button"
                       onClick={() => setShowAddressForm(true)}
-                      className="h-9 bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-xl text-[10px] font-bold uppercase tracking-widest cursor-pointer"
+                      className="h-9 bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-xl text-[10px] font-bold uppercase tracking-widest cursor-pointer focus:outline-none"
                     >
                       Add Shipping Destination
                     </button>
@@ -505,111 +435,36 @@ const ProfilePage = () => {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {addresses.map((addr) => (
-                      <div 
+                      <AddressCard
                         key={addr.id}
-                        className={`border rounded-2xl p-5 flex flex-col justify-between select-none ${
-                          addr.isDefault 
-                            ? 'border-blue-500 bg-blue-50/20 shadow-sm'
-                            : 'border-slate-100 hover:border-blue-300'
-                        }`}
-                      >
-                        <div className="text-xs">
-                          <div className="flex items-center justify-between border-b border-slate-50 pb-2 mb-3">
-                            <span className="font-extrabold text-slate-800">{addr.fullName}</span>
-                            {addr.isDefault && (
-                              <span className="bg-blue-600 text-white text-[7px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded">Default</span>
-                            )}
-                          </div>
-                          <p className="text-slate-500 leading-relaxed">{addr.addressLine1}</p>
-                          <p className="text-slate-500">{addr.city}, {addr.state} - {addr.zipCode}</p>
-                          <span className="block mt-2 font-bold text-slate-400">Phone: {addr.phone}</span>
-                        </div>
-
-                        <div className="flex items-center justify-between border-t border-slate-50 pt-3 mt-4">
-                          {!addr.isDefault ? (
-                            <button
-                              onClick={() => {
-                                setDefaultAddress(addr.id);
-                                toast.success("Updated default delivery preset! ✦");
-                              }}
-                              className="text-[8px] font-bold uppercase tracking-widest text-blue-600 hover:underline cursor-pointer"
-                            >
-                              Set Default
-                            </button>
-                          ) : (
-                            <span className="text-[8px] font-bold uppercase tracking-widest text-emerald-700 flex items-center gap-1">
-                              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                              Active Address
-                            </span>
-                          )}
-
-                          <button
-                            onClick={() => {
-                              deleteAddress(addr.id);
-                              toast.info("Deleted shipping preset.");
-                            }}
-                            className="p-1.5 text-slate-400 hover:text-red-500 rounded-lg cursor-pointer"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
+                        address={addr}
+                        onDelete={deleteAddress}
+                        onSetDefault={setDefaultAddress}
+                      />
                     ))}
                   </div>
                 )}
-              </div>
+              </SectionCard>
             )}
 
             {/* 4. Orders History Tab */}
             {activeTab === 'orders' && (
-              <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
-                <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-800 border-b border-slate-50 pb-3.5 mb-5 select-none">
-                  Orders summary
-                </h3>
-
+              <SectionCard title="Orders summary">
                 {orders.length === 0 ? (
                   <div className="text-center py-10 text-xs text-slate-400 italic">No historical orders found.</div>
                 ) : (
                   <div className="flex flex-col gap-4 select-none animate-fadeIn">
                     {orders.map((ord) => (
-                      <div key={ord.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-50 border border-slate-100 rounded-2xl p-5 gap-4">
-                        <div>
-                          <div className="flex items-center gap-3">
-                            <span className="text-xs font-extrabold text-slate-800 tracking-wider">{ord.orderNumber}</span>
-                            <span className="bg-emerald-50 border border-emerald-100 text-emerald-800 text-[8px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded">{ord.status}</span>
-                          </div>
-                          <span className="text-[9px] text-slate-400 block mt-1">Placed on {ord.createdAt}</span>
-                          <span className="text-[10px] text-slate-500 font-medium block mt-0.5">{ord.items.length} Diamond masterpieces</span>
-                        </div>
-
-                        <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0">
-                          <div>
-                            <span className="block text-[8px] uppercase tracking-widest text-slate-400 font-bold leading-none mb-1">Receipt Value</span>
-                            <span className="text-sm font-serif font-extrabold text-blue-600">₹{ord.grandTotal.toLocaleString('en-IN')}</span>
-                          </div>
-                          
-                          <Link
-                            to={`/orders/${ord.id}`}
-                            className="h-9 border border-blue-200 hover:border-blue-600 text-blue-600 hover:bg-blue-50/50 px-4 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all flex items-center gap-1.5 cursor-pointer"
-                          >
-                            <span>Receipt Details</span>
-                            <ArrowRight className="w-3 h-3" />
-                          </Link>
-                        </div>
-                      </div>
+                      <OrderCard key={ord.id} order={ord} />
                     ))}
                   </div>
                 )}
-              </div>
+              </SectionCard>
             )}
 
             {/* 5. Preferences & Notification Tab */}
             {activeTab === 'preferences' && (
-              <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm select-none">
-                <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-800 border-b border-slate-50 pb-3.5 mb-5">
-                  Saved Preferences
-                </h3>
-
+              <SectionCard title="Saved Preferences">
                 <div className="flex flex-col gap-6 max-w-xl">
                   {/* Delivery preference */}
                   <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
@@ -686,7 +541,7 @@ const ProfilePage = () => {
                     </label>
                   </div>
                 </div>
-              </div>
+              </SectionCard>
             )}
           </div>
         </div>

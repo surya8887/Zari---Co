@@ -7,6 +7,7 @@ export const registerUser = async (
   lastName: string | undefined,
   email: string,
   password: string,
+  phone: string | undefined,
 ) => {
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
@@ -21,6 +22,7 @@ export const registerUser = async (
       lastName: lastName ?? null,
       email,
       passwordHash: hashedPassword,
+      phone: phone ?? null,
     },
     select: {
       id: true,
@@ -28,6 +30,7 @@ export const registerUser = async (
       lastName: true,
       email: true,
       role: true,
+      phone: true,
     },
   });
   return user;

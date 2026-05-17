@@ -4,6 +4,7 @@ export const registerUserValidation = z.object({
     lastName: z.string().optional(),
     email: z.string().email("Invalid email"),
     password: z.string().min(6, "Password must be at least 6 characters long"),
+    phone: z.string().optional(),
 });
 
 export const loginUserValidation = z.object({

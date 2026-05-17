@@ -18,9 +18,9 @@ import type { AuthRequest } from "../../shared/middlewares/auth.middleware.js";
 export const registerUser = asyncHandler(
   async (req: Request, res: Response) => {
     const validatedData = registerUserValidation.parse(req.body);
-    const { firstName, lastName, email, password } = validatedData;
+    const { firstName, lastName, email, password, phone } = validatedData;
     
-    const user = await registerUserService(firstName, lastName, email, password);
+    const user = await registerUserService(firstName, lastName, email, password, phone);
     
     const { accessToken, refreshToken } = await generateAccessTokenRefreshToken(user.id);
 

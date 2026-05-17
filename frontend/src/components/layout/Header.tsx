@@ -3,7 +3,7 @@ import { Search, User, ShoppingBag, MapPin, Phone, Heart, LogOut } from 'lucide-
 import { useAuth } from '@/hooks/useAuth';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
-import { useProductStore } from '@/store/useProductStore';
+import CategoryNav from './CategoryNav';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -12,22 +12,10 @@ const Header = () => {
   // Real-Time Zustand subscriptions
   const { items: cartItems, getTotals } = useCartStore();
   const { items: wishlistItems } = useWishlistStore();
-  const { setCategory } = useProductStore();
 
   const totals = getTotals();
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const wishlistCount = wishlistItems.length;
-
-  const handleCategoryClick = (cat: string) => {
-    // If it's one of our registered categories, filter, else reset to All
-    const validCategories = ['Rings', 'Earrings', 'Pendants', 'Bangles', 'Gifts'];
-    if (validCategories.includes(cat)) {
-      setCategory(cat);
-    } else {
-      setCategory('All');
-    }
-    navigate('/products');
-  };
 
   return (
     <header className="w-full bg-white sticky top-0 z-50 shadow-sm transition-all duration-300">
@@ -164,24 +152,8 @@ const Header = () => {
         </div>
       </div>
 
-      {/* 4. Luxury Navigation Category Bar */}
-      <nav className="bg-white border-b border-neutral-100 shadow-sm">
-        <div className="container mx-auto px-6">
-          <ul className="flex items-center justify-center gap-8 lg:gap-12 py-3.5 text-[11px] font-extrabold uppercase tracking-[2.5px] text-[#4e3a24] overflow-x-auto whitespace-nowrap scrollbar-none select-none">
-            {['Rings', 'Earrings', 'Pendants', 'Bangles', 'Gifts', 'Collections', 'Try At Home', 'Bespoke', '10+1 Plan', 'Kids'].map((item) => (
-              <li key={item} className="relative group">
-                <button 
-                  onClick={() => handleCategoryClick(item)}
-                  className="hover:text-[#8b7355] transition-colors duration-300 block cursor-pointer bg-transparent border-none font-extrabold text-[11px] uppercase tracking-[2.5px] text-[#4e3a24]"
-                >
-                  {item}
-                </button>
-                <span className="absolute -bottom-3.5 left-0 w-0 h-[2.5px] bg-[#8b7355] transition-all duration-300 group-hover:w-full" />
-              </li>
-            ))}
-          </ul>
-        </div>
-      </nav>
+      {/* 4. Luxury Navigation Category Bar with Hover Mega Menu */}
+      <CategoryNav />
     </header>
   );
 };

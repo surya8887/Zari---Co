@@ -1,5 +1,5 @@
-import api from '../../../api/axios';
-import type { LoginInput, RegisterInput, User } from '../schemas/auth.schema';
+import api from '@/api/axios';
+import type { LoginInput, RegisterInput, User } from '@/features/auth/validation';
 
 export const authService = {
   async login(credentials: LoginInput): Promise<User> {

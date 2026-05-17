@@ -1,6 +1,10 @@
-import { Search, User, ShoppingBag, MapPin, Phone, Info } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, User, ShoppingBag, MapPin, Phone, Info, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const Header = () => {
+  const { isAuthenticated, user, logout } = useAuth();
+
   return (
     <header className="w-full">
       {/* Top Promotional Bar */}
@@ -41,7 +45,24 @@ const Header = () => {
             <Info className="w-4 h-4" /> About Us
           </a>
           <div className="flex items-center gap-4 ml-4">
-            <User className="w-6 h-6 text-gray-700 cursor-pointer" />
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] text-gray-500 font-semibold tracking-wider normal-case">
+                  Hi, {user?.firstName || 'User'}
+                </span>
+                <button
+                  onClick={logout}
+                  title="Sign Out"
+                  className="p-1 hover:text-[#b09d81] transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4 text-gray-700 hover:text-red-500" />
+                </button>
+              </div>
+            ) : (
+              <Link to="/login" title="Login / Register" className="hover:text-[#b09d81] transition-colors">
+                <User className="w-6 h-6 text-gray-700 cursor-pointer" />
+              </Link>
+            )}
             <div className="relative">
               <ShoppingBag className="w-6 h-6 text-gray-700 cursor-pointer" />
               <span className="absolute -top-1 -right-1 bg-[#b09d81] text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center font-bold">0</span>

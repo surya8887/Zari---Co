@@ -35,6 +35,16 @@ const errorMiddleware = (
     message = "Duplicate field value entered";
   }
 
+  if (err.code === "P2003") {
+    statusCode = 400;
+    message = "Invalid related record reference";
+  }
+
+  if (err.code === "P2025") {
+    statusCode = 404;
+    message = "Record not found";
+  }
+
   res.status(statusCode).json({
     success: false,
     message,

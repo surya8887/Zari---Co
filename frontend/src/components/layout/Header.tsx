@@ -1,13 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, User, ShoppingBag, MapPin, Phone, Heart, LogOut } from 'lucide-react';
+import { Search, User, ShoppingBag, MapPin, Phone, Heart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import CategoryNav from './CategoryNav';
+import ProfileDropdown from './ProfileDropdown';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   
   // Real-Time Zustand subscriptions
   const { items: cartItems, getTotals } = useCartStore();
@@ -98,23 +99,7 @@ const Header = () => {
 
             {/* User Session Handler */}
             {isAuthenticated ? (
-              <div className="flex items-center gap-3 bg-[#faf9f6] border border-[#8b7355]/15 px-4 py-1.5 rounded-full shadow-sm">
-                <Link 
-                  to="/profile" 
-                  className="text-[10px] text-[#8b7355] font-extrabold uppercase tracking-wider hover:underline"
-                  title="View Settings"
-                >
-                  Hi, {user?.firstName || 'User'}
-                </Link>
-                <span className="w-px h-3 bg-neutral-200" />
-                <button
-                  onClick={logout}
-                  title="Sign Out"
-                  className="text-neutral-400 hover:text-red-600 transition-colors cursor-pointer"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                </button>
-              </div>
+              <ProfileDropdown />
             ) : (
               <Link 
                 to="/login" 

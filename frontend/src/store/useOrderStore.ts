@@ -74,7 +74,14 @@ const MOCK_ORDERS: Order[] = [
           rating: 4.8,
           reviewsCount: 12,
           sku: "ZRI-RG-001",
-          reviews: []
+          reviews: [],
+          productType: "Rings",
+          metal: "Gold",
+          gender: "Women",
+          offers: ["New Arrival", "Best Seller"],
+          occasion: ["Engagement", "Anniversary", "Wedding"],
+          style: "Luxury",
+          design: "Solitaire"
         },
         quantity: 1,
         selectedSize: "Size 12"

@@ -2,6 +2,7 @@ import {
   type Category, 
   type ClientProduct as Product, 
   type ProductImage,
+  type ProductVariant,
   type InventoryItem,
   type InventoryPayload,
   type InventoryUpdatePayload
@@ -24,7 +25,7 @@ export interface MessageItem {
   time: string;
 }
 
-export type { Category, Product, ProductImage, InventoryItem };
+export type { Category, Product, ProductImage, ProductVariant, InventoryItem };
 
 export interface UISlice {
   theme: "light" | "dark";
@@ -48,12 +49,15 @@ export interface CategorySlice {
 
 export interface ProductSlice {
   products: Product[];
-  addProduct: (product: Omit<Product, "id" | "images">) => Promise<Product | undefined>;
+  addProduct: (product: Omit<Product, "id" | "images" | "variants">) => Promise<Product | undefined>;
   updateProduct: (id: string, fields: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   uploadProductImages: (productId: string, files: File[]) => Promise<void>;
   deleteProductImage: (productId: string, imageId: string) => Promise<void>;
   setPrimaryImage: (productId: string, imageId: string) => Promise<void>;
+  addProductVariant: (productId: string, variant: { name: string; sku: string; priceOverride?: number | null; isActive?: boolean; attributes?: Record<string, any> }) => Promise<void>;
+  updateProductVariant: (productId: string, variantId: string, fields: { name?: string; sku?: string; priceOverride?: number | null; isActive?: boolean; attributes?: Record<string, any> }) => Promise<void>;
+  deleteProductVariant: (productId: string, variantId: string) => Promise<void>;
 }
 
 export interface SettingsSlice {

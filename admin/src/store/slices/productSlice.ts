@@ -149,5 +149,72 @@ export const createProductSlice: StateCreator<AppStore, [], [], ProductSlice> = 
         description: "Could not update cover designation on server."
       });
     }
+  },
+
+  addProductVariant: async (productId, variant) => {
+    try {
+      const created = await api.createVariant(productId, variant);
+      set((state) => ({
+        products: state.products.map((p) =>
+          p.id === productId
+            ? { ...p, variants: [...(p.variants || []), created] }
+            : p
+        )
+      }));
+      toast.success("Variant Created Live ✦", {
+        description: `Successfully added ${created.name} to product.`
+      });
+    } catch (error: any) {
+      console.error("Failed to create product variant on backend:", error);
+      toast.error("Database Sync Error ✕", {
+        description: error?.message || "Could not persist product variant in database."
+      });
+    }
+  },
+
+  updateProductVariant: async (productId, variantId, fields) => {
+    try {
+      const updated = await api.updateVariant(variantId, fields);
+      set((state) => ({
+        products: state.products.map((p) => {
+          if (p.id !== productId) return p;
+          return {
+            ...p,
+            variants: (p.variants || []).map((v) => v.id === variantId ? { ...v, ...updated } : v)
+          };
+        })
+      }));
+      toast.success("Variant Sync Successful ✦", {
+        description: "Updates persistently written to database."
+      });
+    } catch (error: any) {
+      console.error("Failed to update product variant on backend:", error);
+      toast.error("Database Sync Error ✕", {
+        description: error?.message || "Could not persist variant updates in database."
+      });
+    }
+  },
+
+  deleteProductVariant: async (productId, variantId) => {
+    try {
+      await api.deleteVariant(variantId);
+      set((state) => ({
+        products: state.products.map((p) => {
+          if (p.id !== productId) return p;
+          return {
+            ...p,
+            variants: (p.variants || []).filter((v) => v.id !== variantId)
+          };
+        })
+      }));
+      toast.success("Variant Deleted Live ✦", {
+        description: "Product variant successfully deleted in database."
+      });
+    } catch (error: any) {
+      console.error("Failed to delete product variant on backend:", error);
+      toast.error("Database Sync Error ✕", {
+        description: error?.message || "Could not delete product variant in database."
+      });
+    }
   }
 });

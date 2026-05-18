@@ -30,6 +30,19 @@ export interface ProductImage {
 // ==========================================
 // Product Interfaces
 // ==========================================
+export interface ProductVariant {
+  id: string;
+  productId: string;
+  name: string;
+  sku: string;
+  priceOverride: number | string | null;
+  isActive: boolean;
+  attributes: Record<string, any>;
+  createdAt?: string;
+  updatedAt?: string;
+  inventory?: InventoryItem;
+}
+
 export interface DbProduct {
   id: string;
   categoryId: string;
@@ -40,6 +53,7 @@ export interface DbProduct {
   sku: string;
   isPublished: boolean;
   images?: ProductImage[]; // Included relations
+  variants?: ProductVariant[]; // Included relations
 }
 
 export interface ClientProduct {
@@ -53,6 +67,7 @@ export interface ClientProduct {
   careInstructions: string;
   isPublished: boolean;
   images: ProductImage[]; // Parsed relations
+  variants: ProductVariant[]; // Parsed relations
 }
 
 // ==========================================
@@ -121,12 +136,13 @@ export const mapDbToClientProduct = (db: DbProduct): ClientProduct => {
     details,
     careInstructions,
     isPublished: db.isPublished,
-    images: db.images || []
+    images: db.images || [],
+    variants: db.variants || []
   };
 };
 
 // Merge client form fields into unified description column
-export const mapClientToDbPayload = (client: Omit<ClientProduct, "id" | "images">) => {
+export const mapClientToDbPayload = (client: Omit<ClientProduct, "id" | "images" | "variants">) => {
   const description = `${client.description || ""}<!--GIA-SPECS-->${client.details || ""}<!--CARE-GUIDES-->${client.careInstructions || ""}`;
   return {
     name: client.name,
@@ -213,7 +229,7 @@ export const api = {
     return dbProducts.map(mapDbToClientProduct);
   },
 
-  async createProduct(product: Omit<ClientProduct, "id" | "images">): Promise<ClientProduct> {
+  async createProduct(product: Omit<ClientProduct, "id" | "images" | "variants">): Promise<ClientProduct> {
     const payload = mapClientToDbPayload(product);
     const dbProd = await fetchJson<DbProduct>("/catalog/product", {
       method: "POST",
@@ -227,7 +243,7 @@ export const api = {
     let payload: Partial<DbProduct> = {};
     
     if (product.name || product.price || product.sku || product.categoryId || product.description || product.details || product.careInstructions || product.isPublished !== undefined) {
-      const fullProduct: Omit<ClientProduct, "id" | "images"> = {
+      const fullProduct: Omit<ClientProduct, "id" | "images" | "variants"> = {
         name: product.name || "",
         price: product.price || "0.0",
         sku: product.sku || "",
@@ -297,6 +313,37 @@ export const api = {
   async setPrimaryImage(id: string): Promise<ProductImage> {
     return fetchJson<ProductImage>(`/catalog/image/${id}/primary`, {
       method: "PUT"
+    });
+  },
+
+  // Product Variant Operations
+  async getVariantsByProduct(productId: string): Promise<ProductVariant[]> {
+    return fetchJson<ProductVariant[]>(`/catalog/product/${productId}/variants`);
+  },
+
+  async createVariant(
+    productId: string,
+    data: { name: string; sku: string; priceOverride?: number | null; isActive?: boolean; attributes?: Record<string, any> }
+  ): Promise<ProductVariant> {
+    return fetchJson<ProductVariant>(`/catalog/product/${productId}/variants`, {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+  },
+
+  async updateVariant(
+    id: string,
+    data: { name?: string; sku?: string; priceOverride?: number | null; isActive?: boolean; attributes?: Record<string, any> }
+  ): Promise<ProductVariant> {
+    return fetchJson<ProductVariant>(`/catalog/variant/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data)
+    });
+  },
+
+  async deleteVariant(id: string): Promise<void> {
+    await fetchJson<void>(`/catalog/variant/${id}`, {
+      method: "DELETE"
     });
   },
 

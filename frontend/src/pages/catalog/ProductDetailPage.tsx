@@ -18,6 +18,14 @@ const ProductDetailPage = () => {
   const [selectedSize, setSelectedSize] = useState<string>('Size 12');
   const [activeTab, setActiveTab] = useState<'details' | 'specs' | 'purity'>('details');
 
+  const [activeImage, setActiveImage] = useState<string>('');
+
+  useEffect(() => {
+    if (selectedProduct) {
+      setActiveImage(selectedProduct.image);
+    }
+  }, [selectedProduct]);
+
   const [pincode, setPincode] = useState('');
   const [deliveryMessage, setDeliveryMessage] = useState('');
   const [isCheckingPincode, setIsCheckingPincode] = useState(false);
@@ -93,13 +101,6 @@ const ProductDetailPage = () => {
   const p = selectedProduct;
   const wishlisted = isInWishlist(p.id);
 
-  const [activeImage, setActiveImage] = useState<string>('');
-
-  useEffect(() => {
-    if (p) {
-      setActiveImage(p.image);
-    }
-  }, [p]);
 
   // Split description if it contains HTML comments from rich text editor
   const desc = p.description || '';

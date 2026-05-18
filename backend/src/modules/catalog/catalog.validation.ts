@@ -67,3 +67,14 @@ export const updateProductSchema = z.object({
     variants: z.array(productVariantSchema.partial()).optional(),
     images: z.array(createImageSchema.partial()).optional(),
 });
+
+// Dedicated individual ProductVariant schemas
+export const createIndividualVariantSchema = z.object({
+    name: z.string().min(1, "Product variant name is required"),
+    sku: z.string().min(1, "Variant SKU is required"),
+    priceOverride: z.number().min(0, "Price override cannot be negative").optional().nullable(),
+    isActive: z.boolean().optional().default(true),
+    attributes: z.record(z.string(), z.any()).optional().default({}),
+});
+
+export const updateIndividualVariantSchema = createIndividualVariantSchema.partial();

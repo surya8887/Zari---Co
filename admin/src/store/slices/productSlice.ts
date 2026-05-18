@@ -18,12 +18,33 @@ export const createProductSlice: StateCreator<AppStore, [], [], ProductSlice> = 
     }
 
     try {
+      // 1. Create the parent product record
       const created = await api.createProduct(product);
+
+      // 2. Seamlessly create a default variant for the new product
+      let defaultVariant;
+      try {
+        defaultVariant = await api.createVariant(created.id, {
+          name: "Default",
+          sku: created.sku,
+          priceOverride: null,
+          isActive: true,
+          attributes: {}
+        });
+        created.variants = [defaultVariant];
+      } catch (varError) {
+        console.error("Failed to create default variant for product:", varError);
+        toast.warning("Product Created, Variant Missing ⚠️", {
+          description: "Product persisted, but default variant registration failed."
+        });
+      }
+
       set((state) => ({
         products: [...state.products, created]
       }));
+
       toast.success("Product Created Live ✦", {
-        description: `Successfully added ${created.name} to catalog database.`
+        description: `Successfully added ${created.name} and mapped default variant.`
       });
       return created;
     } catch (error) {

@@ -53,6 +53,14 @@ const ProductDetailPage = () => {
   const p = selectedProduct;
   const wishlisted = isInWishlist(p.id);
 
+  const [activeImage, setActiveImage] = useState<string>('');
+
+  useEffect(() => {
+    if (p) {
+      setActiveImage(p.image);
+    }
+  }, [p]);
+
   // Split description if it contains HTML comments from rich text editor
   const desc = p.description || '';
   const hasGiaSpecs = desc.includes('<!--GIA-SPECS-->');
@@ -159,7 +167,7 @@ const ProductDetailPage = () => {
             {/* Visual Frame */}
             <div className="aspect-square bg-white border border-[#8b7355]/15 rounded-3xl p-6 shadow-sm overflow-hidden flex items-center justify-center">
               <img
-                src={p.image}
+                src={activeImage || p.image}
                 alt={p.name}
                 className="w-full h-full object-cover rounded-2xl hover:scale-105 transition-transform duration-500"
               />
@@ -173,6 +181,32 @@ const ProductDetailPage = () => {
                 <span>BIS 916 Hallmarked</span>
               </div>
             </div>
+
+            {/* Alternative Product Photos Gallery */}
+            {p.images && p.images.length > 1 && (
+              <div className="flex gap-3 mt-4 overflow-x-auto pb-1 select-none">
+                {p.images.map((imgUrl, idx) => {
+                  const isSelected = activeImage === imgUrl;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveImage(imgUrl)}
+                      className={`w-16 h-16 rounded-2xl overflow-hidden border bg-white cursor-pointer transition-all duration-200 flex-shrink-0 p-1 ${
+                        isSelected
+                          ? 'border-[#8b7355] shadow-[0_0_8px_rgba(139,115,85,0.25)] scale-[1.03]'
+                          : 'border-[#8b7355]/15 hover:border-[#8b7355]/50'
+                      }`}
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`Alternative photo ${idx + 1}`}
+                        className="w-full h-full object-cover rounded-xl"
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Right Column: Order Configuration */}

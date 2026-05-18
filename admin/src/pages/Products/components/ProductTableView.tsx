@@ -64,9 +64,9 @@ export const ProductTableView: React.FC<ProductTableViewProps> = ({
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+            <table className="w-full text-left text-sm border-collapse">
               <thead>
-                <tr className="border-b border-border text-muted-foreground font-semibold">
+                <tr className="border-b border-border text-primary font-bold uppercase tracking-widest font-serif text-sm">
                   <th className="pb-3 pl-2">Product Details</th>
                   <th className="pb-3">Catalog SKU</th>
                   <th className="pb-3">Category Relation</th>
@@ -94,42 +94,42 @@ export const ProductTableView: React.FC<ProductTableViewProps> = ({
                               <img
                                 src={mainSrc}
                                 alt={prod.name}
-                                className="w-10 h-10 rounded-lg object-cover border border-[#3b3227] group-hover:border-primary/50 transition-all shadow-[0_0_10px_rgba(197,168,128,0.08)]"
+                                className="w-11 h-11 rounded-lg object-cover border border-[#3b3227] group-hover:border-primary/50 transition-all shadow-[0_0_10px_rgba(197,168,128,0.08)]"
                               />
                             );
                           })()
                         ) : (
-                          <div className="w-10 h-10 rounded-lg bg-[#241e17] border border-[#3b3227] flex items-center justify-center text-primary font-bold text-xs select-none shadow-[0_0_10px_rgba(197,168,128,0.05)]">
+                          <div className="w-11 h-11 rounded-lg bg-[#241e17] border border-[#3b3227] flex items-center justify-center text-primary font-bold text-sm select-none shadow-[0_0_10px_rgba(197,168,128,0.05)]">
                             {prod.name.split(" ").map((n) => n[0]).join("")}
                           </div>
                         )}
                         <div>
-                          <h5 className="font-semibold text-foreground group-hover:text-primary-foreground group-hover:underline transition-all">
+                          <h5 className="font-serif font-bold text-base text-foreground group-hover:text-primary transition-all">
                             {prod.name}
                           </h5>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">Code: {prod.sku}</p>
+                          <p className="text-xs text-muted-foreground/80 mt-0.5">Code: {prod.sku}</p>
                         </div>
                       </td>
                       <td className="py-4 font-mono font-medium text-muted-foreground uppercase">{prod.sku}</td>
                       <td className="py-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold border ${getCategoryBadgeTheme(prod.categoryId)}`}>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-bold border ${getCategoryBadgeTheme(prod.categoryId)}`}>
                           {catName}
                         </span>
                       </td>
-                      <td className="py-4 font-semibold text-foreground">
+                      <td className="py-4 font-bold text-foreground">
                         ${Number(prod.price).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
 
                       {/* Publish / Draft status mapping schema */}
                       <td className="py-4 text-center select-none">
                         <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[9px] font-bold border ${
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold border ${
                             prod.isPublished
                               ? "text-primary bg-[#241e17] border-[#3b3227]"
                               : "text-muted-foreground bg-secondary/30 border-border"
                           }`}
                         >
-                          {prod.isPublished ? <Eye size={10} /> : <EyeOff size={10} />}
+                          {prod.isPublished ? <Eye size={11} /> : <EyeOff size={11} />}
                           {prod.isPublished ? "Published" : "Draft"}
                         </span>
                       </td>
@@ -139,19 +139,19 @@ export const ProductTableView: React.FC<ProductTableViewProps> = ({
                           {/* Edit Button */}
                           <button
                             onClick={() => onEdit(prod)}
-                            className="w-7 h-7 rounded-lg border border-border bg-[#0d0f14]/50 flex items-center justify-center text-primary hover:bg-primary hover:text-[#090a0f] transition-all cursor-pointer"
+                            className="w-8 h-8 rounded-lg border border-border bg-[#0d0f14]/50 flex items-center justify-center text-primary hover:bg-primary hover:text-[#090a0f] transition-all cursor-pointer"
                             title="Edit GIA rich sheets"
                           >
-                            <Edit3 size={12} />
+                            <Edit3 size={13} />
                           </button>
 
                           {/* Delete Button */}
                           <button
                             onClick={() => onDelete(prod.id, prod.name)}
-                            className="w-7 h-7 rounded-lg border border-border bg-[#0d0f14]/50 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white transition-all cursor-pointer"
+                            className="w-8 h-8 rounded-lg border border-border bg-[#0d0f14]/50 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white transition-all cursor-pointer"
                             title="Delete piece"
                           >
-                            <Trash2 size={12} />
+                            <Trash2 size={13} />
                           </button>
                         </div>
                       </td>

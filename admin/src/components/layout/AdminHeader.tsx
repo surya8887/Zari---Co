@@ -89,7 +89,7 @@ export const AdminHeader: React.FC = () => {
           value={localSearch}
           onChange={(e) => handleSearchChange(e.target.value)}
           placeholder="Search product, orders, customers..." 
-          className="w-full pl-9 pr-4 py-2 text-xs border border-border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-sans"
+          className="w-full pl-9 pr-4 py-2.5 text-sm border border-border bg-[#0d0f14]/70 rounded-lg text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-sans"
         />
       </form>
 

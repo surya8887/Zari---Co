@@ -238,7 +238,7 @@ export const Inventory: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-[#22252e] bg-[#171a23]/30 text-muted-foreground font-bold uppercase tracking-wider select-none">
+              <tr className="border-b border-[#22252e] bg-[#171a23]/30 text-primary font-bold uppercase tracking-widest select-none font-serif text-sm">
                 <th className="py-4 px-5">Product & Variant</th>
                 <th className="py-4 px-5">SKU / Code</th>
                 <th className="py-4 px-5 text-center">On-Hand</th>
@@ -308,13 +308,27 @@ export const Inventory: React.FC = () => {
                     </td>
 
                     {/* On-hand */}
-                    <td className="py-4 px-5 text-center font-bold font-mono text-foreground text-sm">
-                      {item.quantity}
+                    <td 
+                      onClick={() => openAdjustDialog(item)}
+                      className="py-4 px-5 text-center font-bold font-mono text-foreground text-sm cursor-pointer hover:text-primary transition-all group/cell bg-primary/[0.02]"
+                      title="Click to adjust stock"
+                    >
+                      <div className="flex items-center justify-center gap-1.5">
+                        <span>{item.quantity}</span>
+                        <Edit3 size={11} className="text-primary opacity-0 group-hover/cell:opacity-100 transition-opacity" />
+                      </div>
                     </td>
 
                     {/* Reserved */}
-                    <td className="py-4 px-5 text-center font-mono text-muted-foreground text-sm">
-                      {item.reservedQuantity}
+                    <td 
+                      onClick={() => openAdjustDialog(item)}
+                      className="py-4 px-5 text-center font-mono text-muted-foreground text-sm cursor-pointer hover:text-primary transition-all group/cell"
+                      title="Click to adjust reservations"
+                    >
+                      <div className="flex items-center justify-center gap-1.5">
+                        <span>{item.reservedQuantity}</span>
+                        <Edit3 size={11} className="text-primary opacity-0 group-hover/cell:opacity-100 transition-opacity" />
+                      </div>
                     </td>
 
                     {/* Available */}
@@ -323,8 +337,15 @@ export const Inventory: React.FC = () => {
                     </td>
 
                     {/* Threshold */}
-                    <td className="py-4 px-5 text-center font-mono text-muted-foreground">
-                      {item.lowStockThreshold}
+                    <td 
+                      onClick={() => openAdjustDialog(item)}
+                      className="py-4 px-5 text-center font-mono text-muted-foreground text-sm cursor-pointer hover:text-primary transition-all group/cell"
+                      title="Click to adjust threshold limit"
+                    >
+                      <div className="flex items-center justify-center gap-1.5">
+                        <span>{item.lowStockThreshold}</span>
+                        <Edit3 size={11} className="text-primary opacity-0 group-hover/cell:opacity-100 transition-opacity" />
+                      </div>
                     </td>
 
                     {/* Status Badge */}

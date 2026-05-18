@@ -1,7 +1,13 @@
-const App = () => {
-  return (
-    <div>App</div>
-  )
-}
+import React from "react";
+import { AdminLayout } from "./layouts/AdminLayout";
+import Dashboard from "./pages/Dashboard";
 
-export default App
+const App: React.FC = () => {
+  return (
+    <AdminLayout>
+      <Dashboard />
+    </AdminLayout>
+  );
+};
+
+export default App;

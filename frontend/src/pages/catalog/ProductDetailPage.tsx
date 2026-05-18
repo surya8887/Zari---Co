@@ -53,6 +53,54 @@ const ProductDetailPage = () => {
   const p = selectedProduct;
   const wishlisted = isInWishlist(p.id);
 
+  // Split description if it contains HTML comments from rich text editor
+  const desc = p.description || '';
+  const hasGiaSpecs = desc.includes('<!--GIA-SPECS-->');
+  const hasCareGuides = desc.includes('<!--CARE-GUIDES-->');
+
+  let storyHtml = desc;
+  let specsHtml = '';
+  let careHtml = '';
+
+  if (hasGiaSpecs && hasCareGuides) {
+    const parts = desc.split('<!--GIA-SPECS-->');
+    storyHtml = parts[0];
+    const rest = parts[1].split('<!--CARE-GUIDES-->');
+    specsHtml = rest[0];
+    careHtml = rest[1];
+  } else if (hasGiaSpecs) {
+    const parts = desc.split('<!--GIA-SPECS-->');
+    storyHtml = parts[0];
+    specsHtml = parts[1];
+  } else if (hasCareGuides) {
+    const parts = desc.split('<!--CARE-GUIDES-->');
+    storyHtml = parts[0];
+    careHtml = parts[1];
+  }
+
+  // Helper to extract clean text from rich HTML
+  const getCleanPreview = (html: string) => {
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      let text = doc.body.textContent || "";
+      const titleLower = p.name.toLowerCase();
+      const textLower = text.toLowerCase();
+      if (textLower.startsWith(titleLower)) {
+        text = text.substring(p.name.length).trim();
+      }
+      if (text.toLowerCase().startsWith("product story")) {
+        text = text.substring("product story".length).trim();
+      }
+      return text;
+    } catch (e) {
+      return html.replace(/<[^>]*>/g, ""); // simple fallback
+    }
+  };
+
+  const storyPreview = getCleanPreview(storyHtml);
+  const shortDescription = storyPreview.length > 200 ? storyPreview.slice(0, 197) + '...' : storyPreview;
+
   const handleAddToBag = () => {
     addItem(p, 1, selectedSize);
     toast.success(`${p.name} added to your bag! ✨`, {
@@ -167,7 +215,7 @@ const ProductDetailPage = () => {
 
               {/* Brief Description */}
               <p className="text-xs font-sans tracking-wide text-neutral-600 leading-relaxed mb-6">
-                {p.description}
+                {shortDescription}
               </p>
 
               {/* Sizing matrix if Ring */}
@@ -244,56 +292,68 @@ const ProductDetailPage = () => {
 
           {/* Tab content renders */}
           {activeTab === 'details' && (
-            <div className="text-xs text-neutral-600 leading-relaxed font-sans max-w-2xl">
-              <p className="mb-4">
-                This fine jewelry creation represents decades of master craftsmanship. Designed for special moments and everyday luxury alike, it blends timeless visual structures with comfortable modern bands.
-              </p>
-              <p>
-                Each piece is securely packed in an elegant velvet-lined Zari & Co. storage vault box, accompanied by lifetime exchange guarantees, Bis Hallmarked certs, and detailed polish guidelines.
-              </p>
-            </div>
+            <div 
+              className="text-xs text-neutral-600 leading-relaxed font-sans max-w-2xl"
+              dangerouslySetInnerHTML={{ __html: storyHtml }}
+            />
           )}
 
           {activeTab === 'specs' && (
-            <div className="grid grid-cols-2 gap-y-4 max-w-xl text-xs font-sans">
-              <div className="text-neutral-400">Unique Sku Code</div>
-              <div className="font-semibold text-neutral-800">{p.sku}</div>
-              
-              <div className="text-neutral-400">Metal Composition</div>
-              <div className="font-semibold text-neutral-800">{p.metalType}</div>
+            specsHtml ? (
+              <div 
+                className="prose prose-sm max-w-none text-xs font-sans text-neutral-600"
+                dangerouslySetInnerHTML={{ __html: specsHtml }}
+              />
+            ) : (
+              <div className="grid grid-cols-2 gap-y-4 max-w-xl text-xs font-sans">
+                <div className="text-neutral-400">Unique Sku Code</div>
+                <div className="font-semibold text-neutral-800">{p.sku}</div>
+                
+                <div className="text-neutral-400">Metal Composition</div>
+                <div className="font-semibold text-neutral-800">{p.metalType}</div>
 
-              <div className="text-neutral-400">Diamond Carat Weight</div>
-              <div className="font-semibold text-neutral-800">{p.diamondWeight}</div>
+                <div className="text-neutral-400">Diamond Carat Weight</div>
+                <div className="font-semibold text-neutral-800">{p.diamondWeight}</div>
 
-              <div className="text-neutral-400">Assurance Certificate</div>
-              <div className="font-semibold text-neutral-800">{p.certification}</div>
-            </div>
+                <div className="text-neutral-400">Assurance Certificate</div>
+                <div className="font-semibold text-neutral-800">{p.certification}</div>
+              </div>
+            )
           )}
 
           {activeTab === 'purity' && (
             <div className="text-xs text-neutral-600 leading-relaxed font-sans max-w-2xl">
-              <div className="flex items-start gap-3 mb-4">
-                <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-extrabold uppercase tracking-wider text-[#4e3a24] mb-1">
-                    BIS 916 Gold Certified
-                  </h4>
-                  <p>
-                    Every gold item is certified and hallmarked by the Bureau of Indian Standards (BIS), assuring 22 Karat or 18 Karat gold purity values.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-extrabold uppercase tracking-wider text-[#4e3a24] mb-1">
-                    Conflict-Free Natural Diamonds
-                  </h4>
-                  <p>
-                    All diamonds set in Zari & Co creations are strictly conflict-free and natural stones certified by international diamond grading agencies (GIA & SGL).
-                  </p>
-                </div>
-              </div>
+              {careHtml ? (
+                <div 
+                  className="prose prose-sm max-w-none text-xs font-sans text-neutral-600"
+                  dangerouslySetInnerHTML={{ __html: careHtml }}
+                />
+              ) : (
+                <>
+                  <div className="flex items-start gap-3 mb-4">
+                    <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-extrabold uppercase tracking-wider text-[#4e3a24] mb-1">
+                        BIS 916 Gold Certified
+                      </h4>
+                      <p>
+                        Every gold item is certified and hallmarked by the Bureau of Indian Standards (BIS), assuring 22 Karat or 18 Karat gold purity values.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-extrabold uppercase tracking-wider text-[#4e3a24] mb-1">
+                        Conflict-Free Natural Diamonds
+                      </h4>
+                      <p>
+                        All diamonds set in Zari & Co creations are strictly conflict-free and natural stones certified by international diamond grading agencies (GIA & SGL).
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </section>

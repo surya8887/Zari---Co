@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { X, Sparkles, Gem, FolderTree, Eye, EyeOff, Heart, Edit3 } from "lucide-react";
 import { type Product, type Category } from "@/store";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,17 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 }) => {
   const resolvedCategory = categories.find((c) => c.id === product.categoryId);
   const catName = resolvedCategory ? resolvedCategory.name : "Unknown Category";
+
+  const [activeImageId, setActiveImageId] = useState<string | null>(null);
+
+  // Compute selected or fallback primary image
+  const activeImg = product.images && product.images.length > 0
+    ? (product.images.find((img) => img.id === activeImageId) || product.images.find((img) => img.isPrimary) || product.images[0])
+    : null;
+
+  const activeSrc = activeImg
+    ? (activeImg.imageUrl.startsWith("http") ? activeImg.imageUrl : `http://localhost:5000${activeImg.imageUrl}`)
+    : "";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#090a0f]/80 backdrop-blur-md p-4 animate-in fade-in duration-300 text-left">
@@ -47,17 +58,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           {/* Left Column: Image Carousel / Gallery */}
           <div className="space-y-4">
             <div className="relative aspect-square rounded-xl bg-secondary/10 border border-border/60 overflow-hidden flex items-center justify-center group shadow-[0_0_20px_rgba(197,168,128,0.05)]">
-              {product.images && product.images.length > 0 ? (
-                (() => {
-                  const primary = product.images.find((img) => img.isPrimary) || product.images[0];
-                  return (
-                    <img
-                      src={primary.imageUrl}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  );
-                })()
+              {activeSrc ? (
+                <img
+                  src={activeSrc}
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
               ) : (
                 <div className="text-center p-6 space-y-3 animate-in fade-in">
                   <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mx-auto border border-border/40 shadow-xs">
@@ -79,17 +85,22 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             {/* Optional gallery thumbnails */}
             {product.images && product.images.length > 1 && (
               <div className="flex gap-2.5 overflow-x-auto pb-1 select-none">
-                {product.images.map((img) => (
-                  <div
-                    key={img.id}
-                    className={cn(
-                      "w-14 h-14 rounded-lg overflow-hidden border bg-secondary/10 cursor-pointer transition-all duration-200 flex-shrink-0",
-                      img.isPrimary ? "border-primary shadow-[0_0_8px_rgba(197,168,128,0.15)]" : "border-border/50 hover:border-border"
-                    )}
-                  >
-                    <img src={img.imageUrl} alt="Gallery thumbnail" className="w-full h-full object-cover" />
-                  </div>
-                ))}
+                {product.images.map((img) => {
+                  const isCurrentlyActive = activeImageId ? img.id === activeImageId : img.isPrimary;
+                  const normalizedImgUrl = img.imageUrl.startsWith("http") ? img.imageUrl : `http://localhost:5000${img.imageUrl}`;
+                  return (
+                    <div
+                      key={img.id}
+                      onClick={() => setActiveImageId(img.id)}
+                      className={cn(
+                        "w-14 h-14 rounded-lg overflow-hidden border bg-secondary/10 cursor-pointer transition-all duration-200 flex-shrink-0",
+                        isCurrentlyActive ? "border-primary shadow-[0_0_8px_rgba(197,168,128,0.15)]" : "border-border/50 hover:border-border"
+                      )}
+                    >
+                      <img src={normalizedImgUrl} alt="Gallery thumbnail" className="w-full h-full object-cover" />
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

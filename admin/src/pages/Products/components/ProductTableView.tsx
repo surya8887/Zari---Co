@@ -87,11 +87,17 @@ export const ProductTableView: React.FC<ProductTableViewProps> = ({
                         title="Click to view full luxury specifications"
                       >
                         {prod.images && prod.images.length > 0 ? (
-                          <img
-                            src={prod.images.find((img) => img.isPrimary)?.imageUrl || prod.images[0].imageUrl}
-                            alt={prod.name}
-                            className="w-10 h-10 rounded-lg object-cover border border-[#3b3227] group-hover:border-primary/50 transition-all shadow-[0_0_10px_rgba(197,168,128,0.08)]"
-                          />
+                          (() => {
+                            const mainImg = prod.images.find((img) => img.isPrimary) || prod.images[0];
+                            const mainSrc = mainImg.imageUrl.startsWith("http") ? mainImg.imageUrl : `http://localhost:5000${mainImg.imageUrl}`;
+                            return (
+                              <img
+                                src={mainSrc}
+                                alt={prod.name}
+                                className="w-10 h-10 rounded-lg object-cover border border-[#3b3227] group-hover:border-primary/50 transition-all shadow-[0_0_10px_rgba(197,168,128,0.08)]"
+                              />
+                            );
+                          })()
                         ) : (
                           <div className="w-10 h-10 rounded-lg bg-[#241e17] border border-[#3b3227] flex items-center justify-center text-primary font-bold text-xs select-none shadow-[0_0_10px_rgba(197,168,128,0.05)]">
                             {prod.name.split(" ").map((n) => n[0]).join("")}

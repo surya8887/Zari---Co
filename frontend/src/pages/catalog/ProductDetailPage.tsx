@@ -342,7 +342,7 @@ const ProductDetailPage = () => {
 
               {/* Brief Description */}
               <p className="text-xs font-sans tracking-wide text-neutral-500 leading-relaxed mb-6 border-b border-neutral-100 pb-4">
-                Diamond and gold {p.category.toLowerCase()} design in {p.metalType} featuring {p.diamondWeight} diamonds.
+                {shortDescription || `Diamond and gold ${p.category.toLowerCase()} design in ${p.metalType} featuring ${p.diamondWeight} diamonds.`}
               </p>
 
               {/* Interactive Pincode Delivery Check */}

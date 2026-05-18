@@ -27,10 +27,12 @@ app.use(cookieParser());
 
 import authRoutes from "./modules/auth/auth.route.js";
 import userRoutes from "./modules/users/user.route.js";
+import inventoryRoutes from "./modules/inventory/inventory.route.js";
 import errorMiddleware from "./shared/middlewares/error.middleware.js";
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/inventory", inventoryRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorMiddleware);

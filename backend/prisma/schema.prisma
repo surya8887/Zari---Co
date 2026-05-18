@@ -61,6 +61,8 @@ model User {
   firstName    String?   @map("first_name")
   lastName     String?   @map("last_name")
   phone        String?
+  // profilePhoto String?   @map("profile_photo")
+  // alternatePhone String?   @map("alternate_phone")
   role         Role      @default(user)
   isVerified   Boolean   @default(false) @map("is_verified")
   refreshToken String?   @map("refresh_token")

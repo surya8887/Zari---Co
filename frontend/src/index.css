@@ -128,3 +128,67 @@
     @apply font-sans;
     }
 }
+
+/* Premium rich HTML overrides for tables, headers, and editor styling */
+.prose table {
+  width: 100%;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  margin: 1.25rem 0;
+  border: 1px solid rgba(139, 115, 85, 0.15) !important;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.prose th {
+  background-color: rgba(139, 115, 85, 0.05) !important;
+  color: #4e3a24 !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  font-size: 10px !important;
+  letter-spacing: 0.07em;
+  padding: 10px 14px !important;
+  border-bottom: 1px solid rgba(139, 115, 85, 0.15) !important;
+  text-align: left;
+}
+
+.prose td {
+  padding: 10px 14px !important;
+  border-bottom: 1px solid rgba(139, 115, 85, 0.06) !important;
+  color: #4a3e3d !important;
+  font-size: 11px !important;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.prose tr:last-child td {
+  border-bottom: none !important;
+}
+
+.prose tr:hover td {
+  background-color: rgba(139, 115, 85, 0.02) !important;
+}
+
+.prose h1, .prose h2, .prose h3 {
+  color: #2c221e !important;
+  font-weight: 800 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.6rem !important;
+}
+
+.prose h1 {
+  font-size: 1.3rem !important;
+  font-family: serif !important;
+}
+
+.prose h2 {
+  font-size: 1.05rem !important;
+  border-bottom: 1px solid rgba(139, 115, 85, 0.2) !important;
+  padding-bottom: 0.25rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.prose p {
+  margin-bottom: 0.8rem !important;
+  line-height: 1.6 !important;
+}

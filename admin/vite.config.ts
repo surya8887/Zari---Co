@@ -16,6 +16,9 @@ export default defineConfig(({ mode }) => {
     define: {
       'import.meta.env.VITE_TINY_API_KEY': JSON.stringify(env.TINY_API_KEY || '')
     },
+    server: {
+      port: 4001,
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

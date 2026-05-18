@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { AdminLayout } from "./layouts/AdminLayout";
 import { Toaster } from "sonner";
 import { useAppStore } from "./store";
+import { AuthProvider } from "./context/AuthContext";
 
 const App: React.FC = () => {
   const initStore = useAppStore((state) => state.initStore);
@@ -11,7 +12,7 @@ const App: React.FC = () => {
   }, [initStore]);
 
   return (
-    <>
+    <AuthProvider>
       {/* Global premium styled Sonner notifications provider */}
       <Toaster 
         theme="dark"
@@ -29,7 +30,7 @@ const App: React.FC = () => {
       
       {/* Premium Obsidian & Gold Layout wrapping our state-based router pages */}
       <AdminLayout />
-    </>
+    </AuthProvider>
   );
 };
 

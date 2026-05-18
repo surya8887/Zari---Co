@@ -7,11 +7,13 @@ import {
   ChevronDown,
   Sparkles
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 export const ProfileDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { user, logout } = useAuth();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -24,14 +26,20 @@ export const ProfileDropdown: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleAction = (actionName: string) => {
+  const handleAction = async (actionName: string) => {
     setIsOpen(false);
     
     if (actionName === "Logout") {
       const toastId = toast.loading("Securely logging you out from Zari & Co...");
-      setTimeout(() => {
+      try {
+        await logout();
         toast.success("Successfully logged out. Redirecting...", { id: toastId });
-      }, 1200);
+      } catch (error: any) {
+        toast.error("Logout failed ✕", {
+          id: toastId,
+          description: error.message || "Network error. Please try again."
+        });
+      }
     } else {
       toast.success(`Accessing ${actionName}... ✦`, {
         description: "Loading admin preferences and configuration.",
@@ -39,6 +47,16 @@ export const ProfileDropdown: React.FC = () => {
       });
     }
   };
+
+  const initials = user
+    ? `${user.firstName[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
+    : "AD";
+
+  const fullName = user
+    ? `${user.firstName} ${user.lastName || ""}`.trim()
+    : "Administrator";
+
+  const emailAddress = user?.email || "admin@zariandco.com";
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -49,12 +67,12 @@ export const ProfileDropdown: React.FC = () => {
       >
         {/* Gold avatar circle with initials */}
         <div className="w-9 h-9 rounded-lg bg-[#241e17] border border-[#3b3227] flex items-center justify-center text-primary font-bold text-xs select-none shadow-[0_0_10px_rgba(197,168,128,0.1)] hover:border-primary/50 transition-colors">
-          SJ
+          {initials}
         </div>
         <div className="hidden md:block text-left">
-          <p className="text-xs font-semibold text-foreground leading-none">Sarah J.</p>
+          <p className="text-xs font-semibold text-foreground leading-none">{fullName}</p>
           <p className="text-[9px] text-muted-foreground mt-0.5 tracking-wider uppercase font-semibold">
-            Administrator
+            {user?.role || "Administrator"}
           </p>
         </div>
         <ChevronDown 
@@ -68,8 +86,8 @@ export const ProfileDropdown: React.FC = () => {
         <div className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-[#12141a]/95 backdrop-blur-md shadow-xl py-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           {/* User Profile Summary Header */}
           <div className="px-4 py-2.5 border-b border-border/40 mb-1">
-            <p className="text-xs font-semibold text-foreground">Sarah Jenkins</p>
-            <p className="text-[10px] text-muted-foreground truncate">sarah.j@aureliajewels.com</p>
+            <p className="text-xs font-semibold text-foreground">{fullName}</p>
+            <p className="text-[10px] text-muted-foreground truncate">{emailAddress}</p>
           </div>
 
           {/* Menu Items */}

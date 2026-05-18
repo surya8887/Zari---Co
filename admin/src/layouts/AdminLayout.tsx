@@ -5,6 +5,8 @@ import { AdminHeader } from "@/components/layout/AdminHeader";
 import Dashboard from "@/pages/Dashboard";
 import Orders from "@/pages/Orders";
 import Products from "@/pages/Products";
+import { useAuth } from "@/hooks/useAuth";
+import Login from "@/pages/Login";
 import { 
   Megaphone, 
   HelpCircle,
@@ -21,6 +23,11 @@ interface AdminLayoutProps {
 
 export const AdminLayout: React.FC<AdminLayoutProps> = () => {
   const { currentPage } = useAppStore();
+  const { user } = useAuth();
+
+  if (!user) {
+    return <Login />;
+  }
 
   const handleActionMock = (title: string) => {
     toast.success(`Action Triggered: "${title}"`, {

@@ -106,6 +106,7 @@ const fetchJson = async <T>(endpoint: string, options?: RequestInit): Promise<T>
   try {
     const res = await fetch(url, {
       ...options,
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         ...(options?.headers || {})
@@ -222,7 +223,8 @@ export const api = {
     try {
       const res = await fetch(url, {
         method: "POST",
-        body: formData
+        body: formData,
+        credentials: "include"
         // Explicitly omit Content-Type so the browser auto-assigns boundary codes
       });
 
@@ -253,6 +255,33 @@ export const api = {
   async setPrimaryImage(id: string): Promise<ProductImage> {
     return fetchJson<ProductImage>(`/catalog/image/${id}/primary`, {
       method: "PUT"
+    });
+  },
+
+  // Auth Operations
+  async login(email: string, password: string): Promise<any> {
+    return fetchJson<any>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password })
+    });
+  },
+
+  async logout(): Promise<any> {
+    return fetchJson<any>("/auth/logout", {
+      method: "GET" // Backend logout is mounted as a GET request!
+    });
+  },
+
+  async register(payload: {
+    firstName: string;
+    lastName?: string;
+    email: string;
+    password: string;
+    phone?: string;
+  }): Promise<any> {
+    return fetchJson<any>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(payload)
     });
   }
 };

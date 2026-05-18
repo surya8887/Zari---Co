@@ -818,9 +818,9 @@ export const Products: React.FC = () => {
               </h3>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border-collapse">
+                <table className="w-full text-left text-sm border-collapse">
                   <thead>
-                    <tr className="border-b border-border text-muted-foreground font-semibold">
+                    <tr className="border-b border-border text-primary font-bold uppercase tracking-widest font-serif text-sm">
                       <th className="pb-3 pl-2">Name / Slug</th>
                       <th className="pb-3">Parent Link</th>
                       <th className="pb-3 text-center">Status</th>
@@ -833,21 +833,21 @@ export const Products: React.FC = () => {
                       return (
                         <tr key={cat.id} className="hover:bg-secondary/15 transition-colors group">
                           <td className="py-3 pl-2">
-                            <h5 className="font-semibold text-foreground group-hover:text-primary-foreground transition-all">{cat.name}</h5>
-                            <p className="text-[9px] font-mono text-muted-foreground mt-0.5">Slug: /{cat.slug}</p>
+                            <h5 className="font-serif font-bold text-base text-foreground group-hover:text-primary transition-all">{cat.name}</h5>
+                            <p className="text-xs font-mono text-muted-foreground/80 mt-0.5">Slug: /{cat.slug}</p>
                           </td>
                           <td className="py-3">
                             {cat.parentId ? (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-semibold bg-[#171e2c] text-blue-400 border border-[#252f44]">
+                              <span className="inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold bg-[#171e2c] text-blue-400 border border-[#252f44]">
                                 {parentName}
                               </span>
                             ) : (
-                              <span className="text-[10px] text-muted-foreground italic">Top-Level</span>
+                              <span className="text-xs text-muted-foreground italic">Top-Level</span>
                             )}
                           </td>
                           <td className="py-3 text-center select-none">
-                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[9px] font-bold border ${cat.isPublished ? "text-primary bg-[#241e17] border-[#3b3227]" : "text-muted-foreground bg-secondary/30 border-border"}`}>
-                              {cat.isPublished ? <Eye size={10} /> : <EyeOff size={10} />}
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold border ${cat.isPublished ? "text-primary bg-[#241e17] border-[#3b3227]" : "text-muted-foreground bg-secondary/30 border-border"}`}>
+                              {cat.isPublished ? <Eye size={11} /> : <EyeOff size={11} />}
                               {cat.isPublished ? "Published" : "Draft"}
                             </span>
                           </td>
@@ -855,17 +855,17 @@ export const Products: React.FC = () => {
                             <div className="flex justify-end gap-2.5 select-none">
                               <button 
                                 onClick={() => handleCategoryEdit(cat)}
-                                className="w-6 h-6 rounded border border-border bg-[#0d0f14]/50 flex items-center justify-center text-primary hover:bg-primary hover:text-[#090a0f] transition-all cursor-pointer"
+                                className="w-8 h-8 rounded border border-border bg-[#0d0f14]/50 flex items-center justify-center text-primary hover:bg-primary hover:text-[#090a0f] transition-all cursor-pointer"
                                 title="Edit category specs"
                               >
-                                <Edit3 size={11} />
+                                <Edit3 size={13} />
                               </button>
                               <button 
                                 onClick={() => handleCategoryDelete(cat.id, cat.name)}
-                                className="w-6 h-6 rounded border border-border bg-[#0d0f14]/50 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white transition-all cursor-pointer"
+                                className="w-8 h-8 rounded border border-border bg-[#0d0f14]/50 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white transition-all cursor-pointer"
                                 title="Delete category"
                               >
-                                <Trash2 size={11} />
+                                <Trash2 size={13} />
                               </button>
                             </div>
                           </td>

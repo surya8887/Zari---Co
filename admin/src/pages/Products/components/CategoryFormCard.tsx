@@ -67,36 +67,36 @@ export const CategoryFormCard: React.FC<CategoryFormCardProps> = ({
         )}
 
         {/* Name */}
-        <div className="space-y-1 text-left">
-          <label className="text-[10px] font-bold text-muted-foreground uppercase">Category Name</label>
+        <div className="space-y-1.5 text-left">
+          <label className="text-xs font-semibold text-primary tracking-widest uppercase">Category Name</label>
           <input
             type="text"
             value={catName}
             onChange={onCatNameChange}
             placeholder="e.g. Royal Necklaces"
-            className="w-full px-3 py-2 text-xs border border-border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none focus:border-primary/50"
+            className="w-full px-4 py-2.5 text-sm border border-border bg-[#08090d] rounded-lg text-foreground focus:outline-none focus:border-primary/50"
           />
         </div>
 
         {/* Slug Auto-Generated */}
-        <div className="space-y-1 text-left">
-          <label className="text-[10px] font-bold text-muted-foreground uppercase">Slug URL (Unique)</label>
+        <div className="space-y-1.5 text-left">
+          <label className="text-xs font-semibold text-primary tracking-widest uppercase">Slug URL (Unique)</label>
           <input
             type="text"
             value={catSlug}
             onChange={(e) => setCatSlug(e.target.value)}
             placeholder="e.g. royal-necklaces"
-            className="w-full px-3 py-2 text-xs border border-border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none focus:border-primary/50 font-mono"
+            className="w-full px-4 py-2.5 text-sm border border-border bg-[#08090d] rounded-lg text-foreground focus:outline-none focus:border-primary/50 font-mono"
           />
         </div>
 
         {/* Parent Category Tree */}
-        <div className="space-y-1 text-left">
-          <label className="text-[10px] font-bold text-muted-foreground uppercase">Parent Category (Prisma Tree)</label>
+        <div className="space-y-1.5 text-left">
+          <label className="text-xs font-semibold text-primary tracking-widest uppercase">Parent Category (Prisma Tree)</label>
           <select
             value={catParentId}
             onChange={(e) => setCatParentId(e.target.value)}
-            className="w-full px-3 py-2 text-xs border border-border bg-[#0d0f14] rounded-lg text-foreground focus:outline-none focus:border-primary/50 cursor-pointer"
+            className="w-full px-4 py-2.5 text-sm border border-border bg-[#08090d] rounded-lg text-foreground focus:outline-none focus:border-primary/50 cursor-pointer"
           >
             <option value="">— None (Top-Level Category) —</option>
             {categories
@@ -110,8 +110,8 @@ export const CategoryFormCard: React.FC<CategoryFormCardProps> = ({
         </div>
 
         {/* TinyMCE Description for Category */}
-        <div className="space-y-1 text-left">
-          <label className="text-[10px] font-bold text-muted-foreground uppercase">Category Description Narrative</label>
+        <div className="space-y-1.5 text-left">
+          <label className="text-xs font-semibold text-primary tracking-widest uppercase">Category Description Narrative</label>
           <RichTextEditor
             value={catDescription}
             onChange={setCatDescription}
@@ -120,7 +120,7 @@ export const CategoryFormCard: React.FC<CategoryFormCardProps> = ({
         </div>
 
         {/* Category Published Toggle */}
-        <div className="flex items-center gap-2 select-none pt-1 text-left">
+        <div className="flex items-center gap-2.5 select-none pt-1.5 text-left">
           <input
             type="checkbox"
             id="catIsPublished"
@@ -128,7 +128,7 @@ export const CategoryFormCard: React.FC<CategoryFormCardProps> = ({
             onChange={(e) => setCatIsPublished(e.target.checked)}
             className="w-4 h-4 rounded border-border bg-[#0d0f14] text-primary focus:ring-primary/20 accent-[#c5a880] cursor-pointer"
           />
-          <label htmlFor="catIsPublished" className="text-xs font-semibold text-foreground cursor-pointer select-none">
+          <label htmlFor="catIsPublished" className="text-sm font-semibold text-foreground cursor-pointer select-none">
             Publish Category to Storefront
           </label>
         </div>
@@ -136,9 +136,9 @@ export const CategoryFormCard: React.FC<CategoryFormCardProps> = ({
         {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-primary text-[#090a0f] py-2 rounded-lg text-xs font-bold hover:bg-primary/95 transition-all cursor-pointer shadow-[0_0_8px_rgba(197,168,128,0.15)] flex items-center justify-center gap-1"
+          className="w-full bg-primary text-[#090a0f] py-2.5 rounded-lg text-sm font-bold hover:bg-primary/95 transition-all cursor-pointer shadow-[0_0_8px_rgba(197,168,128,0.15)] flex items-center justify-center gap-1.5"
         >
-          <Save size={13} />
+          <Save size={14} />
           {isEditingCategory ? "Update Category" : "Save DB Category"}
         </button>
       </form>

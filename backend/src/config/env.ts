@@ -10,6 +10,9 @@ const envSchema = z.object({
     REFRESH_TOKEN_SECRET: z.string(),
     ACCESS_TOKEN_EXPIRES: z.string(),
     REFRESH_TOKEN_EXPIRES: z.string(),
+    CLOUDINARY_CLOUD_NAME: z.string(),
+    CLOUDINARY_API_KEY: z.string(),
+    CLOUDINARY_API_SECRET: z.string(),
 });
 
 const env = envSchema.parse(process.env);

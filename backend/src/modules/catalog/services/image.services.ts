@@ -1,8 +1,7 @@
 import prisma from "../../../config/db.js";
 import ApiError from "../../../shared/exceptions/apiError.js";
-import path from "path";
-import fs from "fs/promises";
 import { getProductById } from "./product.services.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../../../shared/services/cloudinary.service.js";
 
 // Upload and register multiple image entries in DB
 export const createProductImages = async (productId: string, files: Express.Multer.File[]) => {
@@ -27,10 +26,13 @@ export const createProductImages = async (productId: string, files: Express.Mult
         // Automatically make the first image primary if there are no existing ones
         const isPrimary = !hasPrimary && idx === 0;
 
+        // Upload local temp file to Cloudinary cloud storage
+        const uploadResult = await uploadToCloudinary(file.path, file.originalname);
+
         return prisma.productImage.create({
           data: {
             productId,
-            imageUrl: `/uploads/${file.filename}`,
+            imageUrl: uploadResult.secureUrl,
             altText: (file.originalname.split(".")[0] || "product-image").replace(/[-_]+/g, " "),
             isPrimary,
             sortOrder: idx
@@ -58,17 +60,8 @@ export const deleteProductImage = async (id: string) => {
       throw new ApiError(404, "Product image not found in database");
     }
 
-    // 2. Resolve local filesystem path and physically remove the file
-    const filename = path.basename(image.imageUrl);
-    const localPath = path.join(process.cwd(), "public", "uploads", filename);
-
-    try {
-      await fs.unlink(localPath);
-      console.log(`Physically deleted: ${localPath} ✦`);
-    } catch (fsError) {
-      // Log warning but proceed to delete row if file was already unlinked or missing
-      console.warn(`Asset file missing on disk: ${localPath}`, fsError);
-    }
+    // 2. Safely trigger Cloudinary asset purge
+    await deleteFromCloudinary(image.imageUrl);
 
     // 3. Delete database record
     await prisma.productImage.delete({

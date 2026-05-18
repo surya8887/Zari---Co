@@ -33,16 +33,16 @@ export const AdminSidebar: React.FC = () => {
 
   const getActiveStyle = (pageId: string) => {
     if (currentPage === pageId) {
-      return "flex items-center gap-3 px-4 py-2.5 rounded-lg bg-[#241e17] border border-[#3b3227] text-primary font-medium text-xs shadow-[0_0_15px_rgba(197,168,128,0.05)]";
+      return "flex items-center gap-3 px-4 py-2.5 rounded-lg bg-[#241e17] border border-[#3b3227] text-primary font-semibold text-sm shadow-[0_0_15px_rgba(197,168,128,0.05)]";
     }
-    return "flex items-center gap-3 px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-medium text-xs transition-colors";
+    return "flex items-center gap-3 px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-sm transition-colors";
   };
 
   const getSubActiveStyle = (pageId: string) => {
     if (currentPage === pageId) {
-      return "block py-1.5 text-xs text-primary font-medium pl-2 border-l border-primary/60 transition-colors";
+      return "block py-1.5 text-[13px] text-primary font-medium pl-2 border-l border-primary/60 transition-colors";
     }
-    return "block py-1.5 text-xs text-muted-foreground hover:text-foreground pl-2 border-l border-transparent hover:border-border transition-colors";
+    return "block py-1.5 text-[13px] text-muted-foreground hover:text-foreground pl-2 border-l border-transparent hover:border-border transition-colors";
   };
 
   return (
@@ -73,7 +73,7 @@ export const AdminSidebar: React.FC = () => {
           <div className="space-y-0.5">
             <button 
               onClick={() => setIsProductsOpen(!isProductsOpen)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-medium text-xs transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-sm transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <Package size={15} />
@@ -116,7 +116,7 @@ export const AdminSidebar: React.FC = () => {
           <div className="space-y-0.5">
             <button 
               onClick={() => setIsOrdersOpen(!isOrdersOpen)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-medium text-xs transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-sm transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <ClipboardList size={15} />
@@ -168,7 +168,7 @@ export const AdminSidebar: React.FC = () => {
           <div className="space-y-0.5">
             <button 
               onClick={() => setIsMarketingOpen(!isMarketingOpen)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-medium text-xs transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-sm transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <Megaphone size={15} />
@@ -198,7 +198,7 @@ export const AdminSidebar: React.FC = () => {
           <div className="space-y-0.5">
             <button 
               onClick={() => setIsReportsOpen(!isReportsOpen)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-medium text-xs transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-sm transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <BarChart3 size={15} />

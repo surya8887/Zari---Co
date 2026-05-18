@@ -23,6 +23,7 @@ app.use(
             "http://127.0.0.1:4001",
             "http://localhost:5173",
             "http://127.0.0.1:5173",
+            "http://localhost:5174",
             "http://127.0.0.1:5174"
         ],
         credentials: true,
@@ -36,11 +37,13 @@ app.use(cookieParser());
 import authRoutes from "./modules/auth/auth.route.js";
 import userRoutes from "./modules/users/user.route.js";
 import inventoryRoutes from "./modules/inventory/inventory.route.js";
+import catalogRoutes from "./modules/catalog/catalog.route.js";
 import errorMiddleware from "./shared/middlewares/error.middleware.js";
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/inventory", inventoryRoutes);
+app.use("/api/v1/catalog", catalogRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorMiddleware);

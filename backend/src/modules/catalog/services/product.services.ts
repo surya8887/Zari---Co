@@ -39,7 +39,13 @@ export const getAllProducts = async (page: number = 1, limit: number = 50) => {
         take: limit,
         include: {
           category: true,
-          variants: true
+          variants: true,
+          images: true,
+          reviews: {
+            include: {
+              user: true
+            }
+          }
         }
       }),
       prisma.product.count({
@@ -65,7 +71,13 @@ export const getProductById = async (id: string) => {
       },
       include: {
         category: true,
-        variants: true
+        variants: true,
+        images: true,
+        reviews: {
+          include: {
+            user: true
+          }
+        }
       }
     });
 

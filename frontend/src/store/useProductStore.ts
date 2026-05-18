@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import api from '@/api/axios';
 
 export interface ProductReview {
   id: string;
@@ -365,6 +366,7 @@ interface ProductState {
   products: Product[];
   filteredProducts: Product[];
   selectedProduct: Product | null;
+  isLoading: boolean;
   filters: {
     category: string;
     searchQuery: string;
@@ -394,6 +396,7 @@ interface ProductState {
   getProductById: (id: string) => Product | null;
   addReview: (productId: string, review: Omit<ProductReview, 'id' | 'createdAt'>) => void;
   resetFilters: () => void;
+  fetchProducts: () => Promise<void>;
 }
 
 export const useProductStore = create<ProductState>((set, get) => {
@@ -481,9 +484,10 @@ export const useProductStore = create<ProductState>((set, get) => {
   };
 
   return {
-    products: MOCK_PRODUCTS,
-    filteredProducts: MOCK_PRODUCTS.slice(0, 6),
+    products: [],
+    filteredProducts: [],
     selectedProduct: null,
+    isLoading: false,
     filters: {
       category: 'All',
       searchQuery: '',
@@ -500,7 +504,7 @@ export const useProductStore = create<ProductState>((set, get) => {
     pagination: {
       page: 1,
       limit: 6,
-      totalPages: Math.ceil(MOCK_PRODUCTS.length / 6),
+      totalPages: 1,
     },
 
     setCategory: (category) => {
@@ -645,11 +649,89 @@ export const useProductStore = create<ProductState>((set, get) => {
         const resetPagination: ProductState['pagination'] = {
           page: 1,
           limit: 6,
-          totalPages: Math.ceil(state.products.length / 6),
+          totalPages: Math.max(1, Math.ceil(state.products.length / 6)),
         };
         const { filteredProducts, pagination } = applyFilters(state.products, resetFiltersState, resetPagination);
         return { filters: resetFiltersState, pagination, filteredProducts };
       });
     },
+
+    fetchProducts: async () => {
+      set({ isLoading: true });
+      try {
+        const { data } = await api.get('/catalog/product?limit=100');
+        const dbProducts = data.data.products || [];
+        const mapped = dbProducts.map(mapBackendProductToFrontend);
+        
+        set((state) => {
+          const { filteredProducts, pagination } = applyFilters(mapped, state.filters, {
+            ...state.pagination,
+            totalPages: Math.max(1, Math.ceil(mapped.length / state.pagination.limit))
+          });
+          return {
+            products: mapped,
+            filteredProducts,
+            pagination,
+            isLoading: false
+          };
+        });
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+        set({ isLoading: false });
+      }
+    },
   };
 });
+
+const mapBackendProductToFrontend = (p: any): Product => {
+  const primaryImg = p.images?.find((img: any) => img.isPrimary || img.is_primary)?.imageUrl || p.images?.[0]?.imageUrl || '/images/gold_diamond_ring.png';
+  const allImgs = p.images?.map((img: any) => img.imageUrl || img.image_url) || [primaryImg];
+  
+  const defaultVariant = p.variants?.find((v: any) => v.name === 'Default' || v.name === 'default') || p.variants?.[0];
+  const attrs = defaultVariant?.attributes || {};
+
+  const priceVal = parseFloat(p.basePrice || p.base_price || '0');
+  const origPriceVal = parseFloat(attrs.originalPrice || priceVal * 1.2);
+
+  const reviewsMapped = p.reviews?.map((r: any) => ({
+    id: r.id,
+    userName: r.user ? `${r.user.firstName || ''} ${r.user.lastName || ''}`.trim() || 'Anonymous' : r.userName || 'Anonymous',
+    rating: r.rating,
+    comment: r.body || r.comment || '',
+    createdAt: r.createdAt ? new Date(r.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+  })) || [];
+
+  return {
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    description: p.description || '',
+    category: p.category?.name || 'Rings',
+    price: priceVal,
+    originalPrice: origPriceVal,
+    image: primaryImg,
+    images: allImgs,
+    metalType: attrs.metalType || '18K Yellow Gold',
+    diamondWeight: attrs.diamondWeight || '0.50 Carat',
+    certification: attrs.certification || 'BIS Hallmarked',
+    rating: p.reviews?.length ? parseFloat((p.reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / p.reviews.length).toFixed(1)) : 4.8,
+    reviewsCount: p.reviews?.length || 0,
+    reviews: reviewsMapped,
+    sku: p.sku,
+    variants: p.variants?.filter((v: any) => v.name !== 'Default' && v.name !== 'default')?.map((v: any) => ({
+      id: v.id,
+      name: v.name,
+      price: parseFloat(v.priceOverride || v.price_override || priceVal),
+      stock: v.inventory?.quantity || 10,
+      sku: v.sku
+    })) || [],
+    // Filtering metadata
+    productType: attrs.productType || p.category?.name || 'Rings',
+    metal: attrs.metal || 'Gold',
+    gender: attrs.gender || 'Women',
+    offers: attrs.offers || ['New Arrival'],
+    occasion: attrs.occasion || ['Daily Wear'],
+    style: attrs.style || 'Classic',
+    design: attrs.design || 'Solitaire'
+  };
+};

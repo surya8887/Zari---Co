@@ -11,7 +11,7 @@ const ProductDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   
-  const { getProductBySlug, selectedProduct, addReview } = useProductStore();
+  const { getProductBySlug, selectedProduct, addReview, products, fetchProducts, isLoading } = useProductStore();
   const { addItem } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
 
@@ -24,14 +24,23 @@ const ProductDetailPage = () => {
   const [reviewComment, setReviewComment] = useState('');
 
   useEffect(() => {
-    if (slug) {
+    const loadProduct = async () => {
+      if (products.length === 0) {
+        await fetchProducts();
+      }
+    };
+    loadProduct();
+  }, [products.length, fetchProducts]);
+
+  useEffect(() => {
+    if (products.length > 0 && slug) {
       const p = getProductBySlug(slug);
       if (!p) {
         toast.error("Masterpiece not found!");
         navigate('/products');
       }
     }
-  }, [slug, getProductBySlug, navigate]);
+  }, [slug, products, getProductBySlug, navigate]);
 
   if (!selectedProduct) {
     return (

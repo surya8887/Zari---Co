@@ -31,6 +31,8 @@ const ProductListPage = () => {
     setPriceRange,
     setPage,
     resetFilters,
+    fetchProducts,
+    isLoading,
   } = useProductStore();
 
   const { addItem } = useCartStore();
@@ -76,6 +78,10 @@ const ProductListPage = () => {
       designs,
     });
   }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   // 2. State Change: Write updated Zustand filter states to browser history URL params
   useEffect(() => {
@@ -352,7 +358,22 @@ const ProductListPage = () => {
                 </div>
               </div>
 
-              {filteredProducts.length === 0 ? (
+              {isLoading ? (
+                /* Premium Skeleton Loading State */
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm animate-pulse">
+                      <div className="aspect-square bg-slate-100 rounded-2xl mb-4" />
+                      <div className="h-4 bg-slate-100 rounded w-2/3 mb-2" />
+                      <div className="h-3 bg-slate-100 rounded w-1/2 mb-4" />
+                      <div className="flex justify-between items-center mt-6">
+                        <div className="h-5 bg-slate-100 rounded w-1/3" />
+                        <div className="h-9 bg-slate-100 rounded-xl w-1/3" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : filteredProducts.length === 0 ? (
                 /* DRY Empty State component */
                 <EmptyState
                   title="No Matching Jewelry Found"

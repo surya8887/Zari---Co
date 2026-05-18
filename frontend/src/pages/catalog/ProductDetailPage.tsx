@@ -165,20 +165,20 @@ const ProductDetailPage = () => {
           {/* Left Column: Image Showcase */}
           <div className="relative select-none">
             {/* Visual Frame */}
-            <div className="aspect-square bg-white border border-[#8b7355]/15 rounded-3xl p-6 shadow-sm overflow-hidden flex items-center justify-center">
+            <div className="relative aspect-square bg-white border border-[#8b7355]/15 rounded-3xl p-6 shadow-sm overflow-hidden flex items-center justify-center">
               <img
                 src={activeImage || p.image}
                 alt={p.name}
                 className="w-full h-full object-cover rounded-2xl hover:scale-105 transition-transform duration-500"
               />
-            </div>
 
-            {/*BIS Hallmark Floating Tag */}
-            <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl border border-emerald-500/20 shadow-md text-[10px] text-emerald-800 font-extrabold uppercase tracking-widest flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 animate-pulse" />
-              <div>
-                <span className="block text-[7px] text-neutral-400 font-bold tracking-normal uppercase leading-none mb-0.5">Assured Authenticity</span>
-                <span>BIS 916 Hallmarked</span>
+              {/*BIS Hallmark Floating Tag */}
+              <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl border border-emerald-500/20 shadow-md text-[10px] text-emerald-800 font-extrabold uppercase tracking-widest flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 animate-pulse" />
+                <div>
+                  <span className="block text-[7px] text-neutral-400 font-bold tracking-normal uppercase leading-none mb-0.5">Assured Authenticity</span>
+                  <span>BIS 916 Hallmarked</span>
+                </div>
               </div>
             </div>
 
@@ -327,7 +327,7 @@ const ProductDetailPage = () => {
           {/* Tab content renders */}
           {activeTab === 'details' && (
             <div 
-              className="text-xs text-neutral-600 leading-relaxed font-sans max-w-2xl"
+              className="prose prose-sm max-w-none text-xs font-sans text-neutral-600 leading-relaxed max-w-2xl"
               dangerouslySetInnerHTML={{ __html: storyHtml }}
             />
           )}

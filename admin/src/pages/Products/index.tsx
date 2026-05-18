@@ -922,7 +922,7 @@ export const Products: React.FC = () => {
       {/* High-Fidelity Premium Product Specifications Modal */}
       {viewingProduct && (
         <ProductDetailModal
-          product={viewingProduct}
+          product={products.find((p) => p.id === viewingProduct.id) || viewingProduct}
           categories={categories}
           onClose={() => setViewingProduct(null)}
           onEdit={(prod) => {

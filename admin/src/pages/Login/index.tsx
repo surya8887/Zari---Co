@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Gem, Eye, EyeOff, Loader2, Sparkles, UserPlus, LogIn } from "lucide-react";
 import { toast } from "sonner";
+import { LoginSchema, RegisterSchema } from "@/utils/validation";
 
 const Login: React.FC = () => {
   const { login, register } = useAuth();
@@ -21,9 +22,10 @@ const Login: React.FC = () => {
     e.preventDefault();
 
     if (mode === "login") {
-      if (!email.trim() || !password.trim()) {
-        toast.warning("Missing Fields", {
-          description: "Please complete both the email and password inputs."
+      const validation = LoginSchema.safeParse({ email: email.trim(), password });
+      if (!validation.success) {
+        toast.warning("Validation Error", {
+          description: validation.error.issues[0]?.message
         });
         return;
       }
@@ -48,9 +50,16 @@ const Login: React.FC = () => {
         setIsSubmitting(false);
       }
     } else {
-      if (!firstName.trim() || !email.trim() || !password.trim()) {
-        toast.warning("Missing Fields", {
-          description: "First Name, Email, and Password are required fields."
+      const validation = RegisterSchema.safeParse({
+        firstName: firstName.trim(),
+        lastName: lastName.trim() || undefined,
+        email: email.trim(),
+        password,
+        phone: phone.trim() || undefined
+      });
+      if (!validation.success) {
+        toast.warning("Validation Error", {
+          description: validation.error.issues[0]?.message
         });
         return;
       }

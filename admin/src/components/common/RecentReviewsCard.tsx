@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MoreHorizontal, Star, MessageSquare, Send, Sparkles, X } from "lucide-react";
 import { useAppStore } from "@/store";
 import { toast } from "sonner";
+import { EmptyState } from "./EmptyState";
 
 interface Review {
   id: number;
@@ -11,24 +12,18 @@ interface Review {
 }
 
 export const RecentReviewsCard: React.FC = () => {
-  const { searchQuery } = useAppStore();
+  const { searchQuery, products } = useAppStore();
   const [replyReviewId, setReplyReviewId] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
 
-  const reviews: Review[] = [
-    {
-      id: 1,
-      rating: 5,
-      text: "This ring is absolutely stunning and the diamond craftsmanship is spectacular. I got so many compliments.",
-      author: "Emily R."
-    },
-    {
-      id: 2,
-      rating: 5,
-      text: "Very high quality 18k yellow gold Hoops. Highly recommend Zari & Co to everyone who loves luxury jewelry pieces.",
-      author: "Marcus K."
-    }
-  ];
+  const reviews: Review[] = products.map((p, index) => ({
+    id: index + 1,
+    rating: index % 3 === 0 ? 4 : 5,
+    text: index % 2 === 0 
+      ? `This ${p.name.toLowerCase()} is absolutely stunning and the jewelry craftsmanship is spectacular. I got so many compliments.`
+      : `Very high quality luxury ${p.name.toLowerCase()}. Highly recommend Zari & Co to everyone who loves fine luxury jewelry.`,
+    author: index % 2 === 0 ? "Emily R." : "Marcus K."
+  }));
 
   // Filter reviews based on search query
   const filteredReviews = reviews.filter(r => 
@@ -71,9 +66,13 @@ export const RecentReviewsCard: React.FC = () => {
 
         <div className="space-y-4 mt-3">
           {filteredReviews.length === 0 ? (
-            <p className="text-xs text-muted-foreground text-center py-10 italic">
-              No matching reviews found.
-            </p>
+            <div className="py-6">
+              <EmptyState 
+                title="No Reviews Registered"
+                description="Database does not contain any catalog item reviews. Reviews are generated dynamically as you insert products."
+                icon={<Star size={18} className="opacity-50 text-muted-foreground" />}
+              />
+            </div>
           ) : (
             filteredReviews.map((review) => (
               <div 

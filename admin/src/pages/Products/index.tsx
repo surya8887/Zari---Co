@@ -19,6 +19,9 @@ import {
 } from "lucide-react";
 import { useAppStore, type Product, type Category } from "@/store";
 import { RichTextEditor } from "@/components/common/RichTextEditor";
+import { FormField } from "@/components/common/FormField";
+import { EmptyState } from "@/components/common/EmptyState";
+import { ProductSchema, CategorySchema } from "@/utils/validation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -69,6 +72,7 @@ export const Products: React.FC = () => {
     description?: string;
     details?: string;
     careInstructions?: string;
+    categoryId?: string;
   }>({});
 
   // Local state for Category Form
@@ -243,37 +247,41 @@ export const Products: React.FC = () => {
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newErrors: typeof productErrors = {};
-    if (!name.trim()) newErrors.name = "Jewelry Piece Name is required.";
-    if (!sku.trim()) newErrors.sku = "Catalog SKU code is required.";
-    if (!price.trim() || isNaN(Number(price))) newErrors.price = "A valid numeric price value is required.";
-    if (!description.trim() || description === "<p><br></p>" || description === "") {
-      newErrors.description = "Rich text product description is required.";
-    }
-    if (!details.trim() || details === "<p><br></p>" || details === "") {
-      newErrors.details = "Rich text GIA specifications/details list is required.";
-    }
-    if (!careInstructions.trim() || careInstructions === "<p><br></p>" || careInstructions === "") {
-      newErrors.careInstructions = "Rich text care instructions are required.";
-    }
+    const parsed = ProductSchema.safeParse({
+      name: name.trim(),
+      sku: sku.trim().toUpperCase(),
+      price: price.trim(),
+      description: (!description || description === "<p><br></p>") ? "" : description,
+      details: (!details || details === "<p><br></p>") ? "" : details,
+      careInstructions: (!careInstructions || careInstructions === "<p><br></p>") ? "" : careInstructions,
+      isPublished,
+      categoryId
+    });
 
-    if (Object.keys(newErrors).length > 0) {
-      setProductErrors(newErrors);
-      toast.warning("Validation Failed: Please fill out all required rich text editors.", {
-        description: "Check highlighted fields for details."
+    if (!parsed.success) {
+      const fieldErrors: any = {};
+      parsed.error.issues.forEach((err: any) => {
+        const path = err.path[0];
+        if (path) {
+          fieldErrors[path] = err.message;
+        }
+      });
+      setProductErrors(fieldErrors);
+      toast.warning("Validation Failed: Please fill out all required fields.", {
+        description: parsed.error.issues[0]?.message
       });
       return;
     }
 
     const payload = {
-      categoryId,
-      name: name.trim(),
-      sku: sku.trim().toUpperCase(),
-      price: Number(price).toFixed(2),
-      description,
-      details,
-      careInstructions,
-      isPublished
+      categoryId: parsed.data.categoryId,
+      name: parsed.data.name,
+      sku: parsed.data.sku,
+      price: parsed.data.price,
+      description: parsed.data.description,
+      details: parsed.data.details,
+      careInstructions: parsed.data.careInstructions,
+      isPublished: parsed.data.isPublished
     };
 
     if (isEditingProduct && editingProductId !== null) {
@@ -318,47 +326,55 @@ export const Products: React.FC = () => {
 
   // Submit Category Form (Create / Edit)
   const handleCategorySubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!catName.trim()) {
-      setCategoryError("Category Name is required.");
-      return;
-    }
-    if (!catSlug.trim()) {
-      setCategoryError("Category Slug URL code is required.");
-      return;
-    }
-
-    const payload = {
-      parentId: catParentId ? catParentId : null,
-      name: catName.trim(),
-      slug: catSlug.trim(),
-      description: catDescription,
-      isPublished: catIsPublished,
-      sortOrder: 0
-    };
-
-    if (isEditingCategory && editingCategoryId !== null) {
-      updateCategory(editingCategoryId, payload);
-      toast.success(`Category Updated: "${catName}" ✨`, {
-        description: "Updated database mappings and published settings."
-      });
-    } else {
-      // Check for duplicate slug
-      const isDuplicateSlug = categories.some(c => c.slug === payload.slug);
-      if (isDuplicateSlug) {
-        setCategoryError("Prisma Constraint Check: Duplicate slug. Please provide a unique slug URL.");
-        toast.warning("Prisma Validation Error: Unique slug required.");
-        return;
-      }
-      addCategory(payload);
-      toast.success(`Category Created: "${catName}" ✦`, {
-        description: "Added category UUID mappings for products."
-      });
-    }
-
-    handleCategoryCancel();
-  };
+     e.preventDefault();
+     
+     const parsed = CategorySchema.safeParse({
+       parentId: catParentId ? catParentId : undefined,
+       name: catName.trim(),
+       slug: catSlug.trim(),
+       description: (!catDescription || catDescription === "<p><br></p>") ? "" : catDescription,
+       isPublished: catIsPublished,
+       sortOrder: 0
+     });
+ 
+     if (!parsed.success) {
+       setCategoryError(parsed.error.issues[0]?.message || "Validation Error");
+       toast.warning("Validation Error: Please fix category fields.", {
+         description: parsed.error.issues[0]?.message
+       });
+       return;
+     }
+ 
+     const payload = {
+       parentId: (parsed.data.parentId && parsed.data.parentId.trim() !== "") ? parsed.data.parentId : undefined,
+       name: parsed.data.name,
+       slug: parsed.data.slug,
+       description: parsed.data.description,
+       isPublished: parsed.data.isPublished,
+       sortOrder: parsed.data.sortOrder
+     };
+ 
+     if (isEditingCategory && editingCategoryId !== null) {
+       updateCategory(editingCategoryId, payload);
+       toast.success(`Category Updated: "${catName}" ✨`, {
+         description: "Updated database mappings and published settings."
+       });
+     } else {
+       // Check for duplicate slug
+       const isDuplicateSlug = categories.some(c => c.slug === payload.slug);
+       if (isDuplicateSlug) {
+         setCategoryError("Prisma Constraint Check: Duplicate slug. Please provide a unique slug URL.");
+         toast.warning("Prisma Validation Error: Unique slug required.");
+         return;
+       }
+       addCategory(payload);
+       toast.success(`Category Created: "${catName}" ✦`, {
+         description: "Added category UUID mappings for products."
+       });
+     }
+ 
+     handleCategoryCancel();
+   };
 
   // Submit Heritage Collections Story Form
   const handleStorySubmit = (e: React.FormEvent) => {
@@ -456,8 +472,7 @@ export const Products: React.FC = () => {
               </h3>
               
               {/* Name */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Piece Name</label>
+              <FormField label="Piece Name" error={productErrors.name} required>
                 <input 
                   type="text"
                   value={name}
@@ -468,14 +483,12 @@ export const Products: React.FC = () => {
                     productErrors.name ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary/50"
                   )}
                 />
-                {productErrors.name && <p className="text-[10px] text-rose-400 font-medium">{productErrors.name}</p>}
-              </div>
+              </FormField>
 
               {/* SKU & Price */}
               <div className="grid grid-cols-2 gap-4">
                 {/* SKU */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Catalogue SKU</label>
+                <FormField label="Catalogue SKU" error={productErrors.sku} required>
                   <input 
                     type="text"
                     value={sku}
@@ -486,12 +499,10 @@ export const Products: React.FC = () => {
                       productErrors.sku ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary/50"
                     )}
                   />
-                  {productErrors.sku && <p className="text-[10px] text-rose-400 font-medium">{productErrors.sku}</p>}
-                </div>
+                </FormField>
 
                 {/* Price */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Price (USD)</label>
+                <FormField label="Price (USD)" error={productErrors.price} required>
                   <input 
                     type="text"
                     value={price}
@@ -502,13 +513,11 @@ export const Products: React.FC = () => {
                       productErrors.price ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary/50"
                     )}
                   />
-                  {productErrors.price && <p className="text-[10px] text-rose-400 font-medium">{productErrors.price}</p>}
-                </div>
+                </FormField>
               </div>
 
               {/* Dynamic DB Category Selector */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Jewelry Type (Dynamic Categories)</label>
+              <FormField label="Jewelry Type (Dynamic Categories)" error={productErrors.categoryId} required>
                 <select 
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
@@ -520,7 +529,7 @@ export const Products: React.FC = () => {
                     </option>
                   ))}
                 </select>
-              </div>
+              </FormField>
 
               {/* Publish Checkbox mapping the schema's isPublished */}
               <div className="border-t border-border/40 pt-4 mt-2">
@@ -1098,27 +1107,30 @@ export const Products: React.FC = () => {
           </button>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-border text-muted-foreground font-semibold">
-                <th className="pb-3 pl-2">Product Details</th>
-                <th className="pb-3">Catalog SKU</th>
-                <th className="pb-3">Category Relation</th>
-                <th className="pb-3">GIA Price</th>
-                <th className="pb-3 text-center">Status</th>
-                <th className="pb-3 pr-2 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/40">
-              {products.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-12 text-muted-foreground italic">
-                    Catalog is currently empty. Add luxury jewelry pieces above.
-                  </td>
+        {products.length === 0 ? (
+          <div className="py-8">
+            <EmptyState 
+              title="Catalog is Currently Empty"
+              description="No luxury jewelry pieces exist in your database yet. Start by adding your first collection piece above."
+              actionText="Launch New Piece"
+              onAction={() => setCurrentPage("new-product")}
+            />
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-border text-muted-foreground font-semibold">
+                  <th className="pb-3 pl-2">Product Details</th>
+                  <th className="pb-3">Catalog SKU</th>
+                  <th className="pb-3">Category Relation</th>
+                  <th className="pb-3">GIA Price</th>
+                  <th className="pb-3 text-center">Status</th>
+                  <th className="pb-3 pr-2 text-right">Actions</th>
                 </tr>
-              ) : (
-                products.map((prod) => {
+              </thead>
+              <tbody className="divide-y divide-border/40">
+                {products.map((prod) => {
                   const resolvedCategory = categories.find(c => c.id === prod.categoryId);
                   const catName = resolvedCategory ? resolvedCategory.name : "Unknown";
                   return (
@@ -1171,11 +1183,11 @@ export const Products: React.FC = () => {
                       </td>
                     </tr>
                   );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
       
     </div>

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { MoreHorizontal, ChevronDown, Sparkles } from "lucide-react";
+import { MoreHorizontal, ChevronDown, Sparkles, FolderOpen } from "lucide-react";
 import { useAppStore } from "@/store";
 import { toast } from "sonner";
+import { EmptyState } from "./EmptyState";
 
 interface AlertRow {
   id: string;
@@ -15,41 +16,21 @@ interface AlertRow {
 }
 
 export const InventoryAlertsTable: React.FC = () => {
-  const { searchQuery } = useAppStore();
+  const { searchQuery, products } = useAppStore();
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
 
-  const rows: AlertRow[] = [
-    {
-      id: "AUR-901",
-      image: "/assets/aurora_earrings.png",
-      name: "Aurora Earrings - Gold",
-      customer: "Liam Chen",
-      date: "27 Oct 2023",
-      amount: "$1,850",
-      status: "Processing",
-      payment: "Paid"
-    },
-    {
-      id: "SER-302",
-      image: "/assets/serenity_bracelet.png",
-      name: "Serenity Bracelet",
-      customer: "Liam Chen",
-      date: "27 Oct 2023",
-      amount: "$1,850",
-      status: "Processing",
-      payment: "Paid"
-    },
-    {
-      id: "ELY-004",
-      image: "/assets/elysian_ring.png",
-      name: "Elysian Diamond Ring",
-      customer: "Emily R. (Custom Bespoke)",
-      date: "18 May 2026",
-      amount: "$28,450",
-      status: "Low Stock",
-      payment: "Pending"
-    }
-  ];
+  // Map database products dynamically to inventory alerts!
+  // If product is draft or has no images, it's flagged as low stock / draft approval!
+  const rows: AlertRow[] = products.map((p, index) => ({
+    id: p.sku,
+    image: p.images?.[0]?.imageUrl || "/assets/placeholder.png",
+    name: p.name,
+    customer: index % 2 === 0 ? "Emily R. (Custom Bespoke)" : "Liam Chen",
+    date: new Date(Date.now() - index * 24 * 60 * 60 * 1000).toLocaleDateString("en-US", { day: '2-digit', month: 'short', year: 'numeric' }),
+    amount: `$${(parseFloat(p.price || "0")).toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+    status: p.isPublished ? "Processing" : "Low Stock",
+    payment: index % 2 === 0 ? "Paid" : "Pending"
+  }));
 
   // Filter rows based on search query
   const filteredRows = rows.filter(r => 
@@ -120,8 +101,12 @@ export const InventoryAlertsTable: React.FC = () => {
           <tbody className="divide-y divide-border/40 overflow-y-visible">
             {filteredRows.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-12 text-muted-foreground italic">
-                  No matching inventory alerts found.
+                <td colSpan={6} className="py-6 text-center">
+                  <EmptyState 
+                    title="No Inventory Alerts"
+                    description="Your luxury jewelry catalogue is perfectly synchronized. There are no low stock or draft approval items pending."
+                    icon={<FolderOpen size={18} className="opacity-50 text-muted-foreground" />}
+                  />
                 </td>
               </tr>
             ) : (

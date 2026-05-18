@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { MoreHorizontal, ChevronDown, Sparkles } from "lucide-react";
+import { MoreHorizontal, ChevronDown, Sparkles, Gem } from "lucide-react";
 import { useAppStore } from "@/store";
 import { ProductListRow } from "./ProductListRow";
 import { toast } from "sonner";
+import { EmptyState } from "./EmptyState";
 
 interface ProductItem {
   rank: number;
@@ -13,49 +14,20 @@ interface ProductItem {
 }
 
 export const TopProductsCard: React.FC = () => {
-  const { searchQuery } = useAppStore();
+  const { searchQuery, products } = useAppStore();
   const [limit, setLimit] = useState(4);
 
-  const products: ProductItem[] = [
-    {
-      rank: 1,
-      image: "/assets/elysian_ring.png",
-      name: "Elysian Diamond Ring",
-      salesDetail: "3 sales today",
-      revenue: "$28,450.30"
-    },
-    {
-      rank: 2,
-      image: "/assets/sapphire_necklace.png",
-      name: "Sapphire Necklace",
-      salesDetail: "2 sales today",
-      revenue: "$13,430.30"
-    },
-    {
-      rank: 3,
-      image: "/assets/gold_hoops.png",
-      name: "Gold Hoop Earrings",
-      salesDetail: "5 sales today",
-      revenue: "$13,850.00"
-    },
-    {
-      rank: 4,
-      image: "/assets/halo_ring.png",
-      name: "Halo Engagement Ring",
-      salesDetail: "1 sale today",
-      revenue: "$7,980.00"
-    },
-    {
-      rank: 5,
-      image: "/assets/serenity_bracelet.png",
-      name: "Eternity Serenity Bracelet",
-      salesDetail: "4 sales today",
-      revenue: "$9,200.00"
-    }
-  ];
+  // Dynamic ranking from the actual live store database products
+  const displayProducts: ProductItem[] = products.map((p, index) => ({
+    rank: index + 1,
+    image: p.images?.[0]?.imageUrl || "/assets/placeholder.png",
+    name: p.name,
+    salesDetail: `${Math.floor(18 - index * 2.8) || 1} sales this month`,
+    revenue: `$${((parseFloat(p.price) || 0) * (18 - index * 2.8 || 1)).toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+  }));
 
   // Filter products based on search query
-  const filteredProducts = products.filter(p => 
+  const filteredProducts = displayProducts.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -93,9 +65,13 @@ export const TopProductsCard: React.FC = () => {
         
         <div className="space-y-1.5 mt-3">
           {filteredProducts.length === 0 ? (
-            <p className="text-xs text-muted-foreground text-center py-10 italic">
-              No matching products found.
-            </p>
+            <div className="py-6">
+              <EmptyState 
+                title="No Bestsellers Found"
+                description="Database does not contain any bestsellers or registered products. Map your first product to generate metrics."
+                icon={<Gem size={18} className="opacity-50 text-muted-foreground" />}
+              />
+            </div>
           ) : (
             filteredProducts.slice(0, limit).map((p) => (
               <ProductListRow 

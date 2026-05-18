@@ -130,45 +130,7 @@ export const useAppStore = create<AppStore>((set) => ({
     messages: state.messages.map(m => ({ ...m, read: true }))
   })),
 
-  // Fallback initial categories matching Zari & Co catalog structure
-  categories: [
-    {
-      id: "cat-rings",
-      parentId: null,
-      name: "Solitaire Rings",
-      slug: "solitaire-rings",
-      description: "<h3>Elite Solitaire Rings</h3><p>Perfectly micro-paved solid rings and bands featuring flawless brilliant-cut solitaire diamonds.</p>",
-      isPublished: true,
-      sortOrder: 1
-    },
-    {
-      id: "cat-necklaces",
-      parentId: null,
-      name: "Halo Necklaces",
-      slug: "halo-necklaces",
-      description: "<h3>Royal Halo Necklaces</h3><p>Luxury necklaces framing natural blue sapphires and fine emerald gemstones.</p>",
-      isPublished: true,
-      sortOrder: 2
-    },
-    {
-      id: "cat-earrings",
-      parentId: null,
-      name: "Classic Earrings",
-      slug: "classic-earrings",
-      description: "<h3>Timeless Gold Hoop Earrings</h3><p>Comfortable lightweight drop earrings and hoops polished to mirror gold finishes.</p>",
-      isPublished: true,
-      sortOrder: 3
-    },
-    {
-      id: "cat-bracelets",
-      parentId: null,
-      name: "Bespoke Bracelets",
-      slug: "bespoke-bracelets",
-      description: "<h3>Elite Fine Bracelets</h3><p>Elite hand-crafted yellow gold chain links and classic diamond tennis bracelets.</p>",
-      isPublished: true,
-      sortOrder: 4
-    }
-  ],
+  categories: [],
 
   // Asynchronous API synchronization actions for Category
   addCategory: async (category) => {
@@ -215,57 +177,7 @@ export const useAppStore = create<AppStore>((set) => ({
     }
   },
 
-  // Fallback initial products catalog
-  products: [
-    {
-      id: "prod-1",
-      categoryId: "cat-rings",
-      name: "Elysian Diamond Ring",
-      price: "28450.30",
-      sku: "ELY-004",
-      description: "<h3>The Epitome of Jewelry Brilliance</h3><p>An exquisite, micro-paved 18k yellow gold band featuring a spectacular <strong>brilliant-cut solitaire diamond</strong> centered in a classic four-prong gold crown.</p>",
-      details: "<ul><li>GIA Certified Flawless D-Color Diamond.</li><li>1.8 Carat Solitaire center stone.</li><li>Total pave diamond weight of 0.45 Carats.</li><li>18k solid recycled yellow gold.</li></ul>",
-      careInstructions: "<p>Avoid contact with strong abrasive household cleaners, lotions, and perfumes. Wash occasionally with warm soapy water and a ultra-soft micro-bristle jewelry brush.</p>",
-      isPublished: true,
-      images: []
-    },
-    {
-      id: "prod-2",
-      categoryId: "cat-necklaces",
-      name: "Sapphire Necklace",
-      price: "13430.30",
-      sku: "SAP-901",
-      description: "<h3>Royal Sapphire Solitaire</h3><p>Capturing deep ocean depths, this solid 18k white gold pendant encapsulates a premium <strong>pear-shaped Royal Blue Sapphire</strong> surrounded by a delicate halo of premium micro-pearls.</p>",
-      details: "<ul><li>Natural Heat-Treated Pear Blue Sapphire (1.2ct).</li><li>Micro pave white diamonds (0.15ct total).</li><li>18-inch solid white gold chain with secure lobster clasp.</li></ul>",
-      careInstructions: "<p>Store flat in the provided velvet jewelry box to prevent white gold chain tangles. Clean with a dry microfiber cloth only.</p>",
-      isPublished: true,
-      images: []
-    },
-    {
-      id: "prod-3",
-      categoryId: "cat-earrings",
-      name: "Gold Hoop Earrings",
-      price: "13850.00",
-      sku: "GHO-115",
-      description: "<h3>Timeless Gold Hoop Classics</h3><p>Polished to a flawless mirror finish, these hand-crafted 18k yellow gold hollow hoop earrings offer premium luxury shine with lightweight, comfortable day-to-day wearing weights.</p>",
-      details: "<ul><li>18k heavy solid yellow gold casting.</li><li>Diameter: 35mm | Thickness: 3.5mm.</li><li>Integrated secure hinge-post closures.</li></ul>",
-      careInstructions: "<p>Always remove gold hoops before sleeping or bathing to ensure hinge alignments remain pristine. Buff occasionally with the included gold polishing cloth.</p>",
-      isPublished: true,
-      images: []
-    },
-    {
-      id: "prod-4",
-      categoryId: "cat-rings",
-      name: "Halo Engagement Ring",
-      price: "7980.00",
-      sku: "HAL-202",
-      description: "<h3>Bespoke Romance Re-imagined</h3><p>Celebrate pure love with our signature cushion-cut diamond centered inside a dazzling halo of round brilliant diamonds, set upon a micro-paved platinum band.</p>",
-      details: "<ul><li>0.9 Carat Cushion-Cut center diamond.</li><li>Color: F | Clarity: VS1.</li><li>Solid Platinum-950 hypoallergenic alloy casting.</li></ul>",
-      careInstructions: "<p>Bring to your nearest Aurélia Jewels boutique once a year for complimentary prong audits and professional ultra-sonic polishing.</p>",
-      isPublished: false,
-      images: []
-    }
-  ],
+  products: [],
 
   // Asynchronous API synchronization actions for Product
   addProduct: async (product) => {
@@ -388,17 +300,13 @@ export const useAppStore = create<AppStore>((set) => ({
         api.getProducts()
       ]);
       
-      // Update state if we successfully fetched data
-      if (categories.length > 0) {
-        set({ categories });
-      }
-      if (products.length > 0) {
-        set({ products });
-      }
-      
+      set({
+        categories: categories || [],
+        products: products || []
+      });
       console.log("Database store synchronized successfully ✦");
     } catch (error) {
-      console.warn("Could not sync with backend database. Falling back to local data.", error);
+      console.warn("Could not sync with backend database. Fallback empty catalogs mounted.", error);
     }
   }
 }));

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { 
-  Plus, 
   Trash2, 
   Edit3, 
   Sparkles, 
@@ -20,10 +19,12 @@ import {
 import { useAppStore, type Product, type Category } from "@/store";
 import { RichTextEditor } from "@/components/common/RichTextEditor";
 import { FormField } from "@/components/common/FormField";
-import { EmptyState } from "@/components/common/EmptyState";
 import { ProductSchema, CategorySchema } from "@/utils/validation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { ProductDetailModal } from "./components/ProductDetailModal";
+import { ProductTableView } from "./components/ProductTableView";
+import { CategoryFormCard } from "./components/CategoryFormCard";
 
 export const Products: React.FC = () => {
   const { 
@@ -49,6 +50,7 @@ export const Products: React.FC = () => {
   // Local state for Product Form
   const [isEditingProduct, setIsEditingProduct] = useState(false);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
 
   const [name, setName] = useState("");
   const [sku, setSku] = useState("");
@@ -410,17 +412,6 @@ export const Products: React.FC = () => {
     toast.success("Shipping & Return Guidelines Updated! 📍", {
       description: "Policy briefs updated across transaction nodes."
     });
-  };
-
-  // Render Category specific styling helper
-  const getCategoryBadgeTheme = (id: string) => {
-    switch (id) {
-      case "cat-rings": return "text-primary bg-[#241e17] border-[#3b3227]";
-      case "cat-necklaces": return "text-blue-400 bg-[#171e2c] border-[#252f44]";
-      case "cat-earrings": return "text-[#a58b68] bg-[#241e17] border-[#3b3227]";
-      case "cat-bracelets": return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
-      default: return "text-muted-foreground bg-secondary/30 border-border";
-    }
   };
 
   // ROUTER LOGIC FOR PAGES
@@ -907,106 +898,24 @@ export const Products: React.FC = () => {
             </div>
 
             {/* Right: Category Editor Form */}
-            <div className="lg:col-span-1 rounded-xl border border-border bg-card p-6 space-y-4 h-fit">
-              <div className="flex justify-between items-center border-b border-border/50 pb-3">
-                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
-                  <Sparkles size={14} className="text-primary animate-pulse" />
-                  {isEditingCategory ? "Modify Category" : "Add DB Category"}
-                </h3>
-                {isEditingCategory && (
-                  <button 
-                    onClick={handleCategoryCancel}
-                    className="text-[10px] text-muted-foreground hover:text-foreground font-semibold hover:underline cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                )}
-              </div>
-
-              <form onSubmit={handleCategorySubmit} className="space-y-4">
-                {/* Error */}
-                {categoryError && (
-                  <p className="p-2.5 rounded bg-rose-500/10 border border-rose-500/20 text-[10px] font-semibold text-rose-400 leading-relaxed">
-                    {categoryError}
-                  </p>
-                )}
-
-                {/* Name */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Category Name</label>
-                  <input 
-                    type="text"
-                    value={catName}
-                    onChange={handleCatNameChange}
-                    placeholder="e.g. Royal Necklaces"
-                    className="w-full px-3 py-2 text-xs border border-border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none focus:border-primary/50"
-                  />
-                </div>
-
-                {/* Slug Auto-Generated */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Slug URL (Unique)</label>
-                  <input 
-                    type="text"
-                    value={catSlug}
-                    onChange={(e) => setCatSlug(e.target.value)}
-                    placeholder="e.g. royal-necklaces"
-                    className="w-full px-3 py-2 text-xs border border-border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none focus:border-primary/50 font-mono"
-                  />
-                </div>
-
-                {/* Parent Category Tree */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Parent Category (Prisma Tree)</label>
-                  <select 
-                    value={catParentId}
-                    onChange={(e) => setCatParentId(e.target.value)}
-                    className="w-full px-3 py-2 text-xs border border-border bg-[#0d0f14] rounded-lg text-foreground focus:outline-none focus:border-primary/50 cursor-pointer"
-                  >
-                    <option value="">— None (Top-Level Category) —</option>
-                    {categories
-                      .filter(c => c.id !== editingCategoryId && !c.parentId) // Prevent self-referential or deeper nesting loop
-                      .map(c => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))
-                    }
-                  </select>
-                </div>
-
-                {/* TinyMCE Description for Category */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Category Description Narrative</label>
-                  <RichTextEditor 
-                    value={catDescription}
-                    onChange={(content) => setCatDescription(content)}
-                    placeholder="Rich description for the collection brochure..."
-                  />
-                </div>
-
-                {/* Category Published Toggle */}
-                <div className="flex items-center gap-2 select-none pt-1">
-                  <input 
-                    type="checkbox"
-                    id="catIsPublished"
-                    checked={catIsPublished}
-                    onChange={(e) => setCatIsPublished(e.target.checked)}
-                    className="w-4 h-4 rounded border-border bg-[#0d0f14] text-primary focus:ring-primary/20 accent-[#c5a880] cursor-pointer"
-                  />
-                  <label htmlFor="catIsPublished" className="text-xs font-semibold text-foreground cursor-pointer select-none">
-                    Publish Category to Storefront
-                  </label>
-                </div>
-
-                {/* Submit */}
-                <button
-                  type="submit"
-                  className="w-full bg-primary text-[#090a0f] py-2 rounded-lg text-xs font-bold hover:bg-primary/95 transition-all cursor-pointer shadow-[0_0_8px_rgba(197,168,128,0.15)] flex items-center justify-center gap-1"
-                >
-                  <Save size={13} />
-                  {isEditingCategory ? "Update Category" : "Save DB Category"}
-                </button>
-              </form>
-            </div>
+            <CategoryFormCard
+              isEditingCategory={isEditingCategory}
+              editingCategoryId={editingCategoryId}
+              categories={categories}
+              catName={catName}
+              catSlug={catSlug}
+              catParentId={catParentId}
+              catDescription={catDescription}
+              catIsPublished={catIsPublished}
+              categoryError={categoryError}
+              onCatNameChange={handleCatNameChange}
+              setCatSlug={setCatSlug}
+              setCatParentId={setCatParentId}
+              setCatDescription={setCatDescription}
+              setCatIsPublished={setCatIsPublished}
+              onSubmit={handleCategorySubmit}
+              onCancel={handleCategoryCancel}
+            />
 
           </div>
         </div>
@@ -1091,104 +1000,27 @@ export const Products: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-200 text-left select-none">
       
-      {/* Products Table Card */}
-      <div className="rounded-xl border border-border bg-card p-6 shadow-xs space-y-4">
-        <div className="flex justify-between items-center border-b border-border/50 pb-4">
-          <div>
-            <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Boutique Catalog Database</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">View GIA registered pieces and edit corresponding rich text descriptions.</p>
-          </div>
-          <button 
-            onClick={() => setCurrentPage("new-product")}
-            className="flex items-center gap-1.5 bg-primary text-[#090a0f] px-3.5 py-1.5 rounded-lg text-xs font-bold hover:bg-primary/95 transition-all cursor-pointer shadow-[0_0_8px_rgba(197,168,128,0.15)]"
-          >
-            <Plus size={14} />
-            Add Piece
-          </button>
-        </div>
+      <ProductTableView
+        products={products}
+        categories={categories}
+        onView={setViewingProduct}
+        onEdit={handleProductEdit}
+        onDelete={handleProductDelete}
+        onAddNew={() => setCurrentPage("new-product")}
+      />
 
-        {products.length === 0 ? (
-          <div className="py-8">
-            <EmptyState 
-              title="Catalog is Currently Empty"
-              description="No luxury jewelry pieces exist in your database yet. Start by adding your first collection piece above."
-              actionText="Launch New Piece"
-              onAction={() => setCurrentPage("new-product")}
-            />
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-border text-muted-foreground font-semibold">
-                  <th className="pb-3 pl-2">Product Details</th>
-                  <th className="pb-3">Catalog SKU</th>
-                  <th className="pb-3">Category Relation</th>
-                  <th className="pb-3">GIA Price</th>
-                  <th className="pb-3 text-center">Status</th>
-                  <th className="pb-3 pr-2 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/40">
-                {products.map((prod) => {
-                  const resolvedCategory = categories.find(c => c.id === prod.categoryId);
-                  const catName = resolvedCategory ? resolvedCategory.name : "Unknown";
-                  return (
-                    <tr key={prod.id} className="hover:bg-secondary/20 transition-colors group">
-                      <td className="py-4 pl-2 flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-[#241e17] border border-[#3b3227] flex items-center justify-center text-primary font-bold text-xs select-none shadow-[0_0_10px_rgba(197,168,128,0.05)]">
-                          {prod.name.split(" ").map(n => n[0]).join("")}
-                        </div>
-                        <div>
-                          <h5 className="font-semibold text-foreground group-hover:text-primary-foreground transition-all">{prod.name}</h5>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">Code: {prod.sku}</p>
-                        </div>
-                      </td>
-                      <td className="py-4 font-mono font-medium text-muted-foreground uppercase">{prod.sku}</td>
-                      <td className="py-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold border ${getCategoryBadgeTheme(prod.categoryId)}`}>
-                          {catName}
-                        </span>
-                      </td>
-                      <td className="py-4 font-semibold text-foreground">${Number(prod.price).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                      
-                      {/* Publish / Draft status mapping schema */}
-                      <td className="py-4 text-center select-none">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[9px] font-bold border ${prod.isPublished ? "text-primary bg-[#241e17] border-[#3b3227]" : "text-muted-foreground bg-secondary/30 border-border"}`}>
-                          {prod.isPublished ? <Eye size={10} /> : <EyeOff size={10} />}
-                          {prod.isPublished ? "Published" : "Draft"}
-                        </span>
-                      </td>
-
-                      <td className="py-4 pr-2 text-right">
-                        <div className="flex justify-end gap-2.5 select-none">
-                          {/* Edit Button */}
-                          <button 
-                            onClick={() => handleProductEdit(prod)}
-                            className="w-7 h-7 rounded-lg border border-border bg-[#0d0f14]/50 flex items-center justify-center text-primary hover:bg-primary hover:text-[#090a0f] transition-all cursor-pointer"
-                            title="Edit GIA rich sheets"
-                          >
-                            <Edit3 size={12} />
-                          </button>
-                          
-                          {/* Delete Button */}
-                          <button 
-                            onClick={() => handleProductDelete(prod.id, prod.name)}
-                            className="w-7 h-7 rounded-lg border border-border bg-[#0d0f14]/50 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white transition-all cursor-pointer"
-                            title="Delete piece"
-                          >
-                            <Trash2 size={12} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      {/* High-Fidelity Premium Product Specifications Modal */}
+      {viewingProduct && (
+        <ProductDetailModal
+          product={viewingProduct}
+          categories={categories}
+          onClose={() => setViewingProduct(null)}
+          onEdit={(prod) => {
+            setViewingProduct(null);
+            handleProductEdit(prod);
+          }}
+        />
+      )}
       
     </div>
   );

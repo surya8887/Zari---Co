@@ -176,7 +176,7 @@ const ProductDetailPage = () => {
           </div>
 
           {/* Right Column: Order Configuration */}
-          <div className="flex flex-col justify-between">
+          <div className="flex flex-col justify-start gap-y-6">
             <div>
               {/* Category */}
               <span className="text-xs font-extrabold uppercase tracking-[3px] text-[#8b7355] block mb-2 select-none">
@@ -219,7 +219,7 @@ const ProductDetailPage = () => {
               </p>
 
               {/* Sizing matrix if Ring */}
-              {p.category === 'Rings' && (
+              {(p.category?.toLowerCase() === 'rings' || p.category?.toLowerCase() === 'ring') && (
                 <div className="mb-8 select-none">
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#4e3a24] block mb-3">
                     Select Ring Size

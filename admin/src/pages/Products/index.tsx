@@ -12,7 +12,10 @@ import {
   Scale,
   FolderTree,
   Eye,
-  EyeOff
+  EyeOff,
+  Star,
+  UploadCloud,
+  Image as ImageIcon
 } from "lucide-react";
 import { useAppStore, type Product, type Category } from "@/store";
 import { RichTextEditor } from "@/components/common/RichTextEditor";
@@ -34,7 +37,10 @@ export const Products: React.FC = () => {
     collectionStory,
     updateCollectionStory,
     shippingNotes,
-    updateShippingNotes
+    updateShippingNotes,
+    uploadProductImages,
+    deleteProductImage,
+    setPrimaryImage
   } = useAppStore();
 
   // Local state for Product Form
@@ -49,6 +55,12 @@ export const Products: React.FC = () => {
   const [description, setDescription] = useState("");
   const [details, setDetails] = useState("");
   const [careInstructions, setCareInstructions] = useState("");
+
+  // Local state for Multiple Files Upload
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [primaryIndex, setPrimaryIndex] = useState(0);
+  const [uploading, setUploading] = useState(false);
 
   const [productErrors, setProductErrors] = useState<{
     name?: string;
@@ -111,6 +123,9 @@ export const Products: React.FC = () => {
       setDescription("");
       setDetails("");
       setCareInstructions("");
+      setSelectedFiles([]);
+      setPreviewUrls([]);
+      setPrimaryIndex(0);
       setProductErrors({});
     }
   }, [currentPage, categories]);
@@ -127,6 +142,9 @@ export const Products: React.FC = () => {
     setDescription(product.description);
     setDetails(product.details);
     setCareInstructions(product.careInstructions);
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+    setPrimaryIndex(0);
     setProductErrors({});
     
     setCurrentPage("products-list"); 
@@ -187,8 +205,42 @@ export const Products: React.FC = () => {
     setCategoryError("");
   };
 
+  // Image Selection & Instant Upload Helper Functions
+  const handleLocalImageSelect = (files: FileList) => {
+    const fileArray = Array.from(files);
+    setSelectedFiles(prev => [...prev, ...fileArray]);
+    
+    const newUrls = fileArray.map(file => URL.createObjectURL(file));
+    setPreviewUrls(prev => [...prev, ...newUrls]);
+  };
+
+  const handleLocalImageDelete = (idx: number) => {
+    if (previewUrls[idx]) {
+      URL.revokeObjectURL(previewUrls[idx]);
+    }
+    
+    setSelectedFiles(prev => prev.filter((_, i) => i !== idx));
+    setPreviewUrls(prev => prev.filter((_, i) => i !== idx));
+    
+    if (primaryIndex === idx) {
+      setPrimaryIndex(0);
+    } else if (primaryIndex > idx) {
+      setPrimaryIndex(prev => prev - 1);
+    }
+  };
+
+  const handleInstantImageUpload = async (files: FileList) => {
+    if (!files || files.length === 0 || !editingProductId) return;
+    setUploading(true);
+    try {
+      await uploadProductImages(editingProductId, Array.from(files));
+    } finally {
+      setUploading(false);
+    }
+  };
+
   // Submit Product Form (Create / Edit)
-  const handleProductSubmit = (e: React.FormEvent) => {
+  const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const newErrors: typeof productErrors = {};
@@ -225,14 +277,24 @@ export const Products: React.FC = () => {
     };
 
     if (isEditingProduct && editingProductId !== null) {
-      updateProduct(editingProductId, payload);
+      await updateProduct(editingProductId, payload);
       toast.success(`Successfully updated: "${name}" ✨`, {
         description: "Synchronized rich HTML data to store catalogs."
       });
       setIsEditingProduct(false);
       setEditingProductId(null);
     } else {
-      addProduct(payload);
+      const createdProduct = await addProduct(payload);
+      if (createdProduct && selectedFiles.length > 0) {
+        // Sort files so that the chosen primary cover is uploaded first
+        let uploadFiles = [...selectedFiles];
+        if (primaryIndex > 0 && primaryIndex < uploadFiles.length) {
+          const primaryFile = uploadFiles[primaryIndex];
+          uploadFiles.splice(primaryIndex, 1);
+          uploadFiles.unshift(primaryFile);
+        }
+        await uploadProductImages(createdProduct.id, uploadFiles);
+      }
       toast.success(`Added new piece: "${name}" ✦`, {
         description: "Registered rich content guides into house collections."
       });
@@ -248,6 +310,9 @@ export const Products: React.FC = () => {
     setDescription("");
     setDetails("");
     setCareInstructions("");
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+    setPrimaryIndex(0);
     setProductErrors({});
   };
 
@@ -383,99 +448,262 @@ export const Products: React.FC = () => {
         <form onSubmit={handleProductSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* LEFT: Standard Text inputs & Publish Checkbox */}
-          <div className="lg:col-span-1 rounded-xl border border-border bg-card p-6 space-y-4 h-fit">
-            <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
-              <Gem size={14} className="text-primary" />
-              Product Specification
-            </h3>
-            
-            {/* Name */}
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase">Piece Name</label>
-              <input 
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Elysian Diamond Ring"
-                className={cn(
-                  "w-full px-3 py-2 text-xs border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none",
-                  productErrors.name ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary/50"
-                )}
-              />
-              {productErrors.name && <p className="text-[10px] text-rose-400 font-medium">{productErrors.name}</p>}
-            </div>
-
-            {/* SKU & Price */}
-            <div className="grid grid-cols-2 gap-4">
-              {/* SKU */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="rounded-xl border border-border bg-card p-6 space-y-4 h-fit">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
+                <Gem size={14} className="text-primary" />
+                Product Specification
+              </h3>
+              
+              {/* Name */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Catalogue SKU</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">Piece Name</label>
                 <input 
                   type="text"
-                  value={sku}
-                  onChange={(e) => setSku(e.target.value)}
-                  placeholder="e.g. ELY-004"
-                  className={cn(
-                    "w-full px-3 py-2 text-xs border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none uppercase",
-                    productErrors.sku ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary/50"
-                  )}
-                />
-                {productErrors.sku && <p className="text-[10px] text-rose-400 font-medium">{productErrors.sku}</p>}
-              </div>
-
-              {/* Price */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Price (USD)</label>
-                <input 
-                  type="text"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="e.g. 28450.30"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Elysian Diamond Ring"
                   className={cn(
                     "w-full px-3 py-2 text-xs border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none",
-                    productErrors.price ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary/50"
+                    productErrors.name ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary/50"
                   )}
                 />
-                {productErrors.price && <p className="text-[10px] text-rose-400 font-medium">{productErrors.price}</p>}
+                {productErrors.name && <p className="text-[10px] text-rose-400 font-medium">{productErrors.name}</p>}
+              </div>
+
+              {/* SKU & Price */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* SKU */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Catalogue SKU</label>
+                  <input 
+                    type="text"
+                    value={sku}
+                    onChange={(e) => setSku(e.target.value)}
+                    placeholder="e.g. ELY-004"
+                    className={cn(
+                      "w-full px-3 py-2 text-xs border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none uppercase",
+                      productErrors.sku ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary/50"
+                    )}
+                  />
+                  {productErrors.sku && <p className="text-[10px] text-rose-400 font-medium">{productErrors.sku}</p>}
+                </div>
+
+                {/* Price */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Price (USD)</label>
+                  <input 
+                    type="text"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder="e.g. 28450.30"
+                    className={cn(
+                      "w-full px-3 py-2 text-xs border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none",
+                      productErrors.price ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary/50"
+                    )}
+                  />
+                  {productErrors.price && <p className="text-[10px] text-rose-400 font-medium">{productErrors.price}</p>}
+                </div>
+              </div>
+
+              {/* Dynamic DB Category Selector */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">Jewelry Type (Dynamic Categories)</label>
+                <select 
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-border bg-[#0d0f14] rounded-lg text-foreground focus:outline-none focus:border-primary/50 cursor-pointer"
+                >
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name} {cat.parentId ? `(Subcategory)` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Publish Checkbox mapping the schema's isPublished */}
+              <div className="border-t border-border/40 pt-4 mt-2">
+                <div className="flex items-center gap-2 select-none cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    id="prodIsPublished"
+                    checked={isPublished}
+                    onChange={(e) => setIsPublished(e.target.checked)}
+                    className="w-4 h-4 rounded border-border bg-[#0d0f14] text-primary focus:ring-primary/20 accent-[#c5a880] cursor-pointer"
+                  />
+                  <label htmlFor="prodIsPublished" className="text-xs font-semibold text-foreground cursor-pointer flex items-center gap-1.5 select-none">
+                    {isPublished ? <Eye size={13} className="text-primary" /> : <EyeOff size={13} className="text-muted-foreground" />}
+                    Publish to Boutique Catalogue
+                  </label>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1.5 leading-relaxed pl-6">
+                  If checked, the jewelry piece is published instantly. Otherwise, it remains saved as an admin draft.
+                </p>
               </div>
             </div>
 
-            {/* Dynamic DB Category Selector */}
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase">Jewelry Type (Dynamic Categories)</label>
-              <select 
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-border bg-[#0d0f14] rounded-lg text-foreground focus:outline-none focus:border-primary/50 cursor-pointer"
+            {/* Product Media Gallery Card */}
+            <div className="rounded-xl border border-border bg-card p-6 space-y-4 h-fit">
+              <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
+                <ImageIcon size={14} className="text-primary" />
+                Product Media Gallery
+              </h3>
+              
+              {/* Uploader Box */}
+              <div 
+                className="border-2 border-dashed border-border/80 hover:border-primary/50 transition-all rounded-lg p-6 text-center cursor-pointer bg-[#0d0f14]/50 group"
+                onClick={() => document.getElementById("productImageFileInput")?.click()}
               >
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name} {cat.parentId ? `(Subcategory)` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Publish Checkbox mapping the schema's isPublished */}
-            <div className="border-t border-border/40 pt-4 mt-2">
-              <div className="flex items-center gap-2 select-none cursor-pointer">
                 <input 
-                  type="checkbox"
-                  id="prodIsPublished"
-                  checked={isPublished}
-                  onChange={(e) => setIsPublished(e.target.checked)}
-                  className="w-4 h-4 rounded border-border bg-[#0d0f14] text-primary focus:ring-primary/20 accent-[#c5a880] cursor-pointer"
+                  type="file"
+                  id="productImageFileInput"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const files = e.target.files;
+                    if (!files || files.length === 0) return;
+                    if (isEditingProduct) {
+                      handleInstantImageUpload(files);
+                    } else {
+                      handleLocalImageSelect(files);
+                    }
+                  }}
                 />
-                <label htmlFor="prodIsPublished" className="text-xs font-semibold text-foreground cursor-pointer flex items-center gap-1.5 select-none">
-                  {isPublished ? <Eye size={13} className="text-primary" /> : <EyeOff size={13} className="text-muted-foreground" />}
-                  Publish to Boutique Catalogue
-                </label>
+                
+                <UploadCloud className="mx-auto text-muted-foreground group-hover:text-primary transition-colors mb-2" size={28} />
+                <p className="text-[11px] font-semibold text-foreground">Drag & drop or click to upload</p>
+                <p className="text-[9px] text-muted-foreground mt-1">JPEG, PNG, WEBP, or GIF (max 10MB per file)</p>
               </div>
-              <p className="text-[10px] text-muted-foreground mt-1.5 leading-relaxed pl-6">
-                If checked, the jewelry piece is published instantly. Otherwise, it remains saved as an admin draft.
-              </p>
-            </div>
 
+              {uploading && (
+                <div className="flex items-center justify-center gap-2 text-xs font-semibold text-primary py-2">
+                  <span className="w-2.5 h-2.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+                  Uploading assets live...
+                </div>
+              )}
+
+              {/* Gallery Previews / Displays */}
+              {isEditingProduct ? (
+                // EDIT MODE: Render already-uploaded images from product
+                (() => {
+                  const currentProd = products.find(p => p.id === editingProductId);
+                  const uploadedImages = currentProd?.images || [];
+                  
+                  if (uploadedImages.length === 0) {
+                    return (
+                      <p className="text-[10px] text-muted-foreground text-center py-4">No images uploaded for this catalog item.</p>
+                    );
+                  }
+
+                  return (
+                    <div className="grid grid-cols-3 gap-3 pt-2">
+                      {uploadedImages.map((img) => (
+                        <div key={img.id} className="relative aspect-square border border-border/80 rounded-lg overflow-hidden group bg-black/30">
+                          <img 
+                            src={img.imageUrl.startsWith("http") ? img.imageUrl : `http://localhost:5000${img.imageUrl}`} 
+                            alt={img.altText || "Product Image"}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300"
+                          />
+                          
+                          {/* Overlay Controls */}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPrimaryImage(editingProductId as string, img.id);
+                              }}
+                              className={cn(
+                                "p-1.5 rounded-full backdrop-blur-md cursor-pointer transition-all",
+                                img.isPrimary 
+                                  ? "bg-primary text-[#090a0f]" 
+                                  : "bg-black/60 text-white hover:text-primary hover:bg-black/80"
+                              )}
+                              title={img.isPrimary ? "Primary Cover" : "Make Primary"}
+                            >
+                              <Star size={12} fill={img.isPrimary ? "currentColor" : "none"} />
+                            </button>
+                            
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteProductImage(editingProductId as string, img.id);
+                              }}
+                              className="p-1.5 rounded-full bg-rose-500/80 hover:bg-rose-600 text-white cursor-pointer transition-all"
+                              title="Delete Image"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                          
+                          {img.isPrimary && (
+                            <span className="absolute top-1 left-1 text-[8px] bg-primary text-[#090a0f] font-bold px-1.5 py-0.5 rounded shadow-md uppercase tracking-wider">
+                              Cover
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()
+              ) : (
+                // CREATE MODE: Render local selected files previews
+                previewUrls.length > 0 && (
+                  <div className="grid grid-cols-3 gap-3 pt-2">
+                    {previewUrls.map((url, idx) => (
+                      <div key={idx} className="relative aspect-square border border-border/80 rounded-lg overflow-hidden group bg-black/30">
+                        <img 
+                          src={url} 
+                          alt="preview" 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300"
+                        />
+                        
+                        {/* Overlay Controls */}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPrimaryIndex(idx);
+                            }}
+                            className={cn(
+                              "p-1.5 rounded-full backdrop-blur-md cursor-pointer transition-all",
+                              primaryIndex === idx 
+                                ? "bg-primary text-[#090a0f]" 
+                                : "bg-black/60 text-white hover:text-primary hover:bg-black/80"
+                            )}
+                            title={primaryIndex === idx ? "Primary Cover" : "Make Primary"}
+                          >
+                            <Star size={12} fill={primaryIndex === idx ? "currentColor" : "none"} />
+                          </button>
+                          
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleLocalImageDelete(idx);
+                            }}
+                            className="p-1.5 rounded-full bg-rose-500/80 hover:bg-rose-600 text-white cursor-pointer transition-all"
+                            title="Delete Preview"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                        
+                        {primaryIndex === idx && (
+                          <span className="absolute top-1 left-1 text-[8px] bg-primary text-[#090a0f] font-bold px-1.5 py-0.5 rounded shadow-md uppercase tracking-wider">
+                            Cover
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )
+              )}
+            </div>
           </div>
 
           {/* RIGHT: Multiple TinyMCE Editors */}

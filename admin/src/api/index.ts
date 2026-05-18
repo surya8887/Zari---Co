@@ -16,6 +16,18 @@ export interface Category {
 }
 
 // ==========================================
+// Product Image Interface
+// ==========================================
+export interface ProductImage {
+  id: string;
+  productId: string;
+  imageUrl: string;
+  altText?: string;
+  isPrimary: boolean;
+  sortOrder: number;
+}
+
+// ==========================================
 // Product Interfaces
 // ==========================================
 export interface DbProduct {
@@ -27,6 +39,7 @@ export interface DbProduct {
   basePrice: number | string; // Decimal from Prisma
   sku: string;
   isPublished: boolean;
+  images?: ProductImage[]; // Included relations
 }
 
 export interface ClientProduct {
@@ -39,6 +52,7 @@ export interface ClientProduct {
   details: string;
   careInstructions: string;
   isPublished: boolean;
+  images: ProductImage[]; // Parsed relations
 }
 
 // ==========================================
@@ -64,12 +78,13 @@ export const mapDbToClientProduct = (db: DbProduct): ClientProduct => {
     description,
     details,
     careInstructions,
-    isPublished: db.isPublished
+    isPublished: db.isPublished,
+    images: db.images || []
   };
 };
 
 // Merge client form fields into unified description column
-export const mapClientToDbPayload = (client: Omit<ClientProduct, "id">) => {
+export const mapClientToDbPayload = (client: Omit<ClientProduct, "id" | "images">) => {
   const description = `${client.description || ""}<!--GIA-SPECS-->${client.details || ""}<!--CARE-GUIDES-->${client.careInstructions || ""}`;
   return {
     name: client.name,
@@ -155,7 +170,7 @@ export const api = {
     return dbProducts.map(mapDbToClientProduct);
   },
 
-  async createProduct(product: Omit<ClientProduct, "id">): Promise<ClientProduct> {
+  async createProduct(product: Omit<ClientProduct, "id" | "images">): Promise<ClientProduct> {
     const payload = mapClientToDbPayload(product);
     const dbProd = await fetchJson<DbProduct>("/catalog/product", {
       method: "POST",
@@ -169,7 +184,7 @@ export const api = {
     let payload: Partial<DbProduct> = {};
     
     if (product.name || product.price || product.sku || product.categoryId || product.description || product.details || product.careInstructions || product.isPublished !== undefined) {
-      const fullProduct: Omit<ClientProduct, "id"> = {
+      const fullProduct: Omit<ClientProduct, "id" | "images"> = {
         name: product.name || "",
         price: product.price || "0.0",
         sku: product.sku || "",
@@ -194,5 +209,50 @@ export const api = {
       method: "DELETE"
     });
     return mapDbToClientProduct(dbProd);
+  },
+
+  // Image Upload Handlers
+  async uploadProductImages(productId: string, files: File[]): Promise<ProductImage[]> {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append("images", file);
+    });
+
+    const url = `${API_BASE_URL}/catalog/product/${productId}/images`;
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        body: formData
+        // Explicitly omit Content-Type so the browser auto-assigns boundary codes
+      });
+
+      const payload = await res.json();
+      if (!res.ok) {
+        throw new Error(payload.message || `API error (${res.status})`);
+      }
+
+      toast.success("Images Uploaded Successfully ✦", {
+        description: `Registered ${files.length} assets in product database.`
+      });
+      return payload.data as ProductImage[];
+    } catch (error) {
+      console.error(`File upload to ${productId} failed:`, error);
+      toast.error("Asset Upload Failed ✕", {
+        description: error instanceof Error ? error.message : "Network error."
+      });
+      throw error;
+    }
+  },
+
+  async deleteProductImage(id: string): Promise<ProductImage> {
+    return fetchJson<ProductImage>(`/catalog/image/${id}`, {
+      method: "DELETE"
+    });
+  },
+
+  async setPrimaryImage(id: string): Promise<ProductImage> {
+    return fetchJson<ProductImage>(`/catalog/image/${id}/primary`, {
+      method: "PUT"
+    });
   }
 };

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { api, type Category, type ClientProduct as Product } from "@/api";
+import { api, type Category, type ClientProduct as Product, type ProductImage } from "@/api";
 import { toast } from "sonner";
 
 export interface NotificationItem {
@@ -20,7 +20,7 @@ export interface MessageItem {
 }
 
 // Export the types so they're accessible throughout the app
-export type { Category, Product };
+export type { Category, Product, ProductImage };
 
 interface AppStore {
   theme: "light" | "dark";
@@ -42,10 +42,15 @@ interface AppStore {
   
   // Product Catalog & Actions
   products: Product[];
-  addProduct: (product: Omit<Product, "id">) => Promise<void>;
+  addProduct: (product: Omit<Product, "id" | "images">) => Promise<Product | undefined>;
   updateProduct: (id: string, fields: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   
+  // Image Upload Management Actions
+  uploadProductImages: (productId: string, files: File[]) => Promise<void>;
+  deleteProductImage: (productId: string, imageId: string) => Promise<void>;
+  setPrimaryImage: (productId: string, imageId: string) => Promise<void>;
+
   // Custom collections heritage story
   collectionStory: string;
   updateCollectionStory: (story: string) => void;
@@ -221,7 +226,8 @@ export const useAppStore = create<AppStore>((set) => ({
       description: "<h3>The Epitome of Jewelry Brilliance</h3><p>An exquisite, micro-paved 18k yellow gold band featuring a spectacular <strong>brilliant-cut solitaire diamond</strong> centered in a classic four-prong gold crown.</p>",
       details: "<ul><li>GIA Certified Flawless D-Color Diamond.</li><li>1.8 Carat Solitaire center stone.</li><li>Total pave diamond weight of 0.45 Carats.</li><li>18k solid recycled yellow gold.</li></ul>",
       careInstructions: "<p>Avoid contact with strong abrasive household cleaners, lotions, and perfumes. Wash occasionally with warm soapy water and a ultra-soft micro-bristle jewelry brush.</p>",
-      isPublished: true
+      isPublished: true,
+      images: []
     },
     {
       id: "prod-2",
@@ -232,7 +238,8 @@ export const useAppStore = create<AppStore>((set) => ({
       description: "<h3>Royal Sapphire Solitaire</h3><p>Capturing deep ocean depths, this solid 18k white gold pendant encapsulates a premium <strong>pear-shaped Royal Blue Sapphire</strong> surrounded by a delicate halo of premium micro-pearls.</p>",
       details: "<ul><li>Natural Heat-Treated Pear Blue Sapphire (1.2ct).</li><li>Micro pave white diamonds (0.15ct total).</li><li>18-inch solid white gold chain with secure lobster clasp.</li></ul>",
       careInstructions: "<p>Store flat in the provided velvet jewelry box to prevent white gold chain tangles. Clean with a dry microfiber cloth only.</p>",
-      isPublished: true
+      isPublished: true,
+      images: []
     },
     {
       id: "prod-3",
@@ -243,7 +250,8 @@ export const useAppStore = create<AppStore>((set) => ({
       description: "<h3>Timeless Gold Hoop Classics</h3><p>Polished to a flawless mirror finish, these hand-crafted 18k yellow gold hollow hoop earrings offer premium luxury shine with lightweight, comfortable day-to-day wearing weights.</p>",
       details: "<ul><li>18k heavy solid yellow gold casting.</li><li>Diameter: 35mm | Thickness: 3.5mm.</li><li>Integrated secure hinge-post closures.</li></ul>",
       careInstructions: "<p>Always remove gold hoops before sleeping or bathing to ensure hinge alignments remain pristine. Buff occasionally with the included gold polishing cloth.</p>",
-      isPublished: true
+      isPublished: true,
+      images: []
     },
     {
       id: "prod-4",
@@ -254,7 +262,8 @@ export const useAppStore = create<AppStore>((set) => ({
       description: "<h3>Bespoke Romance Re-imagined</h3><p>Celebrate pure love with our signature cushion-cut diamond centered inside a dazzling halo of round brilliant diamonds, set upon a micro-paved platinum band.</p>",
       details: "<ul><li>0.9 Carat Cushion-Cut center diamond.</li><li>Color: F | Clarity: VS1.</li><li>Solid Platinum-950 hypoallergenic alloy casting.</li></ul>",
       careInstructions: "<p>Bring to your nearest Aurélia Jewels boutique once a year for complimentary prong audits and professional ultra-sonic polishing.</p>",
-      isPublished: false
+      isPublished: false,
+      images: []
     }
   ],
 
@@ -268,8 +277,10 @@ export const useAppStore = create<AppStore>((set) => ({
       toast.success("Product Created Live ✦", {
         description: `Successfully added ${created.name} to catalog database.`
       });
+      return created;
     } catch (error) {
       console.error("Failed to create product on backend:", error);
+      return undefined;
     }
   },
 
@@ -298,6 +309,68 @@ export const useAppStore = create<AppStore>((set) => ({
       });
     } catch (error) {
       console.error("Failed to delete product on backend:", error);
+    }
+  },
+
+  // Image Upload Management Actions
+  uploadProductImages: async (productId, files) => {
+    try {
+      const newImages = await api.uploadProductImages(productId, files);
+      set((state) => ({
+        products: state.products.map((p) =>
+          p.id === productId
+            ? { ...p, images: [...p.images, ...newImages] }
+            : p
+        )
+      }));
+    } catch (error) {
+      console.error("Failed to upload product images in store:", error);
+    }
+  },
+
+  deleteProductImage: async (productId, imageId) => {
+    try {
+      await api.deleteProductImage(imageId);
+      set((state) => ({
+        products: state.products.map((p) => {
+          if (p.id !== productId) return p;
+          const updatedImages = p.images.filter((img) => img.id !== imageId);
+          // Auto-promote first remaining sibling cover if we unlinked the primary thumbnail
+          const deletedImg = p.images.find((img) => img.id === imageId);
+          if (deletedImg?.isPrimary && updatedImages.length > 0) {
+            updatedImages[0].isPrimary = true;
+          }
+          return { ...p, images: updatedImages };
+        })
+      }));
+      toast.success("Image Deleted Successfully ✦", {
+        description: "Physical file unlinked and database references drop."
+      });
+    } catch (error) {
+      console.error("Failed to delete product image in store:", error);
+    }
+  },
+
+  setPrimaryImage: async (productId, imageId) => {
+    try {
+      await api.setPrimaryImage(imageId);
+      set((state) => ({
+        products: state.products.map((p) => {
+          if (p.id !== productId) return p;
+          return {
+            ...p,
+            images: p.images.map((img) => ({
+              ...img,
+              isPrimary: img.id === imageId
+            }))
+          };
+        })
+      }));
+      toast.success("Primary Cover Updated ✦", {
+        description: "New catalog thumbnail designated."
+      });
+    } catch (error) {
+      console.error("Failed to set primary image in store:", error);
     }
   },
 

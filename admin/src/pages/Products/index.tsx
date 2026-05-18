@@ -39,7 +39,7 @@ export const Products: React.FC = () => {
 
   // Local state for Product Form
   const [isEditingProduct, setIsEditingProduct] = useState(false);
-  const [editingProductId, setEditingProductId] = useState<number | null>(null);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [sku, setSku] = useState("");
@@ -137,7 +137,7 @@ export const Products: React.FC = () => {
   };
 
   // Handle Product Delete action click
-  const handleProductDelete = (id: number, productName: string) => {
+  const handleProductDelete = (id: string, productName: string) => {
     deleteProduct(id);
     toast.error(`Removed "${productName}" from jewelry catalog.`);
   };

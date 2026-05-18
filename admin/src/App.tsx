@@ -1,8 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { AdminLayout } from "./layouts/AdminLayout";
 import { Toaster } from "sonner";
+import { useAppStore } from "./store";
 
 const App: React.FC = () => {
+  const initStore = useAppStore((state) => state.initStore);
+
+  useEffect(() => {
+    initStore();
+  }, [initStore]);
+
   return (
     <>
       {/* Global premium styled Sonner notifications provider */}

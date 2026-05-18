@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { api, type Category, type ClientProduct as Product } from "@/api";
+import { toast } from "sonner";
 
 export interface NotificationItem {
   id: number;
@@ -17,29 +19,8 @@ export interface MessageItem {
   time: string;
 }
 
-// Category structure mapping backend Prisma schema
-export interface Category {
-  id: string;
-  parentId: string | null;
-  name: string;
-  slug: string;
-  description: string;
-  isPublished: boolean;
-  sortOrder: number;
-}
-
-// Product structure updated with UUID references and isPublished flag
-export interface Product {
-  id: number;
-  categoryId: string; // Foreign key link to Category
-  name: string;
-  price: string;
-  sku: string;
-  description: string;
-  details: string;
-  careInstructions: string;
-  isPublished: boolean; // Publish checkbox flag
-}
+// Export the types so they're accessible throughout the app
+export type { Category, Product };
 
 interface AppStore {
   theme: "light" | "dark";
@@ -55,15 +36,15 @@ interface AppStore {
   
   // Categories Database & Actions
   categories: Category[];
-  addCategory: (category: Omit<Category, "id">) => void;
-  updateCategory: (id: string, fields: Partial<Category>) => void;
-  deleteCategory: (id: string) => void;
+  addCategory: (category: Omit<Category, "id">) => Promise<void>;
+  updateCategory: (id: string, fields: Partial<Category>) => Promise<void>;
+  deleteCategory: (id: string) => Promise<void>;
   
   // Product Catalog & Actions
   products: Product[];
-  addProduct: (product: Omit<Product, "id">) => void;
-  updateProduct: (id: number, fields: Partial<Product>) => void;
-  deleteProduct: (id: number) => void;
+  addProduct: (product: Omit<Product, "id">) => Promise<void>;
+  updateProduct: (id: string, fields: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
   
   // Custom collections heritage story
   collectionStory: string;
@@ -72,6 +53,9 @@ interface AppStore {
   // Inventory shipping parameters
   shippingNotes: string;
   updateShippingNotes: (notes: string) => void;
+  
+  // Database store initialization
+  initStore: () => Promise<void>;
 }
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -141,7 +125,7 @@ export const useAppStore = create<AppStore>((set) => ({
     messages: state.messages.map(m => ({ ...m, read: true }))
   })),
 
-  // Dynamic Categories Database mapping backend Prisma
+  // Fallback initial categories matching Zari & Co catalog structure
   categories: [
     {
       id: "cat-rings",
@@ -181,27 +165,55 @@ export const useAppStore = create<AppStore>((set) => ({
     }
   ],
 
-  addCategory: (category) => set((state) => ({
-    categories: [
-      ...state.categories,
-      { ...category, id: `cat-${Date.now().toString().slice(-4)}` }
-    ]
-  })),
+  // Asynchronous API synchronization actions for Category
+  addCategory: async (category) => {
+    try {
+      const created = await api.createCategory(category);
+      set((state) => ({
+        categories: [...state.categories, created]
+      }));
+      toast.success("Category Created Live ✦", {
+        description: `Successfully added ${created.name} to database.`
+      });
+    } catch (error) {
+      console.error("Failed to create category on backend:", error);
+    }
+  },
 
-  updateCategory: (id, fields) => set((state) => ({
-    categories: state.categories.map((c) => c.id === id ? { ...c, ...fields } : c)
-  })),
+  updateCategory: async (id, fields) => {
+    try {
+      const updated = await api.updateCategory(id, fields);
+      set((state) => ({
+        categories: state.categories.map((c) => c.id === id ? { ...c, ...updated } : c)
+      }));
+      toast.success("Category Sync Successful ✦", {
+        description: "Updates persistently written to database."
+      });
+    } catch (error) {
+      console.error("Failed to update category on backend:", error);
+    }
+  },
 
-  deleteCategory: (id) => set((state) => ({
-    categories: state.categories.filter((c) => c.id !== id),
-    // Re-assign products pointing to this category to Rings to avoid broken relational bounds
-    products: state.products.map((p) => p.categoryId === id ? { ...p, categoryId: "cat-rings" } : p)
-  })),
+  deleteCategory: async (id) => {
+    try {
+      await api.deleteCategory(id);
+      set((state) => ({
+        categories: state.categories.filter((c) => c.id !== id),
+        // Relational safety: Fallback products referencing the deleted category to rings
+        products: state.products.map((p) => p.categoryId === id ? { ...p, categoryId: "cat-rings" } : p)
+      }));
+      toast.success("Category Deleted Live ✦", {
+        description: "Prisma relations successfully un-mapped."
+      });
+    } catch (error) {
+      console.error("Failed to delete category on backend:", error);
+    }
+  },
 
-  // Catalog products pointing to Category UUIDs and featuring the isPublished schema flag
+  // Fallback initial products catalog
   products: [
     {
-      id: 1,
+      id: "prod-1",
       categoryId: "cat-rings",
       name: "Elysian Diamond Ring",
       price: "28450.30",
@@ -212,7 +224,7 @@ export const useAppStore = create<AppStore>((set) => ({
       isPublished: true
     },
     {
-      id: 2,
+      id: "prod-2",
       categoryId: "cat-necklaces",
       name: "Sapphire Necklace",
       price: "13430.30",
@@ -223,7 +235,7 @@ export const useAppStore = create<AppStore>((set) => ({
       isPublished: true
     },
     {
-      id: 3,
+      id: "prod-3",
       categoryId: "cat-earrings",
       name: "Gold Hoop Earrings",
       price: "13850.00",
@@ -234,7 +246,7 @@ export const useAppStore = create<AppStore>((set) => ({
       isPublished: true
     },
     {
-      id: 4,
+      id: "prod-4",
       categoryId: "cat-rings",
       name: "Halo Engagement Ring",
       price: "7980.00",
@@ -242,28 +254,78 @@ export const useAppStore = create<AppStore>((set) => ({
       description: "<h3>Bespoke Romance Re-imagined</h3><p>Celebrate pure love with our signature cushion-cut diamond centered inside a dazzling halo of round brilliant diamonds, set upon a micro-paved platinum band.</p>",
       details: "<ul><li>0.9 Carat Cushion-Cut center diamond.</li><li>Color: F | Clarity: VS1.</li><li>Solid Platinum-950 hypoallergenic alloy casting.</li></ul>",
       careInstructions: "<p>Bring to your nearest Aurélia Jewels boutique once a year for complimentary prong audits and professional ultra-sonic polishing.</p>",
-      isPublished: false // Setup as a draft item for display comparison!
+      isPublished: false
     }
   ],
 
-  addProduct: (product) => set((state) => ({
-    products: [
-      ...state.products,
-      { ...product, id: Date.now() }
-    ]
-  })),
+  // Asynchronous API synchronization actions for Product
+  addProduct: async (product) => {
+    try {
+      const created = await api.createProduct(product);
+      set((state) => ({
+        products: [...state.products, created]
+      }));
+      toast.success("Product Created Live ✦", {
+        description: `Successfully added ${created.name} to catalog database.`
+      });
+    } catch (error) {
+      console.error("Failed to create product on backend:", error);
+    }
+  },
 
-  updateProduct: (id, fields) => set((state) => ({
-    products: state.products.map((p) => p.id === id ? { ...p, ...fields } : p)
-  })),
+  updateProduct: async (id, fields) => {
+    try {
+      const updated = await api.updateProduct(id, fields);
+      set((state) => ({
+        products: state.products.map((p) => p.id === id ? { ...p, ...updated } : p)
+      }));
+      toast.success("Product Sync Successful ✦", {
+        description: "Updates persistently written to catalogue database."
+      });
+    } catch (error) {
+      console.error("Failed to update product on backend:", error);
+    }
+  },
 
-  deleteProduct: (id) => set((state) => ({
-    products: state.products.filter((p) => p.id !== id)
-  })),
+  deleteProduct: async (id) => {
+    try {
+      await api.deleteProduct(id);
+      set((state) => ({
+        products: state.products.filter((p) => p.id !== id)
+      }));
+      toast.success("Product Deleted Live ✦", {
+        description: "Item successfully soft-deleted in database."
+      });
+    } catch (error) {
+      console.error("Failed to delete product on backend:", error);
+    }
+  },
 
   collectionStory: "<h3>Heritage of Aurélia Jewels</h3><p>Founded in Paris and re-imagined for global connoisseurs, <strong>Aurélia Jewels</strong> creates hand-crafted masterpieces. Every piece of jewelry tells a unique story of ancient volcanic formations, GIA-inspected luxury, and micro-precision craftsmanship.</p><p>We believe in pure structural beauty, sustainable recycled gold castings, and creating heirloom memories that transition elegantly across generations.</p>",
   updateCollectionStory: (story) => set({ collectionStory: story }),
 
   shippingNotes: "<h3>Premium Boutique Delivery System</h3><p>Every Aurélia Jewels dispatch features secure signature-required transit, fully insured under a global cargo policy. Packaging includes our leather jewelry case, GIA certification sheets, and clean gold polishing cloths.</p><h4>Returns Policy</h4><p>We provide a complimentary <strong>30-day window</strong> for exchanges and returns. Returned items must remain completely unworn with security seals and certificates intact.</p>",
-  updateShippingNotes: (notes) => set({ shippingNotes: notes })
+  updateShippingNotes: (notes) => set({ shippingNotes: notes }),
+
+  // Initialize and synchronise store with live backend PostgreSQL database
+  initStore: async () => {
+    try {
+      const [categories, products] = await Promise.all([
+        api.getCategories(),
+        api.getProducts()
+      ]);
+      
+      // Update state if we successfully fetched data
+      if (categories.length > 0) {
+        set({ categories });
+      }
+      if (products.length > 0) {
+        set({ products });
+      }
+      
+      console.log("Database store synchronized successfully ✦");
+    } catch (error) {
+      console.warn("Could not sync with backend database. Falling back to local data.", error);
+    }
+  }
 }));

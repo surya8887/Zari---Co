@@ -63,18 +63,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             content_style: `
               body { 
                 font-family: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
-                font-size: 13px; 
+                font-size: 15px; 
                 color: #f1f5f9; 
                 background-color: #12141a; 
-                line-height: 1.5;
-                padding: 12px;
+                line-height: 1.6;
+                padding: 16px;
               }
               body::before {
                 color: #7e8494 !important;
                 font-style: italic;
               }
-              h3 { color: #c5a880; font-family: serif; font-size: 16px; margin-top: 0; margin-bottom: 8px; }
-              h4 { color: #c5a880; font-size: 14px; margin-top: 0; margin-bottom: 6px; }
+              h3 { color: #c5a880; font-family: serif; font-size: 18px; margin-top: 0; margin-bottom: 8px; }
+              h4 { color: #c5a880; font-size: 16px; margin-top: 0; margin-bottom: 6px; }
               ul { list-style-type: disc; margin-left: 20px; margin-bottom: 8px; }
               ol { list-style-type: decimal; margin-left: 20px; margin-bottom: 8px; }
               strong { color: #c5a880; font-weight: 600; }

@@ -23,11 +23,11 @@ export const StatCard: React.FC<StatCardProps> = ({
           {icon}
         </div>
         <div>
-          <p className="text-xs font-medium text-muted-foreground tracking-wide uppercase">{title}</p>
-          <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-2xl font-semibold tracking-tight text-foreground transition-all group-hover:text-primary-foreground">{value}</span>
+          <p className="text-sm font-semibold text-muted-foreground tracking-widest uppercase">{title}</p>
+          <div className="flex items-baseline gap-2 mt-1.5">
+            <span className="text-2xl font-bold tracking-tight text-foreground transition-all group-hover:text-primary-foreground">{value}</span>
             {trend && (
-              <span className="text-xs font-semibold text-emerald-500 flex items-center gap-0.5 select-none">
+              <span className="text-sm font-bold text-emerald-400 flex items-center gap-0.5 select-none">
                 {trend}
               </span>
             )}

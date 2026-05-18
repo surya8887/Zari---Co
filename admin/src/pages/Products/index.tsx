@@ -40,8 +40,6 @@ export const Products: React.FC = () => {
     deleteCategory,
     collectionStory,
     updateCollectionStory,
-    shippingNotes,
-    updateShippingNotes,
     uploadProductImages,
     deleteProductImage,
     setPrimaryImage
@@ -93,9 +91,7 @@ export const Products: React.FC = () => {
   const [storyText, setStoryText] = useState(collectionStory);
   const [storyError, setStoryError] = useState("");
 
-  // Shipping Notes Local State
-  const [shippingText, setShippingText] = useState(shippingNotes);
-  const [shippingError, setShippingError] = useState("");
+
 
   // Helper: Auto-generate slug from name in real-time
   const generateSlug = (text: string) => {
@@ -396,23 +392,7 @@ export const Products: React.FC = () => {
     });
   };
 
-  // Submit Shipping / Inventory Notes Form
-  const handleShippingSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!shippingText.trim() || shippingText === "<p><br></p>") {
-      setShippingError("Shipping notes and return rules are required.");
-      toast.warning("Validation Failed: Rich text shipping guidelines are empty.");
-      return;
-    }
 
-    updateShippingNotes(shippingText);
-    setShippingError("");
-    
-    toast.success("Shipping & Return Guidelines Updated! 📍", {
-      description: "Policy briefs updated across transaction nodes."
-    });
-  };
 
   // ROUTER LOGIC FOR PAGES
   
@@ -456,9 +436,9 @@ export const Products: React.FC = () => {
           
           {/* LEFT: Standard Text inputs & Publish Checkbox */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="rounded-xl border border-border bg-card p-6 space-y-4 h-fit">
-              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
-                <Gem size={14} className="text-primary" />
+            <div className="rounded-xl border border-border bg-[#0e1015] p-6 space-y-5 h-fit shadow-lg">
+              <h3 className="text-sm font-serif font-bold text-primary uppercase tracking-widest flex items-center gap-2 border-b border-border/30 pb-3 select-none">
+                <Gem size={15} className="text-primary" />
                 Product Specification
               </h3>
               
@@ -470,8 +450,8 @@ export const Products: React.FC = () => {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Elysian Diamond Ring"
                   className={cn(
-                    "w-full px-3 py-2 text-xs border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none",
-                    productErrors.name ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary/50"
+                    "w-full px-4 py-2.5 text-sm border bg-[#08090d] rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                    productErrors.name ? "border-rose-500 ring-2 ring-rose-500/20" : "border-border focus:border-primary/60"
                   )}
                 />
               </FormField>
@@ -486,8 +466,8 @@ export const Products: React.FC = () => {
                     onChange={(e) => setSku(e.target.value)}
                     placeholder="e.g. ELY-004"
                     className={cn(
-                      "w-full px-3 py-2 text-xs border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none uppercase",
-                      productErrors.sku ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary/50"
+                      "w-full px-4 py-2.5 text-sm border bg-[#08090d] rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all uppercase",
+                      productErrors.sku ? "border-rose-500 ring-2 ring-rose-500/20" : "border-border focus:border-primary/60"
                     )}
                   />
                 </FormField>
@@ -500,8 +480,8 @@ export const Products: React.FC = () => {
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="e.g. 28450.30"
                     className={cn(
-                      "w-full px-3 py-2 text-xs border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none",
-                      productErrors.price ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary/50"
+                      "w-full px-4 py-2.5 text-sm border bg-[#08090d] rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                      productErrors.price ? "border-rose-500 ring-2 ring-rose-500/20" : "border-border focus:border-primary/60"
                     )}
                   />
                 </FormField>
@@ -512,7 +492,7 @@ export const Products: React.FC = () => {
                 <select 
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-border bg-[#0d0f14] rounded-lg text-foreground focus:outline-none focus:border-primary/50 cursor-pointer"
+                  className="w-full px-4 py-2.5 text-sm border border-border bg-[#08090d] rounded-lg text-foreground focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all cursor-pointer"
                 >
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
@@ -523,36 +503,36 @@ export const Products: React.FC = () => {
               </FormField>
 
               {/* Publish Checkbox mapping the schema's isPublished */}
-              <div className="border-t border-border/40 pt-4 mt-2">
-                <div className="flex items-center gap-2 select-none cursor-pointer">
+              <div className="border-t border-border/40 pt-4 mt-3">
+                <div className="flex items-center gap-3 select-none cursor-pointer">
                   <input 
                     type="checkbox"
                     id="prodIsPublished"
                     checked={isPublished}
                     onChange={(e) => setIsPublished(e.target.checked)}
-                    className="w-4 h-4 rounded border-border bg-[#0d0f14] text-primary focus:ring-primary/20 accent-[#c5a880] cursor-pointer"
+                    className="w-4.5 h-4.5 rounded border-border bg-[#08090d] text-primary focus:ring-primary/20 accent-[#c5a880] cursor-pointer"
                   />
-                  <label htmlFor="prodIsPublished" className="text-xs font-semibold text-foreground cursor-pointer flex items-center gap-1.5 select-none">
-                    {isPublished ? <Eye size={13} className="text-primary" /> : <EyeOff size={13} className="text-muted-foreground" />}
+                  <label htmlFor="prodIsPublished" className="text-sm font-semibold text-foreground cursor-pointer flex items-center gap-2 select-none">
+                    {isPublished ? <Eye size={14} className="text-primary" /> : <EyeOff size={14} className="text-muted-foreground" />}
                     Publish to Boutique Catalogue
                   </label>
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-1.5 leading-relaxed pl-6">
+                <p className="text-xs text-muted-foreground/80 mt-2 leading-relaxed pl-7">
                   If checked, the jewelry piece is published instantly. Otherwise, it remains saved as an admin draft.
                 </p>
               </div>
             </div>
 
             {/* Product Media Gallery Card */}
-            <div className="rounded-xl border border-border bg-card p-6 space-y-4 h-fit">
-              <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
-                <ImageIcon size={14} className="text-primary" />
+            <div className="rounded-xl border border-border bg-[#0e1015] p-6 space-y-5 h-fit shadow-lg">
+              <h3 className="text-sm font-serif font-bold text-primary uppercase tracking-widest flex items-center gap-2 border-b border-border/30 pb-3 select-none">
+                <ImageIcon size={15} className="text-primary" />
                 Product Media Gallery
               </h3>
               
               {/* Uploader Box */}
               <div 
-                className="border-2 border-dashed border-border/80 hover:border-primary/50 transition-all rounded-lg p-6 text-center cursor-pointer bg-[#0d0f14]/50 group"
+                className="border-2 border-dashed border-border/60 hover:border-primary/60 transition-all rounded-lg p-6 text-center cursor-pointer bg-[#08090d] group"
                 onClick={() => document.getElementById("productImageFileInput")?.click()}
               >
                 <input 
@@ -710,13 +690,13 @@ export const Products: React.FC = () => {
           <div className="lg:col-span-2 space-y-6">
             
             {/* Description Editor */}
-            <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-              <div className="flex justify-between items-center border-b border-border/40 pb-2">
-                <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
-                  <Info size={14} className="text-primary animate-pulse" />
+            <div className="rounded-xl border border-border bg-[#0e1015] p-6 space-y-5 shadow-lg">
+              <div className="flex justify-between items-center border-b border-border/30 pb-3">
+                <span className="text-sm font-serif font-bold text-primary uppercase tracking-widest flex items-center gap-2 select-none">
+                  <Info size={15} className="text-primary animate-pulse" />
                   Product Story & Narrative
                 </span>
-                <span className="text-[9px] text-muted-foreground bg-[#241e17] px-2 py-0.5 rounded font-mono text-primary font-semibold">HTML Editor</span>
+                <span className="text-[10px] text-primary bg-[#241e17] border border-primary/20 px-2.5 py-1 rounded font-mono font-semibold uppercase tracking-wider">HTML Editor</span>
               </div>
               <RichTextEditor 
                 value={description}
@@ -730,13 +710,13 @@ export const Products: React.FC = () => {
             </div>
 
             {/* Product Details Specs Editor */}
-            <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-              <div className="flex justify-between items-center border-b border-border/40 pb-2">
-                <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
-                  <Scale size={14} className="text-blue-400" />
+            <div className="rounded-xl border border-border bg-[#0e1015] p-6 space-y-5 shadow-lg">
+              <div className="flex justify-between items-center border-b border-border/30 pb-3">
+                <span className="text-sm font-serif font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2 select-none">
+                  <Scale size={15} className="text-blue-400" />
                   GIA Specifications & Diamond Metrology
                 </span>
-                <span className="text-[9px] text-muted-foreground bg-[#171e2c] px-2 py-0.5 rounded font-mono text-blue-400 font-semibold">HTML Editor</span>
+                <span className="text-[10px] text-blue-400 bg-[#121b2c] border border-blue-400/20 px-2.5 py-1 rounded font-mono font-semibold uppercase tracking-wider">HTML Editor</span>
               </div>
               <RichTextEditor 
                 value={details}
@@ -750,13 +730,13 @@ export const Products: React.FC = () => {
             </div>
 
             {/* Care Instructions Editor */}
-            <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-              <div className="flex justify-between items-center border-b border-border/40 pb-2">
-                <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
-                  <Heart size={14} className="text-[#a58b68]" />
+            <div className="rounded-xl border border-border bg-[#0e1015] p-6 space-y-5 shadow-lg">
+              <div className="flex justify-between items-center border-b border-border/30 pb-3">
+                <span className="text-sm font-serif font-bold text-[#c5a880] uppercase tracking-widest flex items-center gap-2 select-none">
+                  <Heart size={15} className="text-[#c5a880]" />
                   Care & Preservation Guidelines
                 </span>
-                <span className="text-[9px] text-muted-foreground bg-[#241e17] px-2 py-0.5 rounded font-mono text-[#a58b68] font-semibold">HTML Editor</span>
+                <span className="text-[10px] text-[#c5a880] bg-[#241e17] border border-[#c5a880]/20 px-2.5 py-1 rounded font-mono font-semibold uppercase tracking-wider">HTML Editor</span>
               </div>
               <RichTextEditor 
                 value={careInstructions}
@@ -838,9 +818,9 @@ export const Products: React.FC = () => {
               </h3>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border-collapse">
+                <table className="w-full text-left text-sm border-collapse">
                   <thead>
-                    <tr className="border-b border-border text-muted-foreground font-semibold">
+                    <tr className="border-b border-border text-primary font-bold uppercase tracking-widest font-serif text-sm">
                       <th className="pb-3 pl-2">Name / Slug</th>
                       <th className="pb-3">Parent Link</th>
                       <th className="pb-3 text-center">Status</th>
@@ -853,21 +833,21 @@ export const Products: React.FC = () => {
                       return (
                         <tr key={cat.id} className="hover:bg-secondary/15 transition-colors group">
                           <td className="py-3 pl-2">
-                            <h5 className="font-semibold text-foreground group-hover:text-primary-foreground transition-all">{cat.name}</h5>
-                            <p className="text-[9px] font-mono text-muted-foreground mt-0.5">Slug: /{cat.slug}</p>
+                            <h5 className="font-serif font-bold text-base text-foreground group-hover:text-primary transition-all">{cat.name}</h5>
+                            <p className="text-xs font-mono text-muted-foreground/80 mt-0.5">Slug: /{cat.slug}</p>
                           </td>
                           <td className="py-3">
                             {cat.parentId ? (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-semibold bg-[#171e2c] text-blue-400 border border-[#252f44]">
+                              <span className="inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold bg-[#171e2c] text-blue-400 border border-[#252f44]">
                                 {parentName}
                               </span>
                             ) : (
-                              <span className="text-[10px] text-muted-foreground italic">Top-Level</span>
+                              <span className="text-xs text-muted-foreground italic">Top-Level</span>
                             )}
                           </td>
                           <td className="py-3 text-center select-none">
-                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[9px] font-bold border ${cat.isPublished ? "text-primary bg-[#241e17] border-[#3b3227]" : "text-muted-foreground bg-secondary/30 border-border"}`}>
-                              {cat.isPublished ? <Eye size={10} /> : <EyeOff size={10} />}
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold border ${cat.isPublished ? "text-primary bg-[#241e17] border-[#3b3227]" : "text-muted-foreground bg-secondary/30 border-border"}`}>
+                              {cat.isPublished ? <Eye size={11} /> : <EyeOff size={11} />}
                               {cat.isPublished ? "Published" : "Draft"}
                             </span>
                           </td>
@@ -875,17 +855,17 @@ export const Products: React.FC = () => {
                             <div className="flex justify-end gap-2.5 select-none">
                               <button 
                                 onClick={() => handleCategoryEdit(cat)}
-                                className="w-6 h-6 rounded border border-border bg-[#0d0f14]/50 flex items-center justify-center text-primary hover:bg-primary hover:text-[#090a0f] transition-all cursor-pointer"
+                                className="w-8 h-8 rounded border border-border bg-[#0d0f14]/50 flex items-center justify-center text-primary hover:bg-primary hover:text-[#090a0f] transition-all cursor-pointer"
                                 title="Edit category specs"
                               >
-                                <Edit3 size={11} />
+                                <Edit3 size={13} />
                               </button>
                               <button 
                                 onClick={() => handleCategoryDelete(cat.id, cat.name)}
-                                className="w-6 h-6 rounded border border-border bg-[#0d0f14]/50 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white transition-all cursor-pointer"
+                                className="w-8 h-8 rounded border border-border bg-[#0d0f14]/50 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white transition-all cursor-pointer"
                                 title="Delete category"
                               >
-                                <Trash2 size={11} />
+                                <Trash2 size={13} />
                               </button>
                             </div>
                           </td>
@@ -924,77 +904,7 @@ export const Products: React.FC = () => {
     );
   }
 
-  // 3. INVENTORY & SHIPPING RETURN NOTES
-  if (currentPage === "inventory") {
-    return (
-      <div className="space-y-6 animate-in fade-in duration-200 text-left">
-        <form onSubmit={handleShippingSubmit} className="space-y-6">
-          <div className="flex justify-between items-center border-b border-border/10 pb-4">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight text-foreground font-serif">Inventory Notes & Delivery Policies</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Configure delivery insurance coverage limits, dispatch packaging, and return windows.
-              </p>
-            </div>
-            <button 
-              type="submit"
-              className="flex items-center gap-1.5 bg-primary text-[#090a0f] px-5 py-2 rounded-lg text-xs font-bold hover:bg-primary/95 transition-all cursor-pointer shadow-[0_0_12px_rgba(197,168,128,0.25)] select-none"
-            >
-              <Save size={14} />
-              Save Policies
-            </button>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            {/* Left: Mock Inventory Rules */}
-            <div className="lg:col-span-1 rounded-xl border border-[#22252e] bg-[#12141a] p-6 space-y-4 h-fit select-none">
-              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                <Info size={14} className="text-primary animate-pulse" />
-                Inventory Stock Thresholds
-              </h3>
-              <div className="space-y-3">
-                <div className="p-3 bg-secondary/15 rounded-lg border border-border/40">
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Critical Low Limit</p>
-                  <p className="text-sm font-semibold text-foreground mt-0.5">2 pieces remaining</p>
-                </div>
-                <div className="p-3 bg-secondary/15 rounded-lg border border-border/40">
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Auto-Reorder Dispatch</p>
-                  <p className="text-sm font-semibold text-primary mt-0.5">10 units (Prong Settings)</p>
-                </div>
-                <div className="p-3 bg-[#241e17]/30 rounded-lg border border-[#3b3227]/40">
-                  <p className="text-[10px] text-primary uppercase font-bold">Bespoke Lead Time</p>
-                  <p className="text-sm font-semibold text-foreground mt-0.5">14 Standard Business Days</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: TinyMCE Shipping Policies Editor */}
-            <div className="lg:col-span-2 rounded-xl border border-[#22252e] bg-[#12141a] p-6 space-y-4">
-              <div className="flex justify-between items-center border-b border-border/40 pb-2">
-                <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
-                  <Scale size={14} className="text-blue-400" />
-                  Shipping Insurances & Returns Policy
-                </span>
-                <span className="text-[9px] text-muted-foreground bg-[#171e2c] px-2 py-0.5 rounded font-mono text-blue-400 font-semibold">HTML Editor</span>
-              </div>
-              
-              <RichTextEditor 
-                value={shippingText}
-                onChange={(content) => {
-                  setShippingText(content);
-                  if (shippingError) setShippingError("");
-                }}
-                placeholder="Detail packaging guidelines, customs clearance codes, and 30-day exchange windows..."
-                error={shippingError}
-              />
-            </div>
-            
-          </div>
-        </form>
-      </div>
-    );
-  }
 
   // 4. MAIN PRODUCTS CATALOG LIST (products-list)
   return (
@@ -1012,7 +922,7 @@ export const Products: React.FC = () => {
       {/* High-Fidelity Premium Product Specifications Modal */}
       {viewingProduct && (
         <ProductDetailModal
-          product={viewingProduct}
+          product={products.find((p) => p.id === viewingProduct.id) || viewingProduct}
           categories={categories}
           onClose={() => setViewingProduct(null)}
           onEdit={(prod) => {

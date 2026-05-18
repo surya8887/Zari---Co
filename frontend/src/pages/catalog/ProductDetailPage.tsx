@@ -4,7 +4,7 @@ import Header from '@/components/layout/Header';
 import { useProductStore } from '@/store/useProductStore';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
-import { Star, ShieldCheck, ShoppingBag, Heart, ArrowLeft, Send, Video, MapPin, Truck, Calendar, ChevronDown, ChevronUp, RotateCcw, CheckCircle, Check, PhoneCall, Award } from 'lucide-react';
+import { Star, ShieldCheck, ShoppingBag, Heart, Send, Video, MapPin, Truck, ChevronDown, ChevronUp, RotateCcw, Check, PhoneCall, Award } from 'lucide-react';
 import { toast } from 'sonner';
 
 const ProductDetailPage = () => {

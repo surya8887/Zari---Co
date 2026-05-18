@@ -16,7 +16,15 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: [
+            "http://localhost:4000",
+            "http://127.0.0.1:4000",
+            "http://localhost:4001",
+            "http://127.0.0.1:4001",
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:5174"
+        ],
         credentials: true,
     }),
 );

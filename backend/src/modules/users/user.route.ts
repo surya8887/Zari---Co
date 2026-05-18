@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as userController from "./user.controller.js";
+import * as addressController from "./address.controller.js";
 import { authenticateUser, authenticateAdmin } from "../../shared/middlewares/auth.middleware.js";
 
 const router: Router = Router();
@@ -7,6 +8,14 @@ const router: Router = Router();
 // @route GET /api/v1/users
 // @desc Get all users (Admin only)
 router.get("/", authenticateUser, authenticateAdmin, userController.getAllUsers);
+
+// --- User Address Book Routes ---
+// These must be declared BEFORE dynamic user ID parameters to prevent dynamic route masking
+router.post("/address", authenticateUser, addressController.createAddress);
+router.get("/address", authenticateUser, addressController.getAddresses);
+router.get("/address/:id", authenticateUser, addressController.getAddress);
+router.put("/address/:id", authenticateUser, addressController.updateAddress);
+router.delete("/address/:id", authenticateUser, addressController.deleteAddress);
 
 // @route GET /api/v1/users/:id
 // @desc Get single user

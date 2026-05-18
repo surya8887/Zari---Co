@@ -93,32 +93,17 @@ const updateProductImageSchema = createImageSchema.partial().extend({
 
 export const updateProductSchema = z.object({
     product: productSchema.partial().optional(),
-    variants: z.object({
-        create: z.array(productVariantSchema).optional(),
-        update: z.array(updateProductVariantSchema).optional(),
-        delete: z.array(z.string().uuid("Variant ID must be a valid UUID")).optional(),
-    }).optional(),
-    images: z.object({
-        create: z.array(createImageSchema).optional(),
-        update: z.array(updateProductImageSchema).optional(),
-        delete: z.array(z.string().uuid("Image ID must be a valid UUID")).optional(),
-    }).optional(),
-}).refine(
-    (value) => {
-        const imageCreates = value.images?.create ?? [];
-        const imageUpdates = value.images?.update ?? [];
-        return [...imageCreates, ...imageUpdates].filter((image) => image.isPrimary).length <= 1;
-    },
-    { path: ["images"], message: "Only one primary image can be set in a single request" },
-);
-
-export const getAllProductsSchema = z.object({
-    query: z.object({
-        page: queryNumber(1),
-        limit: queryNumber(10, 100),
-        categoryId: z.string().uuid("Invalid category ID format").optional(),
-        search: z.string().trim().min(1).optional(),
-        isPublished: queryBoolean,
-        includeDeleted: queryBoolean.default(false),
-    }),
+    variants: z.array(productVariantSchema.partial()).optional(),
+    images: z.array(createImageSchema.partial()).optional(),
 });
+
+// Dedicated individual ProductVariant schemas
+export const createIndividualVariantSchema = z.object({
+    name: z.string().min(1, "Product variant name is required"),
+    sku: z.string().min(1, "Variant SKU is required"),
+    priceOverride: z.number().min(0, "Price override cannot be negative").optional().nullable(),
+    isActive: z.boolean().optional().default(true),
+    attributes: z.record(z.string(), z.any()).optional().default({}),
+});
+
+export const updateIndividualVariantSchema = createIndividualVariantSchema.partial();

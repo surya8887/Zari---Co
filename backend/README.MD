@@ -145,8 +145,49 @@ Since the `package.json` configurations are designed to run nodemon against the 
 To compile and execute the application in production mode:
 ```bash
 npm run build
-npm run start
 ```
+
+---
+
+## 🛣️ API Endpoints Summary
+
+### 🔑 Authentication Module (`/api/v1/auth`)
+- `POST /register`: Registers a new user account with hashed passwords.
+- `POST /login`: Authenticates credentials and issues HttpOnly Cookies.
+- `POST /refresh-token`: Rotates access tokens securely.
+- `POST /logout`: Clears HttpOnly cookies and terminates session tokens.
+
+### 👥 Users Module (`/api/v1/users`)
+- `GET /`: Lists all users (Admin only).
+- `GET /:id`: Retrieves profile details for a specific user.
+- `DELETE /:id`: Deletes a user profile (Admin only).
+
+### 🏠 Address Book Sub-Module (`/api/v1/users/address`)
+- `POST /address`: Creates a new shipping/billing address. Automatically enforces the **Single Default Address** rule.
+- `GET /address`: Retrieves all active addresses for the authenticated user.
+- `GET /address/:id`: Gets details for a specific address.
+- `PUT /address/:id`: Updates an address, handles default resets.
+- `DELETE /address/:id`: Safely unlinks and deletes an address. Promotes the next available sibling to default automatically if the deleted one was default.
+
+### 💍 Catalog Module (`/api/v1/catalog`)
+- `GET /product`: Lists all products in the catalogue.
+- `POST /product`: Creates a new product catalog item.
+- `PUT /product/:id`: Updates a product's text and rich parameters.
+- `DELETE /product/:id`: Unlinks a product record.
+
+### 🖼️ Product Media Sub-Module (`/api/v1/catalog/product/:productId/images`)
+- `POST /product/:productId/images`: Uploads multiple images (supports up to 10 files simultaneously) via secure **Multer** middlewares. Validates against size limits (max 10MB) and image types (`JPEG, PNG, WEBP, GIF`).
+- `DELETE /image/:id`: Deletes an image record from PostgreSQL and unlinks the physical asset from the local disk. Promotes the next available sibling if the deleted cover was primary.
+- `PUT /image/:id/primary`: Instantly updates and marks the selected asset as the main primary thumbnail cover.
+
+### 🧬 Product Variant Sub-Module (`/api/v1/catalog`)
+- `POST /product/:productId/variants`: Creates a new product variant. Executes a transactional query that automatically initializes matching, zero-stock **Inventory** rows in PostgreSQL.
+- `GET /product/:productId/variants`: Lists all variants for a specific product alongside active inventory levels.
+- `GET /variant/:id`: Retrieves specific variant details (includes nested product references and stock summaries).
+- `PUT /variant/:id`: Updates variant attributes, names, price overrides, and active statuses.
+- `DELETE /variant/:id`: Safely unlinks and deletes a variant, cascading physical and inventory unlinks safely.
+
+---
 
 ---
 

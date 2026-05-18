@@ -1,31 +1,104 @@
 import React, { createContext, useContext, useState } from "react";
+import { api } from "../api";
 
-interface User {
-  name: string;
+export interface User {
+  id: string;
   email: string;
+  firstName: string;
+  lastName: string | null;
+  role: string;
+  phone?: string | null;
+  isVerified?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string) => void;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  register: (payload: {
+    firstName: string;
+    lastName?: string;
+    email: string;
+    password: string;
+    phone?: string;
+  }) => Promise<void>;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem("zari_admin_user");
+    try {
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [loading, setLoading] = useState(false);
 
-  const login = (email: string) => {
-    setUser({ name: "Admin User", email });
+  const login = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      const response = await api.login(email, password);
+      // The response payload from backend contains { user, accessToken, refreshToken }
+      const userData = response.user;
+
+      if (!userData) {
+        throw new Error("Invalid response format from authentication node.");
+      }
+
+      // For local development convenience, we permit role: "admin", "superadmin", or "user" to explore the administration console
+      if (!["admin", "superadmin", "user"].includes(userData.role)) {
+        throw new Error("Access Denied: You do not possess administrator credentials.");
+      }
+
+      setUser(userData);
+      localStorage.setItem("zari_admin_user", JSON.stringify(userData));
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const logout = () => {
-    setUser(null);
+  const register = async (payload: {
+    firstName: string;
+    lastName?: string;
+    email: string;
+    password: string;
+    phone?: string;
+  }) => {
+    setLoading(true);
+    try {
+      const response = await api.register(payload);
+      const userData = response.user;
+
+      if (!userData) {
+        throw new Error("Invalid response format from registration node.");
+      }
+
+      setUser(userData);
+      localStorage.setItem("zari_admin_user", JSON.stringify(userData));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    setLoading(true);
+    try {
+      await api.logout();
+    } catch (error) {
+      console.warn("Backend logout session unlinking was not acknowledged:", error);
+    } finally {
+      setUser(null);
+      localStorage.removeItem("zari_admin_user");
+      setLoading(false);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, register, loading }}>
       {children}
     </AuthContext.Provider>
   );

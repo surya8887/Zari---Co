@@ -40,8 +40,6 @@ export const Products: React.FC = () => {
     deleteCategory,
     collectionStory,
     updateCollectionStory,
-    shippingNotes,
-    updateShippingNotes,
     uploadProductImages,
     deleteProductImage,
     setPrimaryImage
@@ -93,9 +91,7 @@ export const Products: React.FC = () => {
   const [storyText, setStoryText] = useState(collectionStory);
   const [storyError, setStoryError] = useState("");
 
-  // Shipping Notes Local State
-  const [shippingText, setShippingText] = useState(shippingNotes);
-  const [shippingError, setShippingError] = useState("");
+
 
   // Helper: Auto-generate slug from name in real-time
   const generateSlug = (text: string) => {
@@ -396,23 +392,7 @@ export const Products: React.FC = () => {
     });
   };
 
-  // Submit Shipping / Inventory Notes Form
-  const handleShippingSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!shippingText.trim() || shippingText === "<p><br></p>") {
-      setShippingError("Shipping notes and return rules are required.");
-      toast.warning("Validation Failed: Rich text shipping guidelines are empty.");
-      return;
-    }
 
-    updateShippingNotes(shippingText);
-    setShippingError("");
-    
-    toast.success("Shipping & Return Guidelines Updated! 📍", {
-      description: "Policy briefs updated across transaction nodes."
-    });
-  };
 
   // ROUTER LOGIC FOR PAGES
   
@@ -924,77 +904,7 @@ export const Products: React.FC = () => {
     );
   }
 
-  // 3. INVENTORY & SHIPPING RETURN NOTES
-  if (currentPage === "inventory") {
-    return (
-      <div className="space-y-6 animate-in fade-in duration-200 text-left">
-        <form onSubmit={handleShippingSubmit} className="space-y-6">
-          <div className="flex justify-between items-center border-b border-border/10 pb-4">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight text-foreground font-serif">Inventory Notes & Delivery Policies</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Configure delivery insurance coverage limits, dispatch packaging, and return windows.
-              </p>
-            </div>
-            <button 
-              type="submit"
-              className="flex items-center gap-1.5 bg-primary text-[#090a0f] px-5 py-2 rounded-lg text-xs font-bold hover:bg-primary/95 transition-all cursor-pointer shadow-[0_0_12px_rgba(197,168,128,0.25)] select-none"
-            >
-              <Save size={14} />
-              Save Policies
-            </button>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            {/* Left: Mock Inventory Rules */}
-            <div className="lg:col-span-1 rounded-xl border border-[#22252e] bg-[#12141a] p-6 space-y-4 h-fit select-none">
-              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                <Info size={14} className="text-primary animate-pulse" />
-                Inventory Stock Thresholds
-              </h3>
-              <div className="space-y-3">
-                <div className="p-3 bg-secondary/15 rounded-lg border border-border/40">
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Critical Low Limit</p>
-                  <p className="text-sm font-semibold text-foreground mt-0.5">2 pieces remaining</p>
-                </div>
-                <div className="p-3 bg-secondary/15 rounded-lg border border-border/40">
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Auto-Reorder Dispatch</p>
-                  <p className="text-sm font-semibold text-primary mt-0.5">10 units (Prong Settings)</p>
-                </div>
-                <div className="p-3 bg-[#241e17]/30 rounded-lg border border-[#3b3227]/40">
-                  <p className="text-[10px] text-primary uppercase font-bold">Bespoke Lead Time</p>
-                  <p className="text-sm font-semibold text-foreground mt-0.5">14 Standard Business Days</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: TinyMCE Shipping Policies Editor */}
-            <div className="lg:col-span-2 rounded-xl border border-[#22252e] bg-[#12141a] p-6 space-y-4">
-              <div className="flex justify-between items-center border-b border-border/40 pb-2">
-                <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
-                  <Scale size={14} className="text-blue-400" />
-                  Shipping Insurances & Returns Policy
-                </span>
-                <span className="text-[9px] text-muted-foreground bg-[#171e2c] px-2 py-0.5 rounded font-mono text-blue-400 font-semibold">HTML Editor</span>
-              </div>
-              
-              <RichTextEditor 
-                value={shippingText}
-                onChange={(content) => {
-                  setShippingText(content);
-                  if (shippingError) setShippingError("");
-                }}
-                placeholder="Detail packaging guidelines, customs clearance codes, and 30-day exchange windows..."
-                error={shippingError}
-              />
-            </div>
-            
-          </div>
-        </form>
-      </div>
-    );
-  }
 
   // 4. MAIN PRODUCTS CATALOG LIST (products-list)
   return (

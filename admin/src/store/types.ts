@@ -1,4 +1,11 @@
-import { type Category, type ClientProduct as Product, type ProductImage } from "@/api";
+import { 
+  type Category, 
+  type ClientProduct as Product, 
+  type ProductImage,
+  type InventoryItem,
+  type InventoryPayload,
+  type InventoryUpdatePayload
+} from "@/api";
 
 export interface NotificationItem {
   id: number;
@@ -17,7 +24,7 @@ export interface MessageItem {
   time: string;
 }
 
-export type { Category, Product, ProductImage };
+export type { Category, Product, ProductImage, InventoryItem };
 
 export interface UISlice {
   theme: "light" | "dark";
@@ -56,6 +63,27 @@ export interface SettingsSlice {
   updateShippingNotes: (notes: string) => void;
 }
 
-export interface AppStore extends UISlice, CategorySlice, ProductSlice, SettingsSlice {
+export interface InventorySlice {
+  inventory: InventoryItem[];
+  inventoryPagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+  isLoadingInventory: boolean;
+  fetchInventory: (params?: {
+    page?: number;
+    limit?: number;
+    productId?: string;
+    variantId?: string;
+    lowStockOnly?: boolean;
+  }) => Promise<void>;
+  initializeStock: (payload: InventoryPayload) => Promise<void>;
+  adjustStock: (id: string, payload: InventoryUpdatePayload) => Promise<void>;
+  deleteStock: (id: string) => Promise<void>;
+}
+
+export interface AppStore extends UISlice, CategorySlice, ProductSlice, SettingsSlice, InventorySlice {
   initStore: () => Promise<void>;
 }

@@ -16,7 +16,6 @@ export const createCategorySlice: StateCreator<AppStore, [], [], CategorySlice> 
       });
       return;
     }
-
     try {
       const created = await api.createCategory(category);
       set((state) => ({
@@ -25,10 +24,10 @@ export const createCategorySlice: StateCreator<AppStore, [], [], CategorySlice> 
       toast.success("Category Created Live ✦", {
         description: `Successfully added ${created.name} to database.`
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to create category on backend:", error);
       toast.error("Database Sync Error ✕", {
-        description: "Could not persist new category on remote host."
+        description: error?.message || "Could not persist new category on remote host."
       });
     }
   },
@@ -51,10 +50,10 @@ export const createCategorySlice: StateCreator<AppStore, [], [], CategorySlice> 
       toast.success("Category Sync Successful ✦", {
         description: "Updates persistently written to database."
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to update category on backend:", error);
       toast.error("Database Sync Error ✕", {
-        description: "Could not persist category updates on remote host."
+        description: error?.message || "Could not persist category updates on remote host."
       });
     }
   },

@@ -5,6 +5,7 @@ import { AdminHeader } from "@/components/layout/AdminHeader";
 import Dashboard from "@/pages/Dashboard";
 import Orders from "@/pages/Orders";
 import Products from "@/pages/Products";
+import { Inventory } from "@/pages/Inventory";
 import { useAuth } from "@/hooks/useAuth";
 import Login from "@/pages/Login";
 import { 
@@ -45,7 +46,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = () => {
       case "products-list":
       case "new-product":
       case "collections":
-      case "inventory":
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -65,6 +65,29 @@ export const AdminLayout: React.FC<AdminLayoutProps> = () => {
               </button>
             </div>
             <Products />
+          </div>
+        );
+
+      case "inventory":
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight text-foreground font-serif capitalize">
+                  Inventory & Stock
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Aurélia Jewels premium inventory control and collection manager.
+                </p>
+              </div>
+              <button 
+                onClick={() => handleActionMock("Export Inventory")}
+                className="flex items-center gap-1.5 border border-border bg-[#101216]/50 text-foreground px-4 py-2 rounded-lg text-xs font-semibold hover:bg-secondary/40 transition-all cursor-pointer"
+              >
+                Export Vault Stock
+              </button>
+            </div>
+            <Inventory />
           </div>
         );
 

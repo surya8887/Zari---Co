@@ -56,6 +56,48 @@ export interface ClientProduct {
 }
 
 // ==========================================
+// Inventory Interfaces
+// ==========================================
+export interface InventoryItem {
+  id: string;
+  variantId: string;
+  quantity: number;
+  reservedQuantity: number;
+  availableQuantity: number;
+  lowStockThreshold: number;
+  isLowStock: boolean;
+  updatedAt: string;
+  variant?: {
+    id: string;
+    name: string;
+    sku: string;
+    product?: {
+      id: string;
+      name: string;
+    }
+  };
+}
+
+export interface InventoryPayload {
+  variantId: string;
+  quantity: number;
+  reservedQuantity: number;
+  lowStockThreshold: number;
+  performedById?: string;
+  referenceId?: string;
+  note?: string;
+}
+
+export interface InventoryUpdatePayload {
+  quantity: number;
+  reservedQuantity: number;
+  lowStockThreshold: number;
+  performedById?: string;
+  referenceId?: string;
+  note?: string;
+}
+
+// ==========================================
 // Mapping & Serialization Helpers
 // ==========================================
 
@@ -282,6 +324,45 @@ export const api = {
     return fetchJson<any>("/auth/register", {
       method: "POST",
       body: JSON.stringify(payload)
+    });
+  },
+
+  // Inventory Endpoints
+  async getInventory(params?: {
+    page?: number;
+    limit?: number;
+    productId?: string;
+    variantId?: string;
+    lowStockOnly?: boolean;
+  }): Promise<{ inventory: InventoryItem[]; pagination: any }> {
+    const query = new URLSearchParams();
+    if (params?.page) query.append("page", String(params.page));
+    if (params?.limit) query.append("limit", String(params.limit));
+    if (params?.productId) query.append("productId", params.productId);
+    if (params?.variantId) query.append("variantId", params.variantId);
+    if (params?.lowStockOnly) query.append("lowStockOnly", String(params.lowStockOnly));
+    
+    const queryString = query.toString() ? `?${query.toString()}` : "";
+    return fetchJson<{ inventory: InventoryItem[]; pagination: any }>(`/inventory${queryString}`);
+  },
+
+  async createInventory(payload: InventoryPayload): Promise<InventoryItem> {
+    return fetchJson<InventoryItem>("/inventory", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+  },
+
+  async updateInventory(id: string, payload: InventoryUpdatePayload): Promise<InventoryItem> {
+    return fetchJson<InventoryItem>(`/inventory/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload)
+    });
+  },
+
+  async deleteInventory(id: string): Promise<any> {
+    return fetchJson<any>(`/inventory/${id}`, {
+      method: "DELETE"
     });
   }
 };

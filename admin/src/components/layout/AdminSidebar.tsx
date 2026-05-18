@@ -33,16 +33,16 @@ export const AdminSidebar: React.FC = () => {
 
   const getActiveStyle = (pageId: string) => {
     if (currentPage === pageId) {
-      return "flex items-center gap-3 px-4 py-2.5 rounded-lg bg-[#241e17] border border-[#3b3227] text-primary font-semibold text-sm shadow-[0_0_15px_rgba(197,168,128,0.05)]";
+      return "flex items-center gap-3.5 px-4 py-3 rounded-lg bg-[#241e17] border border-[#3b3227] text-primary font-semibold text-base shadow-[0_0_15px_rgba(197,168,128,0.05)]";
     }
-    return "flex items-center gap-3 px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-sm transition-colors";
+    return "flex items-center gap-3.5 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-base transition-colors";
   };
 
   const getSubActiveStyle = (pageId: string) => {
     if (currentPage === pageId) {
-      return "block py-1.5 text-[13px] text-primary font-medium pl-2 border-l border-primary/60 transition-colors";
+      return "block py-2 text-sm text-primary font-medium pl-3 border-l border-primary/60 transition-colors";
     }
-    return "block py-1.5 text-[13px] text-muted-foreground hover:text-foreground pl-2 border-l border-transparent hover:border-border transition-colors";
+    return "block py-2 text-sm text-muted-foreground hover:text-foreground pl-3 border-l border-transparent hover:border-border transition-colors";
   };
 
   return (
@@ -50,10 +50,10 @@ export const AdminSidebar: React.FC = () => {
       <div className="space-y-6">
         {/* Elegant gold serif branding logo */}
         <div className="px-4 py-2 border-b border-border/20 pb-4">
-          <h2 className="text-xl font-bold tracking-[0.25em] text-primary uppercase font-serif text-center md:text-left select-none drop-shadow-[0_0_8px_rgba(197,168,128,0.15)]">
+          <h2 className="text-2xl font-bold tracking-[0.25em] text-primary uppercase font-serif text-center md:text-left select-none drop-shadow-[0_0_8px_rgba(197,168,128,0.15)]">
             Aurélia
           </h2>
-          <p className="text-[10px] font-medium tracking-[0.35em] text-[#a58b68] uppercase text-center md:text-left mt-0.5 pl-0.5 select-none">
+          <p className="text-xs font-medium tracking-[0.35em] text-[#a58b68] uppercase text-center md:text-left mt-0.5 pl-0.5 select-none">
             Jewels
           </p>
         </div>
@@ -65,7 +65,7 @@ export const AdminSidebar: React.FC = () => {
             onClick={() => navigateTo("dashboard", "Dashboard Overview")}
             className={`w-full text-left cursor-pointer ${getActiveStyle("dashboard")}`}
           >
-            <LayoutGrid size={15} />
+            <LayoutGrid size={18} />
             Dashboard
           </button>
 
@@ -73,17 +73,17 @@ export const AdminSidebar: React.FC = () => {
           <div className="space-y-0.5">
             <button 
               onClick={() => setIsProductsOpen(!isProductsOpen)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-sm transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-base transition-colors cursor-pointer"
             >
-              <div className="flex items-center gap-3">
-                <Package size={15} />
+              <div className="flex items-center gap-3.5">
+                <Package size={18} />
                 Products
               </div>
-              {isProductsOpen ? <ChevronDown size={12} className="text-primary" /> : <ChevronRight size={12} />}
+              {isProductsOpen ? <ChevronDown size={15} className="text-primary" /> : <ChevronRight size={15} />}
             </button>
             
             {isProductsOpen && (
-              <div className="pl-11 pr-2 py-1 space-y-1 ml-3 mt-0.5">
+              <div className="pl-12 pr-2 py-1 space-y-1 ml-3 mt-0.5">
                 <button 
                   onClick={() => navigateTo("products-list", "Products List")} 
                   className={`w-full text-left cursor-pointer ${getSubActiveStyle("products-list")}`}
@@ -116,17 +116,17 @@ export const AdminSidebar: React.FC = () => {
           <div className="space-y-0.5">
             <button 
               onClick={() => setIsOrdersOpen(!isOrdersOpen)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-sm transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-base transition-colors cursor-pointer"
             >
-              <div className="flex items-center gap-3">
-                <ClipboardList size={15} />
+              <div className="flex items-center gap-3.5">
+                <ClipboardList size={18} />
                 Orders
               </div>
-              {isOrdersOpen ? <ChevronDown size={12} className="text-primary" /> : <ChevronRight size={12} />}
+              {isOrdersOpen ? <ChevronDown size={15} className="text-primary" /> : <ChevronRight size={15} />}
             </button>
             
             {isOrdersOpen && (
-              <div className="pl-11 pr-2 py-1 space-y-1 ml-3 mt-0.5">
+              <div className="pl-12 pr-2 py-1 space-y-1 ml-3 mt-0.5">
                 <button 
                   onClick={() => navigateTo("all-orders", "All Orders")} 
                   className={`w-full text-left cursor-pointer ${getSubActiveStyle("all-orders")}`}
@@ -160,7 +160,7 @@ export const AdminSidebar: React.FC = () => {
             onClick={() => navigateTo("customers", "Customer Directory")}
             className={`w-full text-left cursor-pointer ${getActiveStyle("customers")}`}
           >
-            <Users size={15} />
+            <Users size={18} />
             Customers
           </button>
 
@@ -168,16 +168,16 @@ export const AdminSidebar: React.FC = () => {
           <div className="space-y-0.5">
             <button 
               onClick={() => setIsMarketingOpen(!isMarketingOpen)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-sm transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-base transition-colors cursor-pointer"
             >
-              <div className="flex items-center gap-3">
-                <Megaphone size={15} />
+              <div className="flex items-center gap-3.5">
+                <Megaphone size={18} />
                 Marketing
               </div>
-              {isMarketingOpen ? <ChevronDown size={12} className="text-primary" /> : <ChevronRight size={12} />}
+              {isMarketingOpen ? <ChevronDown size={15} className="text-primary" /> : <ChevronRight size={15} />}
             </button>
             {isMarketingOpen && (
-              <div className="pl-11 pr-2 py-1 space-y-1 ml-3 mt-0.5">
+              <div className="pl-12 pr-2 py-1 space-y-1 ml-3 mt-0.5">
                 <button 
                   onClick={() => navigateTo("campaigns", "Marketing Campaigns")} 
                   className={`w-full text-left cursor-pointer ${getSubActiveStyle("campaigns")}`}
@@ -198,16 +198,16 @@ export const AdminSidebar: React.FC = () => {
           <div className="space-y-0.5">
             <button 
               onClick={() => setIsReportsOpen(!isReportsOpen)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-sm transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground font-semibold text-base transition-colors cursor-pointer"
             >
-              <div className="flex items-center gap-3">
-                <BarChart3 size={15} />
+              <div className="flex items-center gap-3.5">
+                <BarChart3 size={18} />
                 Reports
               </div>
-              {isReportsOpen ? <ChevronDown size={12} className="text-primary" /> : <ChevronRight size={12} />}
+              {isReportsOpen ? <ChevronDown size={15} className="text-primary" /> : <ChevronRight size={15} />}
             </button>
             {isReportsOpen && (
-              <div className="pl-11 pr-2 py-1 space-y-1 ml-3 mt-0.5">
+              <div className="pl-12 pr-2 py-1 space-y-1 ml-3 mt-0.5">
                 <button 
                   onClick={() => navigateTo("sales-report", "House Sales Report")} 
                   className={`w-full text-left cursor-pointer ${getSubActiveStyle("sales-report")}`}
@@ -229,7 +229,7 @@ export const AdminSidebar: React.FC = () => {
             onClick={() => navigateTo("settings", "Dashboard Settings")}
             className={`w-full text-left cursor-pointer ${getActiveStyle("settings")}`}
           >
-            <Settings size={15} />
+            <Settings size={18} />
             Settings
           </button>
 
@@ -238,7 +238,7 @@ export const AdminSidebar: React.FC = () => {
             onClick={() => navigateTo("reviews", "Customer Feedback")}
             className={`w-full text-left cursor-pointer ${getActiveStyle("reviews")}`}
           >
-            <MessageSquare size={15} />
+            <MessageSquare size={18} />
             Reviews
           </button>
         </nav>
@@ -246,10 +246,10 @@ export const AdminSidebar: React.FC = () => {
 
       {/* Footer Sidebar Profile (matching the aesthetic of Zari & Co admin panel) */}
       <div className="border-t border-border/20 pt-4 flex flex-col items-center justify-center gap-1 select-none">
-        <p className="text-[10px] text-[#a58b68] tracking-widest font-semibold uppercase">
+        <p className="text-xs text-[#a58b68] tracking-widest font-semibold uppercase">
           Zari & Co Admin
         </p>
-        <p className="text-[8px] text-muted-foreground opacity-60">
+        <p className="text-[10px] text-muted-foreground opacity-60">
           v1.2.0 Stable Build
         </p>
       </div>

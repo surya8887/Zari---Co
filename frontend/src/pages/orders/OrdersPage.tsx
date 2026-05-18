@@ -9,15 +9,17 @@ import { toast } from 'sonner';
 const OrdersPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { filteredOrders, pagination, setPage } = useOrderStore();
+  const { filteredOrders, pagination, setPage, fetchOrders } = useOrderStore();
 
-  // Guard route against non-authenticated users
+  // Guard route against non-authenticated users and load orders
   useEffect(() => {
     if (!isAuthenticated) {
       toast.warning("Please sign in to view your order histories.");
       navigate('/login');
+    } else {
+      fetchOrders();
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, fetchOrders]);
 
   if (!isAuthenticated) return null;
 

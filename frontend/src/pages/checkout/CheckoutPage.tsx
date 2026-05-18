@@ -12,7 +12,7 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { items, getTotals, clearCart } = useCartStore();
-  const { addresses } = useAddressStore();
+  const { addresses, fetchAddresses } = useAddressStore();
   const { placeOrder } = useOrderStore();
 
   const [selectedAddressId, setSelectedAddressId] = useState<string>('');
@@ -29,13 +29,15 @@ const CheckoutPage = () => {
   const [newState, setNewState] = useState('');
   const [newZipCode, setNewZipCode] = useState('');
 
-  // 1. Guard against non-authenticated users
+  // 1. Guard against non-authenticated users and load addresses
   useEffect(() => {
     if (!isAuthenticated) {
       toast.warning("Please sign in to configure your checkout securely.");
       navigate('/login');
+    } else {
+      fetchAddresses();
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, fetchAddresses]);
 
   // 2. Set default selected address
   useEffect(() => {

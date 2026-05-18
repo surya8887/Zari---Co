@@ -38,12 +38,14 @@ import authRoutes from "./modules/auth/auth.route.js";
 import userRoutes from "./modules/users/user.route.js";
 import inventoryRoutes from "./modules/inventory/inventory.route.js";
 import catalogRoutes from "./modules/catalog/catalog.route.js";
+import orderRoutes from "./modules/orders/order.route.js";
 import errorMiddleware from "./shared/middlewares/error.middleware.js";
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/inventory", inventoryRoutes);
 app.use("/api/v1/catalog", catalogRoutes);
+app.use("/api/v1/orders", orderRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorMiddleware);

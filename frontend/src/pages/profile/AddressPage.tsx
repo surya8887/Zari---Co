@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 const AddressPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
-  const { addresses, addAddress, deleteAddress, setDefaultAddress } = useAddressStore();
+  const { addresses, addAddress, deleteAddress, setDefaultAddress, fetchAddresses } = useAddressStore();
 
   const [showForm, setShowForm] = useState(false);
   const [fullName, setFullName] = useState('');
@@ -19,13 +19,15 @@ const AddressPage = () => {
   const [state, setState] = useState('');
   const [zipCode, setZipCode] = useState('');
 
-  // Guard routing against non-authenticated users
+  // Guard routing against non-authenticated users and fetch data
   useEffect(() => {
     if (!isAuthenticated) {
       toast.warning("Please sign in to view your addresses.");
       navigate('/login');
+    } else {
+      fetchAddresses();
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, fetchAddresses]);
 
   if (!isAuthenticated || !user) return null;
 

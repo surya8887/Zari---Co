@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import api from '@/api/axios';
+import { useAuthStore } from './useAuthStore';
 
 export interface Address {
   id: string;
@@ -16,84 +17,114 @@ export interface Address {
 
 interface AddressState {
   addresses: Address[];
-  addAddress: (address: Omit<Address, 'id'>) => void;
-  updateAddress: (id: string, address: Partial<Address>) => void;
-  deleteAddress: (id: string) => void;
-  setDefaultAddress: (id: string) => void;
+  isLoading: boolean;
+  error: string | null;
+  fetchAddresses: () => Promise<void>;
+  addAddress: (address: Omit<Address, 'id'>) => Promise<void>;
+  updateAddress: (id: string, address: Partial<Address>) => Promise<void>;
+  deleteAddress: (id: string) => Promise<void>;
+  setDefaultAddress: (id: string) => Promise<void>;
 }
 
-const MOCK_ADDRESSES: Address[] = [
-  {
-    id: "addr-1",
-    fullName: "Surya Prakash",
-    phone: "+91 9876543210",
-    addressLine1: "12, Royal Heritage Enclave",
-    addressLine2: "Opposite Tanishq Showroom, Jayanagar",
-    city: "Bengaluru",
-    state: "Karnataka",
-    zipCode: "560041",
-    country: "India",
-    isDefault: true
-  }
-];
+const mapApiAddressToFrontend = (addr: any): Address => {
+  const user = useAuthStore.getState().user;
+  return {
+    id: addr.id,
+    fullName: user ? `${user.firstName} ${user.lastName}`.trim() : 'Valued Customer',
+    phone: user?.phone || '',
+    addressLine1: addr.line1,
+    addressLine2: addr.line2 || undefined,
+    city: addr.city,
+    state: addr.state,
+    zipCode: addr.zipCode,
+    country: addr.countryCode === 'IN' ? 'India' : addr.countryCode,
+    isDefault: addr.isDefault
+  };
+};
 
-export const useAddressStore = create<AddressState>()(
-  persist(
-    (set) => ({
-      addresses: MOCK_ADDRESSES,
+export const useAddressStore = create<AddressState>((set, get) => ({
+  addresses: [],
+  isLoading: false,
+  error: null,
 
-      addAddress: (addressInput) => {
-        set((state) => {
-          const id = `addr-${Date.now()}`;
-          const isDefault = state.addresses.length === 0 ? true : addressInput.isDefault;
-
-          const updatedAddresses = state.addresses.map((a) => 
-            isDefault ? { ...a, isDefault: false } : a
-          );
-
-          return {
-            addresses: [...updatedAddresses, { ...addressInput, id, isDefault }]
-          };
-        });
-      },
-
-      updateAddress: (id, addressInput) => {
-        set((state) => {
-          const isSettingDefault = addressInput.isDefault;
-          const updatedAddresses = state.addresses.map((a) => {
-            if (a.id === id) {
-              return { ...a, ...addressInput };
-            }
-            if (isSettingDefault) {
-              return { ...a, isDefault: false };
-            }
-            return a;
-          });
-          return { addresses: updatedAddresses };
-        });
-      },
-
-      deleteAddress: (id) => {
-        set((state) => {
-          const remaining = state.addresses.filter((a) => a.id !== id);
-          if (remaining.length > 0 && !remaining.some((a) => a.isDefault)) {
-            remaining[0].isDefault = true;
-          }
-          return { addresses: remaining };
-        });
-      },
-
-      setDefaultAddress: (id) => {
-        set((state) => ({
-          addresses: state.addresses.map((a) => ({
-            ...a,
-            isDefault: a.id === id,
-          })),
-        }));
-      },
-    }),
-    {
-      name: 'zari-address-storage',
+  fetchAddresses: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.get('/users/address');
+      const apiAddresses = data.data || [];
+      const mapped = apiAddresses.map(mapApiAddressToFrontend);
+      set({ addresses: mapped, isLoading: false });
+    } catch (err: any) {
+      console.error('Failed to fetch addresses:', err);
+      set({ isLoading: false, error: err.message });
     }
-  )
-);
+  },
+
+  addAddress: async (addressInput) => {
+    set({ isLoading: true, error: null });
+    try {
+      const payload = {
+        line1: addressInput.addressLine1,
+        line2: addressInput.addressLine2 || null,
+        city: addressInput.city,
+        state: addressInput.state,
+        zipCode: addressInput.zipCode,
+        countryCode: addressInput.country.toLowerCase() === 'india' ? 'IN' : addressInput.country.slice(0, 2).toUpperCase(),
+        isDefault: addressInput.isDefault
+      };
+      await api.post('/users/address', payload);
+      await get().fetchAddresses();
+    } catch (err: any) {
+      console.error('Failed to add address:', err);
+      set({ isLoading: false, error: err.message });
+      throw err;
+    }
+  },
+
+  updateAddress: async (id, addressInput) => {
+    set({ isLoading: true, error: null });
+    try {
+      const payload: any = {};
+      if (addressInput.addressLine1 !== undefined) payload.line1 = addressInput.addressLine1;
+      if (addressInput.addressLine2 !== undefined) payload.line2 = addressInput.addressLine2 || null;
+      if (addressInput.city !== undefined) payload.city = addressInput.city;
+      if (addressInput.state !== undefined) payload.state = addressInput.state;
+      if (addressInput.zipCode !== undefined) payload.zipCode = addressInput.zipCode;
+      if (addressInput.country !== undefined) {
+        payload.countryCode = addressInput.country.toLowerCase() === 'india' ? 'IN' : addressInput.country.slice(0, 2).toUpperCase();
+      }
+      if (addressInput.isDefault !== undefined) payload.isDefault = addressInput.isDefault;
+
+      await api.put(`/users/address/${id}`, payload);
+      await get().fetchAddresses();
+    } catch (err: any) {
+      console.error('Failed to update address:', err);
+      set({ isLoading: false, error: err.message });
+      throw err;
+    }
+  },
+
+  deleteAddress: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.delete(`/users/address/${id}`);
+      await get().fetchAddresses();
+    } catch (err: any) {
+      console.error('Failed to delete address:', err);
+      set({ isLoading: false, error: err.message });
+      throw err;
+    }
+  },
+
+  setDefaultAddress: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.put(`/users/address/${id}`, { isDefault: true });
+      await get().fetchAddresses();
+    } catch (err: any) {
+      console.error('Failed to set default address:', err);
+      set({ isLoading: false, error: err.message });
+      throw err;
+    }
+  }
+}));

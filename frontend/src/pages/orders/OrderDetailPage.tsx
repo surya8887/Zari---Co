@@ -10,7 +10,7 @@ const OrderDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { getOrderById, selectedOrder } = useOrderStore();
+  const { getOrderById, selectedOrder, fetchOrders, orders } = useOrderStore();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -19,14 +19,21 @@ const OrderDetailPage = () => {
       return;
     }
 
-    if (id) {
-      const ord = getOrderById(id);
-      if (!ord) {
-        toast.error("Order details not found!");
-        navigate('/orders');
+    const loadOrder = async () => {
+      if (orders.length === 0) {
+        await fetchOrders();
       }
-    }
-  }, [id, isAuthenticated, getOrderById, navigate]);
+      if (id) {
+        const ord = getOrderById(id);
+        if (!ord) {
+          toast.error("Order details not found!");
+          navigate('/orders');
+        }
+      }
+    };
+
+    loadOrder();
+  }, [id, isAuthenticated, getOrderById, navigate, fetchOrders, orders.length]);
 
   if (!isAuthenticated || !selectedOrder) return null;
 

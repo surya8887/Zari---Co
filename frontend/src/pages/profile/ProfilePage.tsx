@@ -27,8 +27,8 @@ const ProfilePage = () => {
   const { isAuthenticated, user } = useAuth();
   
   // Zustand Stores
-  const { addresses, addAddress, deleteAddress, setDefaultAddress } = useAddressStore();
-  const { orders } = useOrderStore();
+  const { addresses, addAddress, deleteAddress, setDefaultAddress, fetchAddresses } = useAddressStore();
+  const { orders, fetchOrders } = useOrderStore();
   const { items: wishlistItems, toggleWishlist } = useWishlistStore();
   const { addItem } = useCartStore();
 
@@ -55,13 +55,16 @@ const ProfilePage = () => {
   const [optEmailReceipts, setOptEmailReceipts] = useState(true);
   const [optSavedCards, setOptSavedCards] = useState(false);
 
-  // 1. Guard against non-authenticated users
+  // 1. Guard against non-authenticated users and load details
   useEffect(() => {
     if (!isAuthenticated) {
       toast.warning("Please sign in to configure your personal preferences.");
       navigate('/login');
+    } else {
+      fetchAddresses();
+      fetchOrders();
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, fetchAddresses, fetchOrders]);
 
   // 2. Pre-fill details
   useEffect(() => {

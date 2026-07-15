@@ -126,5 +126,66 @@
     }
   html {
     @apply font-sans;
-    }
+  }
+}
+
+@layer components {
+  .prose-jewelry {
+    @apply text-xs font-sans tracking-wide text-neutral-600 leading-loose max-w-none;
+  }
+  
+  .prose-jewelry p {
+    @apply mb-4 text-[#4e3a24]/90;
+  }
+  
+  .prose-jewelry h1, .prose-jewelry h2, .prose-jewelry h3, .prose-jewelry h4 {
+    @apply font-serif text-[#4e3a24] font-extrabold italic mt-6 mb-3;
+  }
+
+  .prose-jewelry h1 { @apply text-xl; }
+  .prose-jewelry h2 { @apply text-lg; }
+  .prose-jewelry h3 { @apply text-base; }
+  .prose-jewelry h4 { @apply text-sm; }
+
+  .prose-jewelry strong, .prose-jewelry b {
+    @apply font-bold text-[#4e3a24] tracking-wider uppercase text-[10px];
+  }
+  
+  .prose-jewelry ul {
+    @apply list-none pl-0 mb-6 space-y-2.5;
+  }
+  
+  .prose-jewelry ul li {
+    @apply relative pl-5 text-[#4e3a24]/80;
+  }
+  
+  .prose-jewelry ul > li::before {
+    content: "✦";
+    @apply absolute left-0 top-[1px] text-[#8b7355] text-[9px];
+  }
+
+  .prose-jewelry ul ul {
+    @apply pl-4 mt-2 mb-4 space-y-1.5;
+  }
+
+  .prose-jewelry ul ul > li::before {
+    content: "•";
+    @apply absolute left-0 top-[-2px] text-[#8b7355] text-[14px];
+  }
+  
+  .prose-jewelry table {
+    @apply w-full text-left border-collapse my-8 text-xs border border-[#8b7355]/20 rounded-xl overflow-hidden shadow-sm;
+  }
+  
+  .prose-jewelry th {
+    @apply bg-[#faf9f6] text-[#8b7355] uppercase tracking-widest font-extrabold text-[9px] px-5 py-4 border-b border-[#8b7355]/20;
+  }
+  
+  .prose-jewelry td {
+    @apply px-5 py-4 border-b border-neutral-100 text-[#4e3a24]/80 bg-white;
+  }
+  
+  .prose-jewelry tr:last-child td {
+    @apply border-b-0;
+  }
 }

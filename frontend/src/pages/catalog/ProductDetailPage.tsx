@@ -4,7 +4,7 @@ import Header from '@/components/layout/Header';
 import { useProductStore } from '@/store/useProductStore';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
-import { Star, ShieldCheck, ShoppingBag, Heart, ArrowLeft, Send } from 'lucide-react';
+import { Star, ShieldCheck, ShoppingBag, Heart, ArrowLeft, Send, Sparkles, ClipboardList, HeartHandshake } from 'lucide-react';
 import { toast } from 'sonner';
 
 const ProductDetailPage = () => {
@@ -16,7 +16,8 @@ const ProductDetailPage = () => {
   const { toggleWishlist, isInWishlist } = useWishlistStore();
 
   const [selectedSize, setSelectedSize] = useState<string>('Size 12');
-  const [activeTab, setActiveTab] = useState<'details' | 'specs' | 'purity'>('details');
+  const [quantity, setQuantity] = useState<number>(1);
+  const [activeImage, setActiveImage] = useState<string>('');
 
   // Review Form State
   const [reviewName, setReviewName] = useState('');
@@ -42,6 +43,13 @@ const ProductDetailPage = () => {
     }
   }, [slug, products, getProductBySlug, navigate]);
 
+  useEffect(() => {
+    if (selectedProduct) {
+      setActiveImage(selectedProduct.image);
+      setQuantity(1);
+    }
+  }, [selectedProduct]);
+
   if (!selectedProduct) {
     return (
       <div className="min-h-screen bg-[#faf9f6] flex items-center justify-center">
@@ -53,10 +61,89 @@ const ProductDetailPage = () => {
   const p = selectedProduct;
   const wishlisted = isInWishlist(p.id);
 
+  // Helper to strip HTML tags for a clean brief description
+  const getBriefDescription = (desc: string) => {
+    // Get part before any specs separator
+    const detailsPart = desc.split(/~GIA-SPECS~|<!--GIA-SPECS-->/)[0] || desc;
+    const stripHtml = (html: string) => {
+      return html
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&times;/g, '×')
+        .replace(/&amp;/g, '&')
+        .trim();
+    };
+    const cleanText = stripHtml(detailsPart);
+    
+    // Remove "Product Description" prefix (with/without colon) if present
+    let result = cleanText.replace(/^Product Description:?\s*/i, '');
+    
+    // Find "Key Features" and cut before it if present
+    const keyFeaturesIndex = result.search(/Key Features:?/i);
+    if (keyFeaturesIndex !== -1) {
+      result = result.substring(0, keyFeaturesIndex).trim();
+    }
+    return result;
+  };
+
+  // Helper to remove redundant headers from the parsed sections
+  const cleanHtml = (html: string, type: 'details' | 'specs' | 'care') => {
+    let cleaned = html.trim();
+    cleaned = cleaned.replace(/^(<br\s*\/?>|&nbsp;|\s)+/i, '');
+    cleaned = cleaned.replace(/(<br\s*\/?>|&nbsp;|\s)+$/i, '');
+    
+    if (type === 'details') {
+      cleaned = cleaned.replace(/^<h3>Product Description:?<\/h3>/i, '');
+      cleaned = cleaned.replace(/^<h2>Product Description:?<\/h2>/i, '');
+    } else if (type === 'specs') {
+      cleaned = cleaned.replace(/^<p><strong>Specifications:?<\/strong><\/p>/i, '');
+      cleaned = cleaned.replace(/^<h2>Specifications:?<\/h2>/i, '');
+    } else if (type === 'care') {
+      cleaned = cleaned.replace(/^<h2>Care &amp; Preservation Guidance:?<\/h2>/i, '');
+      cleaned = cleaned.replace(/^<h2>Care & Preservation Guidance:?<\/h2>/i, '');
+    }
+    
+    cleaned = cleaned.replace(/^(<br\s*\/?>|&nbsp;|\s)+/i, '');
+    cleaned = cleaned.replace(/(<br\s*\/?>|&nbsp;|\s)+$/i, '');
+    return cleaned;
+  };
+
+  // Parse the sections from description
+  const parseDescription = (desc: string) => {
+    let details = '';
+    let specs = '';
+    let care = '';
+
+    const parts = desc.split(/~GIA-SPECS~|~CARE-GUIDES~|<!--GIA-SPECS-->|<!--CARE-GUIDES-->/);
+
+    if (parts.length >= 3) {
+      details = parts[0] || '';
+      specs = parts[1] || '';
+      care = parts[2] || '';
+    } else if (parts.length === 2) {
+      details = parts[0] || '';
+      if (desc.includes('GIA-SPECS') || desc.includes('~GIA-SPECS~')) {
+        specs = parts[1] || '';
+      } else {
+        care = parts[1] || '';
+      }
+    } else {
+      details = desc || '';
+    }
+
+    return { 
+      detailsHtml: cleanHtml(details, 'details'), 
+      specsHtml: cleanHtml(specs, 'specs'), 
+      careHtml: cleanHtml(care, 'care') 
+    };
+  };
+
+  const { detailsHtml, specsHtml, careHtml } = parseDescription(p.description);
+
   const handleAddToBag = () => {
-    addItem(p, 1, selectedSize);
+    addItem(p, quantity, selectedSize);
     toast.success(`${p.name} added to your bag! ✨`, {
-      description: `Size: ${selectedSize} | Free Insured Shipping.`,
+      description: `Quantity: ${quantity} | Size: ${selectedSize} | Free Insured Shipping.`,
     });
   };
 
@@ -107,24 +194,43 @@ const ProductDetailPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           
           {/* Left Column: Image Showcase */}
-          <div className="relative select-none">
+          <div className="flex flex-col select-none">
             {/* Visual Frame */}
-            <div className="aspect-square bg-white border border-[#8b7355]/15 rounded-3xl p-6 shadow-sm overflow-hidden flex items-center justify-center">
+            <div className="relative aspect-square bg-white border border-[#8b7355]/15 rounded-3xl p-6 shadow-sm overflow-hidden flex items-center justify-center">
               <img
-                src={p.image}
+                src={activeImage || p.image}
                 alt={p.name}
                 className="w-full h-full object-cover rounded-2xl hover:scale-105 transition-transform duration-500"
               />
-            </div>
 
-            {/*BIS Hallmark Floating Tag */}
-            <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl border border-emerald-500/20 shadow-md text-[10px] text-emerald-800 font-extrabold uppercase tracking-widest flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 animate-pulse" />
-              <div>
-                <span className="block text-[7px] text-neutral-400 font-bold tracking-normal uppercase leading-none mb-0.5">Assured Authenticity</span>
-                <span>BIS 916 Hallmarked</span>
+              {/* BIS Hallmark Floating Tag */}
+              <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl border border-emerald-500/20 shadow-md text-[10px] text-emerald-800 font-extrabold uppercase tracking-widest flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 animate-pulse" />
+                <div>
+                  <span className="block text-[7px] text-neutral-400 font-bold tracking-normal uppercase leading-none mb-0.5">Assured Authenticity</span>
+                  <span>BIS 916 Hallmarked</span>
+                </div>
               </div>
             </div>
+
+            {/* Thumbnails list */}
+            {p.images && p.images.length > 1 && (
+              <div className="flex gap-3 mt-4 overflow-x-auto pb-2 scrollbar-thin">
+                {p.images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImage(img)}
+                    className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-300 flex-shrink-0 cursor-pointer ${
+                      (activeImage || p.image) === img
+                        ? 'border-[#8b7355] shadow-sm scale-105 bg-white'
+                        : 'border-[#8b7355]/10 hover:border-[#8b7355]/40 bg-white'
+                    }`}
+                  >
+                    <img src={img} alt={`${p.name} view ${idx + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right Column: Order Configuration */}
@@ -141,11 +247,11 @@ const ProductDetailPage = () => {
               </h1>
 
               {/* Stars summary */}
-              <div className="flex items-center gap-2 mb-6 select-none">
+              <div className="flex items-center gap-2 mb-6 select-none w-fit bg-white border border-[#8b7355]/10 px-3 py-1.5 rounded-full shadow-sm">
                 <div className="flex text-amber-500">
                   <Star className="w-3.5 h-3.5 fill-current" />
                 </div>
-                <span className="text-[11px] font-extrabold text-neutral-500">
+                <span className="text-[11px] font-extrabold text-[#4e3a24]">
                   {p.rating} Stars ({p.reviewsCount} Customer Reviews)
                 </span>
                 <span className="text-neutral-300">|</span>
@@ -166,136 +272,256 @@ const ProductDetailPage = () => {
               </div>
 
               {/* Brief Description */}
-              <p className="text-xs font-sans tracking-wide text-neutral-600 leading-relaxed mb-6">
-                {p.description}
+              <p className="text-xs font-sans tracking-wide text-neutral-600 leading-relaxed mb-8">
+                {getBriefDescription(p.description)}
               </p>
 
-              {/* Sizing matrix if Ring */}
-              {p.category === 'Rings' && (
-                <div className="mb-8 select-none">
+              {/* Quantity Selector & Size Selector */}
+              <div className="flex flex-wrap gap-6 mb-8 items-end">
+                {/* Sizing matrix if Ring */}
+                {p.category === 'Rings' && (
+                  <div className="flex-grow min-w-[150px] select-none">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#4e3a24] block mb-3">
+                      Select Ring Size
+                    </span>
+                    <div className="flex gap-2">
+                      {['Size 10', 'Size 12', 'Size 14', 'Size 16'].map((sz) => (
+                        <button
+                          key={sz}
+                          onClick={() => setSelectedSize(sz)}
+                          className={`px-3 py-2 text-xs rounded-xl border font-bold transition-all cursor-pointer ${
+                            selectedSize === sz
+                              ? 'bg-[#8b7355] text-white border-[#8b7355] shadow-sm'
+                              : 'bg-white text-neutral-600 border-[#8b7355]/20 hover:border-[#8b7355]/50'
+                          }`}
+                        >
+                          {sz}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Quantity selector */}
+                <div className="select-none">
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#4e3a24] block mb-3">
-                    Select Ring Size
+                    Quantity
                   </span>
-                  <div className="flex gap-2.5">
-                    {['Size 10', 'Size 12', 'Size 14', 'Size 16'].map((sz) => (
-                      <button
-                        key={sz}
-                        onClick={() => setSelectedSize(sz)}
-                        className={`px-4 py-2 text-xs rounded-xl border font-bold transition-all cursor-pointer ${
-                          selectedSize === sz
-                            ? 'bg-[#8b7355] text-white border-[#8b7355] shadow-sm'
-                            : 'bg-white text-neutral-600 border-[#8b7355]/20 hover:border-[#8b7355]/50'
-                        }`}
-                      >
-                        {sz}
-                      </button>
-                    ))}
+                  <div className="flex items-center border border-[#8b7355]/20 bg-white rounded-xl h-10 px-2 gap-3 w-fit">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-7 h-7 flex items-center justify-center text-[#8b7355] hover:bg-[#8b7355]/10 rounded-lg font-bold cursor-pointer transition-colors"
+                    >
+                      -
+                    </button>
+                    <span className="text-xs font-bold text-neutral-800 w-6 text-center">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="w-7 h-7 flex items-center justify-center text-[#8b7355] hover:bg-[#8b7355]/10 rounded-lg font-bold cursor-pointer transition-colors"
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
-            {/* Large Buy triggers */}
-            <div className="flex gap-4 select-none">
-              <button
-                onClick={handleAddToBag}
-                className="flex-grow h-12 bg-[#8b7355] hover:bg-[#6e583e] text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-[0.98]"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span>Add To Bag</span>
-              </button>
+            {/* Buy triggers & Trust Badges */}
+            <div>
+              <div className="flex gap-4 select-none">
+                <button
+                  onClick={handleAddToBag}
+                  className="flex-grow h-12 bg-[#8b7355] hover:bg-[#6e583e] text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-[0.98]"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  <span>Add To Bag</span>
+                </button>
 
-              <button
-                onClick={handleToggleWishlist}
-                className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
-                  wishlisted
-                    ? 'border-red-500 bg-red-50 text-red-500 shadow-sm'
-                    : 'border-[#8b7355]/20 bg-white text-neutral-400 hover:text-red-500 hover:border-red-200'
-                }`}
-              >
-                <Heart className={`w-5 h-5 ${wishlisted ? 'fill-current' : ''}`} />
-              </button>
+                <button
+                  onClick={handleToggleWishlist}
+                  className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                    wishlisted
+                      ? 'border-red-500 bg-red-50 text-red-500 shadow-sm'
+                      : 'border-[#8b7355]/20 bg-white text-neutral-400 hover:text-red-500 hover:border-red-200'
+                  }`}
+                >
+                  <Heart className={`w-5 h-5 ${wishlisted ? 'fill-current' : ''}`} />
+                </button>
+              </div>
+
+              {/* Trust Badges */}
+              <div className="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-[#8b7355]/15 select-none">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="block text-[10px] font-extrabold uppercase tracking-wider text-[#4e3a24]">BIS 916 Gold</span>
+                    <span className="text-[9px] text-neutral-400">100% Pure Assured Gold</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-amber-50 text-amber-700 rounded-lg">
+                    <Star className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="block text-[10px] font-extrabold uppercase tracking-wider text-[#4e3a24]">GIA Certified</span>
+                    <span className="text-[9px] text-neutral-400">Conflict-Free Diamonds</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-50 text-blue-700 rounded-lg">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="block text-[10px] font-extrabold uppercase tracking-wider text-[#4e3a24]">Insured Shipping</span>
+                    <span className="text-[9px] text-neutral-400">Free Home Delivery</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-50 text-purple-700 rounded-lg">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3 3L22 4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="block text-[10px] font-extrabold uppercase tracking-wider text-[#4e3a24]">Lifetime Exchange</span>
+                    <span className="text-[9px] text-neutral-400">Hassle-Free Buyback</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Specifications Tab Drawers */}
-        <section className="mt-16 bg-white border border-[#8b7355]/10 rounded-3xl p-8 shadow-sm select-none">
-          <div className="flex border-b border-neutral-100 gap-8 mb-6 text-xs font-extrabold uppercase tracking-widest">
-            {[
-              { id: 'details', label: 'Product Details' },
-              { id: 'specs', label: 'Specifications' },
-              { id: 'purity', label: 'Purity & Certifications' },
-            ].map((tb) => (
-              <button
-                key={tb.id}
-                onClick={() => setActiveTab(tb.id as any)}
-                className={`pb-3 relative cursor-pointer ${
-                  activeTab === tb.id ? 'text-[#8b7355]' : 'text-neutral-400 hover:text-neutral-600'
-                }`}
-              >
-                {tb.label}
-                {activeTab === tb.id && (
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#8b7355]" />
+        {/* Product Details, Specifications & Care (3-Column Grid) */}
+        <section className="mt-16 select-none">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            {/* Column 1: Product Details */}
+            <div className="bg-gradient-to-br from-white to-[#faf9f6]/30 border border-[#8b7355]/10 rounded-3xl p-8 shadow-sm flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2.5 bg-[#8b7355]/10 rounded-xl text-[#8b7355]">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg text-[#4e3a24] font-extrabold italic">
+                    Product Details
+                  </h3>
+                  <p className="text-[9px] uppercase tracking-wider font-extrabold text-neutral-400">
+                    Design & Styling
+                  </p>
+                </div>
+              </div>
+              <div className="w-12 h-[1px] bg-[#8b7355]/30 mt-2 mb-6" />
+              <div className="prose-jewelry flex-grow">
+                {detailsHtml ? (
+                  <div dangerouslySetInnerHTML={{ __html: detailsHtml }} />
+                ) : (
+                  <div className="text-xs text-neutral-600 leading-relaxed font-sans">
+                    <p className="mb-4">
+                      This fine jewelry creation represents decades of master craftsmanship. Designed for special moments and everyday luxury alike, it blends timeless visual structures with comfortable modern bands.
+                    </p>
+                    <p>
+                      Each piece is securely packed in an elegant velvet-lined Zari & Co. storage vault box, accompanied by lifetime exchange guarantees, Bis Hallmarked certs, and detailed polish guidelines.
+                    </p>
+                  </div>
                 )}
-              </button>
-            ))}
+              </div>
+            </div>
+
+            {/* Column 2: Specifications */}
+            <div className="bg-gradient-to-br from-white to-[#faf9f6]/30 border border-[#8b7355]/10 rounded-3xl p-8 shadow-sm flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2.5 bg-[#8b7355]/10 rounded-xl text-[#8b7355]">
+                  <ClipboardList className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg text-[#4e3a24] font-extrabold italic">
+                    Specifications
+                  </h3>
+                  <p className="text-[9px] uppercase tracking-wider font-extrabold text-neutral-400">
+                    Material & Metrology
+                  </p>
+                </div>
+              </div>
+              <div className="w-12 h-[1px] bg-[#8b7355]/30 mt-2 mb-6" />
+              <div className="prose-jewelry flex-grow overflow-x-auto">
+                {specsHtml ? (
+                  <div dangerouslySetInnerHTML={{ __html: specsHtml }} />
+                ) : (
+                  <table className="w-full text-left border-collapse my-4 text-xs border border-[#8b7355]/20 rounded-xl overflow-hidden shadow-sm">
+                    <tbody>
+                      <tr>
+                        <td className="font-extrabold uppercase tracking-wider text-[9px] bg-[#faf9f6] text-[#8b7355] px-4 py-3 border-b border-[#8b7355]/20 w-1/3">SKU</td>
+                        <td className="px-4 py-3 border-b border-neutral-100 text-[#4e3a24]/80">{p.sku}</td>
+                      </tr>
+                      <tr>
+                        <td className="font-extrabold uppercase tracking-wider text-[9px] bg-[#faf9f6] text-[#8b7355] px-4 py-3 border-b border-[#8b7355]/20">Metal</td>
+                        <td className="px-4 py-3 border-b border-neutral-100 text-[#4e3a24]/80">{p.metalType}</td>
+                      </tr>
+                      <tr>
+                        <td className="font-extrabold uppercase tracking-wider text-[9px] bg-[#faf9f6] text-[#8b7355] px-4 py-3 border-b border-[#8b7355]/20">Diamonds</td>
+                        <td className="px-4 py-3 border-b border-neutral-100 text-[#4e3a24]/80">{p.diamondWeight}</td>
+                      </tr>
+                      <tr>
+                        <td className="font-extrabold uppercase tracking-wider text-[9px] bg-[#faf9f6] text-[#8b7355] px-4 py-3 border-b border-neutral-100">Certification</td>
+                        <td className="px-4 py-3 border-b border-neutral-100 text-[#4e3a24]/80">{p.certification}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+
+            {/* Column 3: Care & Preservation */}
+            <div className="bg-gradient-to-br from-white to-[#faf9f6]/30 border border-[#8b7355]/10 rounded-3xl p-8 shadow-sm flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2.5 bg-[#8b7355]/10 rounded-xl text-[#8b7355]">
+                  <HeartHandshake className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg text-[#4e3a24] font-extrabold italic">
+                    Care & Preservation
+                  </h3>
+                  <p className="text-[9px] uppercase tracking-wider font-extrabold text-neutral-400">
+                    Maintenance & Longevity
+                  </p>
+                </div>
+              </div>
+              <div className="w-12 h-[1px] bg-[#8b7355]/30 mt-2 mb-6" />
+              <div className="prose-jewelry flex-grow">
+                {careHtml ? (
+                  <div dangerouslySetInnerHTML={{ __html: careHtml }} />
+                ) : (
+                  <div className="text-xs text-neutral-600 leading-relaxed font-sans">
+                    <p className="mb-3 font-semibold text-[#4e3a24]">Preserve the brilliance of your jewelry with proper care:</p>
+                    <ul className="list-none pl-0 space-y-2.5">
+                      <li className="relative pl-5 text-[#4e3a24]/80">
+                        <span className="absolute left-0 top-[1px] text-[#8b7355] text-[9px]">✦</span>
+                        Store in a dry, soft-lined jewelry box or pouch.
+                      </li>
+                      <li className="relative pl-5 text-[#4e3a24]/80">
+                        <span className="absolute left-0 top-[1px] text-[#8b7355] text-[9px]">✦</span>
+                        Avoid direct contact with perfumes, hairsprays, and lotions.
+                      </li>
+                      <li className="relative pl-5 text-[#4e3a24]/80">
+                        <span className="absolute left-0 top-[1px] text-[#8b7355] text-[9px]">✦</span>
+                        Clean gently with a soft microfiber jewelry polishing cloth.
+                      </li>
+                      <li className="relative pl-5 text-[#4e3a24]/80">
+                        <span className="absolute left-0 top-[1px] text-[#8b7355] text-[9px]">✦</span>
+                        Remove your jewelry before swimming, bathing, or doing strenuous activities.
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+
           </div>
-
-          {/* Tab content renders */}
-          {activeTab === 'details' && (
-            <div className="text-xs text-neutral-600 leading-relaxed font-sans max-w-2xl">
-              <p className="mb-4">
-                This fine jewelry creation represents decades of master craftsmanship. Designed for special moments and everyday luxury alike, it blends timeless visual structures with comfortable modern bands.
-              </p>
-              <p>
-                Each piece is securely packed in an elegant velvet-lined Zari & Co. storage vault box, accompanied by lifetime exchange guarantees, Bis Hallmarked certs, and detailed polish guidelines.
-              </p>
-            </div>
-          )}
-
-          {activeTab === 'specs' && (
-            <div className="grid grid-cols-2 gap-y-4 max-w-xl text-xs font-sans">
-              <div className="text-neutral-400">Unique Sku Code</div>
-              <div className="font-semibold text-neutral-800">{p.sku}</div>
-              
-              <div className="text-neutral-400">Metal Composition</div>
-              <div className="font-semibold text-neutral-800">{p.metalType}</div>
-
-              <div className="text-neutral-400">Diamond Carat Weight</div>
-              <div className="font-semibold text-neutral-800">{p.diamondWeight}</div>
-
-              <div className="text-neutral-400">Assurance Certificate</div>
-              <div className="font-semibold text-neutral-800">{p.certification}</div>
-            </div>
-          )}
-
-          {activeTab === 'purity' && (
-            <div className="text-xs text-neutral-600 leading-relaxed font-sans max-w-2xl">
-              <div className="flex items-start gap-3 mb-4">
-                <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-extrabold uppercase tracking-wider text-[#4e3a24] mb-1">
-                    BIS 916 Gold Certified
-                  </h4>
-                  <p>
-                    Every gold item is certified and hallmarked by the Bureau of Indian Standards (BIS), assuring 22 Karat or 18 Karat gold purity values.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-extrabold uppercase tracking-wider text-[#4e3a24] mb-1">
-                    Conflict-Free Natural Diamonds
-                  </h4>
-                  <p>
-                    All diamonds set in Zari & Co creations are strictly conflict-free and natural stones certified by international diamond grading agencies (GIA & SGL).
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
         </section>
 
         {/* Customer Review Section */}

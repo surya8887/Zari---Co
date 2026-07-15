@@ -50,11 +50,11 @@ export const AdminSidebar: React.FC = () => {
       <div className="space-y-6">
         {/* Elegant gold serif branding logo */}
         <div className="px-4 py-2 border-b border-border/20 pb-4">
-          <h2 className="text-2xl font-bold tracking-[0.25em] text-primary uppercase font-serif text-center md:text-left select-none drop-shadow-[0_0_8px_rgba(197,168,128,0.15)]">
-            Aurélia
+          <h2 className="text-2xl font-bold tracking-[0.15em] text-primary uppercase font-serif text-center md:text-left select-none drop-shadow-[0_0_8px_rgba(197,168,128,0.15)]">
+            Zari & Co.
           </h2>
-          <p className="text-xs font-medium tracking-[0.35em] text-[#a58b68] uppercase text-center md:text-left mt-0.5 pl-0.5 select-none">
-            Jewels
+          <p className="text-xs font-medium tracking-[0.25em] text-[#a58b68] uppercase text-center md:text-left mt-0.5 pl-0.5 select-none">
+            Fine Jewellery
           </p>
         </div>
 

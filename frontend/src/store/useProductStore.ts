@@ -155,9 +155,8 @@ export const useProductStore = create<ProductState>((set, get) => {
 
     const totalPages = Math.max(1, Math.ceil(result.length / pagination.limit));
 
-    // Slice pagination
-    const startIdx = (pagination.page - 1) * pagination.limit;
-    const paginated = result.slice(startIdx, startIdx + pagination.limit);
+    // Slice for infinite scroll: show all products from start up to current page's limit
+    const paginated = result.slice(0, pagination.page * pagination.limit);
 
     return {
       filteredProducts: paginated,

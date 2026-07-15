@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import { useProductStore } from '@/store/useProductStore';
@@ -13,7 +13,6 @@ import FilterCheckboxGroup from '@/components/common/FilterCheckboxGroup';
 import PriceRangeFilter from '@/components/common/PriceRangeFilter';
 import ProductCard from '@/components/common/ProductCard';
 import EmptyState from '@/components/common/EmptyState';
-import PaginationWrapper from '@/components/common/PaginationWrapper';
 
 import { SlidersHorizontal, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -100,6 +99,33 @@ const ProductListPage = () => {
 
     setSearchParams(params, { replace: true });
   }, [filters, setSearchParams]);
+
+  const observerRef = useRef<HTMLDivElement | null>(null);
+  const hasMore = pagination.page < pagination.totalPages;
+
+  useEffect(() => {
+    if (!hasMore || isLoading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setPage(pagination.page + 1);
+        }
+      },
+      { threshold: 0.1, rootMargin: '150px' }
+    );
+
+    const currentSentinel = observerRef.current;
+    if (currentSentinel) {
+      observer.observe(currentSentinel);
+    }
+
+    return () => {
+      if (currentSentinel) {
+        observer.unobserve(currentSentinel);
+      }
+    };
+  }, [hasMore, isLoading, pagination.page, setPage]);
 
   const handleAddToBag = (product: Product) => {
     addItem(product, 1);
@@ -415,12 +441,29 @@ const ProductListPage = () => {
               )}
             </div>
 
-            {/* DRY PaginationWrapper component */}
-            <PaginationWrapper
-              page={pagination.page}
-              totalPages={pagination.totalPages}
-              onPageChange={setPage}
-            />
+            {/* Infinite Scroll Sentinel / Loaded State */}
+            {hasMore ? (
+              <div 
+                ref={observerRef} 
+                className="py-12 flex justify-center items-center"
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-6 h-6 border-2 border-[#8b7355]/20 border-t-[#8b7355] rounded-full animate-spin" />
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#8b7355]/60 animate-pulse">
+                    Loading more masterpieces...
+                  </p>
+                </div>
+              </div>
+            ) : (
+              filteredProducts.length > 0 && (
+                <div className="py-16 text-center select-none">
+                  <div className="w-16 h-0.5 bg-[#8b7355]/25 mx-auto mb-3" />
+                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                    You have viewed all {filteredProducts.length} masterpieces
+                  </p>
+                </div>
+              )
+            )}
           </div>
         </div>
       </main>

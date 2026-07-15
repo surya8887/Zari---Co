@@ -782,7 +782,7 @@ export const Products: React.FC = () => {
             <div className="flex justify-between items-center border-b border-border/40 pb-2">
               <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 select-none">
                 <Sparkles size={14} className="text-primary animate-pulse" />
-                Aurelia Legacy Narrative Editor
+                Zari & Co. Heritage Narrative Editor
               </span>
               <span className="text-[9px] text-muted-foreground bg-[#241e17] px-2 py-0.5 rounded font-mono text-primary font-semibold">HTML Editor</span>
             </div>

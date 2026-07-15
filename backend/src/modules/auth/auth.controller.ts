@@ -4,7 +4,8 @@ import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { 
   registerUser as registerUserService, 
   loginUser as loginUserService,
-  logoutUser as logoutUserService
+  logoutUser as logoutUserService,
+  loginWithGoogle as loginWithGoogleService
 } from "./auth.service.js";
 import ApiResponse from "../../shared/exceptions/apiResponse.js";
 import { generateAccessTokenRefreshToken, cookieOptions } from "../../shared/utils/cookie.js";
@@ -65,4 +66,26 @@ export const logoutUser = asyncHandler(async (req: AuthRequest, res: Response) =
     .clearCookie("accessToken", cookieOptions)
     .clearCookie("refreshToken", cookieOptions)
     .json(new ApiResponse(200, {}, "User logged out successfully"));
+});
+
+/**
+ * @desc Google Login
+ * @route POST /api/v1/auth/google/login
+ * @access Public
+ */
+export const googleLogin = asyncHandler(async (req: Request, res: Response) => {
+  const { idToken } = req.body;
+  if (!idToken) {
+    return res.status(400).json(new ApiResponse(400, null, "ID token is required"));
+  }
+
+  const user = await loginWithGoogleService(idToken);
+  
+  const { accessToken: appAccessToken, refreshToken } = await generateAccessTokenRefreshToken(user.id);
+
+  return res
+    .status(200)
+    .cookie("accessToken", appAccessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
+    .json(new ApiResponse(200, { user, accessToken: appAccessToken, refreshToken }, "User logged in with Google successfully"));
 });

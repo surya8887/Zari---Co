@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, loginUser, logoutUser } from "./auth.controller.js";
+import { registerUser, loginUser, logoutUser, googleLogin } from "./auth.controller.js";
 import { authenticateUser } from "../../shared/middlewares/auth.middleware.js";
 
 const router: Router = Router();
@@ -7,6 +7,8 @@ const router: Router = Router();
 // public routes
 router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
+router.route("/google/login").post(googleLogin);
+
 // private routes
 router.route("/logout").get(authenticateUser, logoutUser);
 

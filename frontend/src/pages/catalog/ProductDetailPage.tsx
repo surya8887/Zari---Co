@@ -11,7 +11,7 @@ const ProductDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   
-  const { getProductBySlug, selectedProduct, addReview, products, fetchProducts, isLoading } = useProductStore();
+  const { getProductBySlug, selectedProduct, addReview, products, fetchProducts } = useProductStore();
   const { addItem } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
 

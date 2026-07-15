@@ -9,18 +9,27 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { auth, googleProvider } from "@/lib/firebase";
+import { signInWithPopup } from "firebase/auth";
 
 export default function SignupPage() {
   const navigate = useNavigate();
   const { register, isLoading, error: apiError, isAuthenticated, loginWithGoogle } = useAuth();
 
   const handleGoogleSignup = async () => {
-    toast.loading("Connecting to Google...", { id: "google-auth" });
-    const result = await loginWithGoogle();
-    if (result && result.success) {
-      toast.success("Successfully registered with Google!", { id: "google-auth" });
-    } else {
-      toast.error(result?.error || "Google registration failed. Please try again.", { id: "google-auth" });
+    try {
+      toast.loading("Authenticating with Google...", { id: "google-auth" });
+      const result = await signInWithPopup(auth, googleProvider);
+      const idToken = await result.user.getIdToken();
+      
+      const backendResult = await loginWithGoogle(idToken);
+      if (backendResult && backendResult.success) {
+        toast.success("Successfully registered with Google!", { id: "google-auth" });
+      } else {
+        toast.error(backendResult?.error || "Google registration failed. Please try again.", { id: "google-auth" });
+      }
+    } catch (error) {
+      toast.error("Google registration failed. Please try again.", { id: "google-auth" });
     }
   };
 
@@ -293,7 +302,7 @@ export default function SignupPage() {
                 type="button"
                 variant="outline"
                 className="w-full h-10 border border-neutral-200 hover:border-[#b09d81]/40 hover:bg-[#f9f7f4] rounded-lg transition-all flex items-center justify-center gap-2 font-medium tracking-wide text-xs cursor-pointer active:scale-[0.99]"
-                onClick={handleGoogleSignup}
+                onClick={() => handleGoogleSignup()}
               >
                 <svg className="w-4 h-4 mr-1.5" viewBox="0 0 24 24" fill="none">
                   <path

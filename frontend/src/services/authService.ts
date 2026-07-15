@@ -20,4 +20,9 @@ export const authService = {
     const { data } = await api.get('/auth/me');
     return data.data;
   },
+
+  async googleLogin(accessToken: string): Promise<User> {
+    const { data } = await api.post('/auth/google/login', { accessToken });
+    return data.data.user;
+  },
 };

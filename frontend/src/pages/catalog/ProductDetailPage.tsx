@@ -180,7 +180,7 @@ const ProductDetailPage = () => {
     <div className="min-h-screen bg-[#faf9f6] text-[#2c221e]">
       <Header />
 
-      <main className="container mx-auto px-6 py-10">
+      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-10 animate-in fade-in duration-350">
         {/* Back Link */}
         <Link 
           to="/products"
@@ -191,12 +191,12 @@ const ProductDetailPage = () => {
         </Link>
 
         {/* Core Product Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
           
           {/* Left Column: Image Showcase */}
           <div className="flex flex-col select-none">
             {/* Visual Frame */}
-            <div className="relative aspect-square bg-white border border-[#8b7355]/15 rounded-3xl p-6 shadow-sm overflow-hidden flex items-center justify-center">
+            <div className="relative aspect-square bg-white border border-[#8b7355]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm overflow-hidden flex items-center justify-center">
               <img
                 src={activeImage || p.image}
                 alt={p.name}
@@ -204,8 +204,8 @@ const ProductDetailPage = () => {
               />
 
               {/* BIS Hallmark Floating Tag */}
-              <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl border border-emerald-500/20 shadow-md text-[10px] text-emerald-800 font-extrabold uppercase tracking-widest flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 animate-pulse" />
+              <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 bg-white/95 backdrop-blur-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl border border-emerald-500/20 shadow-md text-[9px] sm:text-[10px] text-emerald-800 font-extrabold uppercase tracking-widest flex items-center gap-1.5 sm:gap-2 scale-90 sm:scale-100 origin-bottom-left select-none">
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 animate-pulse" />
                 <div>
                   <span className="block text-[7px] text-neutral-400 font-bold tracking-normal uppercase leading-none mb-0.5">Assured Authenticity</span>
                   <span>BIS 916 Hallmarked</span>
@@ -242,7 +242,7 @@ const ProductDetailPage = () => {
               </span>
 
               {/* Title */}
-              <h1 className="text-3xl font-serif text-[#4e3a24] font-extrabold italic leading-tight mb-4">
+              <h1 className="text-2xl sm:text-3xl font-serif text-[#4e3a24] font-extrabold italic leading-tight mb-4">
                 {p.name}
               </h1>
 
@@ -259,7 +259,7 @@ const ProductDetailPage = () => {
               </div>
 
               {/* Pricing Display */}
-              <div className="flex items-baseline gap-4 mb-6">
+              <div className="flex flex-wrap items-baseline gap-2.5 sm:gap-4 mb-6">
                 <span className="text-[#8b7355] font-serif font-bold text-3xl">
                   ₹{p.price.toLocaleString('en-IN')}
                 </span>
@@ -350,7 +350,7 @@ const ProductDetailPage = () => {
               </div>
 
               {/* Trust Badges */}
-              <div className="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-[#8b7355]/15 select-none">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 pt-8 border-t border-[#8b7355]/15 select-none">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg">
                     <ShieldCheck className="w-4 h-4" />
@@ -397,11 +397,11 @@ const ProductDetailPage = () => {
         </div>
 
         {/* Product Details, Specifications & Care (3-Column Grid) */}
-        <section className="mt-16 select-none">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <section className="mt-12 sm:mt-16 select-none">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             
             {/* Column 1: Product Details */}
-            <div className="bg-gradient-to-br from-white to-[#faf9f6]/30 border border-[#8b7355]/10 rounded-3xl p-8 shadow-sm flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+            <div className="bg-gradient-to-br from-white to-[#faf9f6]/30 border border-[#8b7355]/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-sm flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2.5 bg-[#8b7355]/10 rounded-xl text-[#8b7355]">
                   <Sparkles className="w-5 h-5" />
@@ -433,7 +433,7 @@ const ProductDetailPage = () => {
             </div>
 
             {/* Column 2: Specifications */}
-            <div className="bg-gradient-to-br from-white to-[#faf9f6]/30 border border-[#8b7355]/10 rounded-3xl p-8 shadow-sm flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+            <div className="bg-gradient-to-br from-white to-[#faf9f6]/30 border border-[#8b7355]/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-sm flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2.5 bg-[#8b7355]/10 rounded-xl text-[#8b7355]">
                   <ClipboardList className="w-5 h-5" />
@@ -477,7 +477,7 @@ const ProductDetailPage = () => {
             </div>
 
             {/* Column 3: Care & Preservation */}
-            <div className="bg-gradient-to-br from-white to-[#faf9f6]/30 border border-[#8b7355]/10 rounded-3xl p-8 shadow-sm flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+            <div className="bg-gradient-to-br from-white to-[#faf9f6]/30 border border-[#8b7355]/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-sm flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2.5 bg-[#8b7355]/10 rounded-xl text-[#8b7355]">
                   <HeartHandshake className="w-5 h-5" />
@@ -525,7 +525,7 @@ const ProductDetailPage = () => {
         </section>
 
         {/* Customer Review Section */}
-        <section className="mt-12 bg-white border border-[#8b7355]/10 rounded-3xl p-8 shadow-sm">
+        <section className="mt-10 sm:mt-12 bg-white border border-[#8b7355]/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-sm">
           <h3 className="text-lg font-serif text-[#4e3a24] font-extrabold italic mb-6">
             Customer Reviews ({p.reviewsCount})
           </h3>

@@ -38,8 +38,8 @@ export const CategoryNav = () => {
       className="bg-white border-b border-neutral-100 shadow-sm relative select-none"
       onMouseLeave={() => setActiveCategory(null)}
     >
-      <div className="container mx-auto px-6">
-        <ul className="flex items-center justify-center gap-8 lg:gap-12 py-3.5 text-[11px] font-extrabold uppercase tracking-[2.5px] text-[#4e3a24] overflow-x-auto whitespace-nowrap scrollbar-none">
+      <div className="container mx-auto px-4 md:px-6">
+        <ul className="flex items-center justify-start md:justify-center gap-8 lg:gap-12 py-3.5 text-[11px] font-extrabold uppercase tracking-[2.5px] text-[#4e3a24] overflow-x-auto whitespace-nowrap scrollbar-none px-2 md:px-0">
           {categories.map((item) => {
             const hasMegaMenu = megaMenuCategories.includes(item);
             const isHovered = activeCategory === item;

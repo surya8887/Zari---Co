@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 
 const ProductListPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   const {
     filteredProducts,
@@ -127,6 +128,136 @@ const ProductListPage = () => {
     filters.designs.length +
     (filters.priceRange[1] !== 300000 ? 1 : 0);
 
+  const renderFiltersContent = () => (
+    <>
+      <div className="flex items-center justify-between pb-3.5 border-b border-neutral-100 mb-4">
+        <span className="text-xs font-extrabold uppercase tracking-widest text-[#4e3a24] flex items-center gap-2">
+          <SlidersHorizontal className="w-3.5 h-3.5 text-[#8b7355]" />
+          Refine Search ({activeFiltersCount})
+        </span>
+        {activeFiltersCount > 0 && (
+          <button
+            onClick={resetFilters}
+            className="text-[10px] font-bold uppercase tracking-wider text-[#8b7355] hover:text-[#6e583e] transition-colors cursor-pointer"
+          >
+            Clear All
+          </button>
+        )}
+      </div>
+
+      {/* Price section accordion */}
+      <FilterSection
+        title="Price Range"
+        isOpen={expandedSections.price}
+        onToggle={() => toggleSection('price')}
+      >
+        <PriceRangeFilter
+          selectedValue={filters.priceRange[1]}
+          onChange={(val) => setPriceRange([0, val])}
+          options={[
+            { label: 'Under ₹20,000', value: 20000 },
+            { label: 'Under ₹50,000', value: 50000 },
+            { label: 'Under ₹100,000', value: 100000 },
+            { label: 'Under ₹200,000', value: 200000 },
+            { label: 'Show All Prices', value: 300000 },
+          ]}
+        />
+      </FilterSection>
+
+      {/* Product Type section accordion */}
+      <FilterSection
+        title="Product Type"
+        isOpen={expandedSections.type}
+        onToggle={() => toggleSection('type')}
+      >
+        <FilterCheckboxGroup
+          options={['Earrings', 'Rings', 'Necklaces', 'Bracelets', 'Bangles', 'Pendants', 'Chains']}
+          selectedValues={filters.productTypes}
+          onChange={(val) => toggleFilter('productTypes', val)}
+        />
+      </FilterSection>
+
+      {/* Metal section accordion */}
+      <FilterSection
+        title="Metal Type"
+        isOpen={expandedSections.metal}
+        onToggle={() => toggleSection('metal')}
+      >
+        <FilterCheckboxGroup
+          options={['Gold', 'Diamond', 'Silver', 'Platinum', 'Rose Gold']}
+          selectedValues={filters.metals}
+          onChange={(val) => toggleFilter('metals', val)}
+        />
+      </FilterSection>
+
+      {/* Gender preset accordion */}
+      <FilterSection
+        title="Gender Preset"
+        isOpen={expandedSections.gender}
+        onToggle={() => toggleSection('gender')}
+      >
+        <FilterCheckboxGroup
+          options={['Women', 'Men', 'Kids', 'Unisex']}
+          selectedValues={filters.genders}
+          onChange={(val) => toggleFilter('genders', val)}
+        />
+      </FilterSection>
+
+      {/* Offers accordion */}
+      <FilterSection
+        title="Exclusive Offers"
+        isOpen={expandedSections.offers}
+        onToggle={() => toggleSection('offers')}
+      >
+        <FilterCheckboxGroup
+          options={['Discount', 'New Arrival', 'Best Seller', 'Ready to Ship']}
+          selectedValues={filters.offers}
+          onChange={(val) => toggleFilter('offers', val)}
+        />
+      </FilterSection>
+
+      {/* Occasions accordion */}
+      <FilterSection
+        title="Occasions"
+        isOpen={expandedSections.occasion}
+        onToggle={() => toggleSection('occasion')}
+      >
+        <FilterCheckboxGroup
+          options={['Wedding', 'Daily Wear', 'Party Wear', 'Gifting', 'Engagement', 'Anniversary']}
+          selectedValues={filters.occasions}
+          onChange={(val) => toggleFilter('occasions', val)}
+        />
+      </FilterSection>
+
+      {/* Styles accordion */}
+      <FilterSection
+        title="Design Styles"
+        isOpen={expandedSections.style}
+        onToggle={() => toggleSection('style')}
+      >
+        <FilterCheckboxGroup
+          options={['Classic', 'Modern', 'Traditional', 'Minimal', 'Luxury']}
+          selectedValues={filters.styles}
+          onChange={(val) => toggleFilter('styles', val)}
+        />
+      </FilterSection>
+
+      {/* Design patterns/motifs accordion */}
+      <FilterSection
+        title="Patterns / Motifs"
+        isOpen={expandedSections.design}
+        onToggle={() => toggleSection('design')}
+        isLast
+      >
+        <FilterCheckboxGroup
+          options={['Solitaire', 'Floral', 'Geometric', 'Heart', 'Pearl', 'Gemstone']}
+          selectedValues={filters.designs}
+          onChange={(val) => toggleFilter('designs', val)}
+        />
+      </FilterSection>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
       <Header />
@@ -139,136 +270,23 @@ const ProductListPage = () => {
           description="Pure diamonds, gold certifications, and timeless contemporary styles."
         />
 
+        {/* Mobile Filters Trigger */}
+        <div className="lg:hidden mb-6">
+          <button 
+            onClick={() => setIsMobileFilterOpen(true)}
+            className="w-full h-11 bg-white border border-[#8b7355]/20 rounded-xl text-xs font-bold uppercase tracking-widest text-[#8b7355] flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-98 transition-all hover:bg-[#faf9f6]"
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            <span>Refine Collection ({activeFiltersCount})</span>
+          </button>
+        </div>
+
         {/* Filters and catalog grid layout */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
-          {/* 1. Sidebar Advanced Filters */}
-          <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm h-fit select-none lg:sticky lg:top-28 max-h-[80vh] overflow-y-auto scrollbar-thin">
-            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 mb-4">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-slate-800 flex items-center gap-2">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-blue-600" />
-                Refine Search ({activeFiltersCount})
-              </span>
-              {activeFiltersCount > 0 && (
-                <button
-                  onClick={resetFilters}
-                  className="text-[10px] font-bold uppercase tracking-wider text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
-                >
-                  Clear All
-                </button>
-              )}
-            </div>
-
-            {/* Price section accordion */}
-            <FilterSection
-              title="Price Range"
-              isOpen={expandedSections.price}
-              onToggle={() => toggleSection('price')}
-            >
-              <PriceRangeFilter
-                selectedValue={filters.priceRange[1]}
-                onChange={(val) => setPriceRange([0, val])}
-                options={[
-                  { label: 'Under ₹20,000', value: 20000 },
-                  { label: 'Under ₹50,000', value: 50000 },
-                  { label: 'Under ₹1,000,000', value: 100000 },
-                  { label: 'Under ₹2,000,000', value: 200000 },
-                  { label: 'Show All Prices', value: 300000 },
-                ]}
-              />
-            </FilterSection>
-
-            {/* Product Type section accordion */}
-            <FilterSection
-              title="Product Type"
-              isOpen={expandedSections.type}
-              onToggle={() => toggleSection('type')}
-            >
-              <FilterCheckboxGroup
-                options={['Earrings', 'Rings', 'Necklaces', 'Bracelets', 'Bangles', 'Pendants', 'Chains']}
-                selectedValues={filters.productTypes}
-                onChange={(val) => toggleFilter('productTypes', val)}
-              />
-            </FilterSection>
-
-            {/* Metal section accordion */}
-            <FilterSection
-              title="Metal Type"
-              isOpen={expandedSections.metal}
-              onToggle={() => toggleSection('metal')}
-            >
-              <FilterCheckboxGroup
-                options={['Gold', 'Diamond', 'Silver', 'Platinum', 'Rose Gold']}
-                selectedValues={filters.metals}
-                onChange={(val) => toggleFilter('metals', val)}
-              />
-            </FilterSection>
-
-            {/* Gender preset accordion */}
-            <FilterSection
-              title="Gender Preset"
-              isOpen={expandedSections.gender}
-              onToggle={() => toggleSection('gender')}
-            >
-              <FilterCheckboxGroup
-                options={['Women', 'Men', 'Kids', 'Unisex']}
-                selectedValues={filters.genders}
-                onChange={(val) => toggleFilter('genders', val)}
-              />
-            </FilterSection>
-
-            {/* Offers accordion */}
-            <FilterSection
-              title="Exclusive Offers"
-              isOpen={expandedSections.offers}
-              onToggle={() => toggleSection('offers')}
-            >
-              <FilterCheckboxGroup
-                options={['Discount', 'New Arrival', 'Best Seller', 'Ready to Ship']}
-                selectedValues={filters.offers}
-                onChange={(val) => toggleFilter('offers', val)}
-              />
-            </FilterSection>
-
-            {/* Occasions accordion */}
-            <FilterSection
-              title="Occasions"
-              isOpen={expandedSections.occasion}
-              onToggle={() => toggleSection('occasion')}
-            >
-              <FilterCheckboxGroup
-                options={['Wedding', 'Daily Wear', 'Party Wear', 'Gifting', 'Engagement', 'Anniversary']}
-                selectedValues={filters.occasions}
-                onChange={(val) => toggleFilter('occasions', val)}
-              />
-            </FilterSection>
-
-            {/* Styles accordion */}
-            <FilterSection
-              title="Design Styles"
-              isOpen={expandedSections.style}
-              onToggle={() => toggleSection('style')}
-            >
-              <FilterCheckboxGroup
-                options={['Classic', 'Modern', 'Traditional', 'Minimal', 'Luxury']}
-                selectedValues={filters.styles}
-                onChange={(val) => toggleFilter('styles', val)}
-              />
-            </FilterSection>
-
-            {/* Design patterns/motifs accordion */}
-            <FilterSection
-              title="Patterns / Motifs"
-              isOpen={expandedSections.design}
-              onToggle={() => toggleSection('design')}
-              isLast
-            >
-              <FilterCheckboxGroup
-                options={['Solitaire', 'Floral', 'Geometric', 'Heart', 'Pearl', 'Gemstone']}
-                selectedValues={filters.designs}
-                onChange={(val) => toggleFilter('designs', val)}
-              />
-            </FilterSection>
+          {/* 1. Sidebar Advanced Filters (Desktop) */}
+          <div className="hidden lg:block bg-white border border-neutral-100 rounded-3xl p-5 shadow-sm h-fit select-none lg:sticky lg:top-28 max-h-[80vh] overflow-y-auto scrollbar-thin">
+            {renderFiltersContent()}
           </div>
 
           {/* 2. Main Products Catalog Grid */}
@@ -277,61 +295,61 @@ const ProductListPage = () => {
               {/* Dynamic Active Filters Pills Listing */}
               {activeFiltersCount > 0 && (
                 <div className="flex flex-wrap gap-2 mb-6 bg-white border border-slate-100 rounded-2xl p-4 shadow-sm select-none">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 self-center mr-1">Active Refinements:</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#4e3a24]/50 self-center mr-1">Active Refinements:</span>
                   
                   {filters.priceRange[1] !== 300000 && (
-                    <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-100">
+                    <span className="inline-flex items-center gap-1 bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-bold px-3 py-1 rounded-full border border-[#8b7355]/20">
                       <span>Under ₹{filters.priceRange[1].toLocaleString('en-IN')}</span>
-                      <button onClick={() => setPriceRange([0, 300000])} className="cursor-pointer hover:text-blue-900"><X className="w-3 h-3" /></button>
+                      <button onClick={() => setPriceRange([0, 300000])} className="cursor-pointer hover:text-[#6e583e]"><X className="w-3 h-3" /></button>
                     </span>
                   )}
-
+ 
                   {filters.productTypes.map((type) => (
-                    <span key={type} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-100">
+                    <span key={type} className="inline-flex items-center gap-1 bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-bold px-3 py-1 rounded-full border border-[#8b7355]/20">
                       <span>{type}</span>
-                      <button onClick={() => toggleFilter('productTypes', type)} className="cursor-pointer hover:text-blue-900"><X className="w-3 h-3" /></button>
+                      <button onClick={() => toggleFilter('productTypes', type)} className="cursor-pointer hover:text-[#6e583e]"><X className="w-3 h-3" /></button>
                     </span>
                   ))}
-
+ 
                   {filters.metals.map((met) => (
-                    <span key={met} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-100">
+                    <span key={met} className="inline-flex items-center gap-1 bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-bold px-3 py-1 rounded-full border border-[#8b7355]/20">
                       <span>{met}</span>
-                      <button onClick={() => toggleFilter('metals', met)} className="cursor-pointer hover:text-blue-900"><X className="w-3 h-3" /></button>
+                      <button onClick={() => toggleFilter('metals', met)} className="cursor-pointer hover:text-[#6e583e]"><X className="w-3 h-3" /></button>
                     </span>
                   ))}
-
+ 
                   {filters.genders.map((gen) => (
-                    <span key={gen} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-100">
+                    <span key={gen} className="inline-flex items-center gap-1 bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-bold px-3 py-1 rounded-full border border-[#8b7355]/20">
                       <span>{gen}</span>
-                      <button onClick={() => toggleFilter('genders', gen)} className="cursor-pointer hover:text-blue-900"><X className="w-3 h-3" /></button>
+                      <button onClick={() => toggleFilter('genders', gen)} className="cursor-pointer hover:text-[#6e583e]"><X className="w-3 h-3" /></button>
                     </span>
                   ))}
-
+ 
                   {filters.offers.map((off) => (
-                    <span key={off} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-100">
+                    <span key={off} className="inline-flex items-center gap-1 bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-bold px-3 py-1 rounded-full border border-[#8b7355]/20">
                       <span>{off}</span>
-                      <button onClick={() => toggleFilter('offers', off)} className="cursor-pointer hover:text-blue-900"><X className="w-3 h-3" /></button>
+                      <button onClick={() => toggleFilter('offers', off)} className="cursor-pointer hover:text-[#6e583e]"><X className="w-3 h-3" /></button>
                     </span>
                   ))}
-
+ 
                   {filters.occasions.map((occ) => (
-                    <span key={occ} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-100">
+                    <span key={occ} className="inline-flex items-center gap-1 bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-bold px-3 py-1 rounded-full border border-[#8b7355]/20">
                       <span>{occ}</span>
-                      <button onClick={() => toggleFilter('occasions', occ)} className="cursor-pointer hover:text-blue-900"><X className="w-3 h-3" /></button>
+                      <button onClick={() => toggleFilter('occasions', occ)} className="cursor-pointer hover:text-[#6e583e]"><X className="w-3 h-3" /></button>
                     </span>
                   ))}
-
+ 
                   {filters.styles.map((sty) => (
-                    <span key={sty} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-100">
+                    <span key={sty} className="inline-flex items-center gap-1 bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-bold px-3 py-1 rounded-full border border-[#8b7355]/20">
                       <span>{sty}</span>
-                      <button onClick={() => toggleFilter('styles', sty)} className="cursor-pointer hover:text-blue-900"><X className="w-3 h-3" /></button>
+                      <button onClick={() => toggleFilter('styles', sty)} className="cursor-pointer hover:text-[#6e583e]"><X className="w-3 h-3" /></button>
                     </span>
                   ))}
-
+ 
                   {filters.designs.map((des) => (
-                    <span key={des} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-100">
+                    <span key={des} className="inline-flex items-center gap-1 bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-bold px-3 py-1 rounded-full border border-[#8b7355]/20">
                       <span>{des}</span>
-                      <button onClick={() => toggleFilter('designs', des)} className="cursor-pointer hover:text-blue-900"><X className="w-3 h-3" /></button>
+                      <button onClick={() => toggleFilter('designs', des)} className="cursor-pointer hover:text-[#6e583e]"><X className="w-3 h-3" /></button>
                     </span>
                   ))}
                 </div>
@@ -406,6 +424,61 @@ const ProductListPage = () => {
           </div>
         </div>
       </main>
+
+      {/* Mobile Filters Drawer */}
+      {isMobileFilterOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/45 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
+            onClick={() => setIsMobileFilterOpen(false)}
+          />
+          
+          {/* Drawer Content */}
+          <div className="relative ml-auto w-80 max-w-[85vw] bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300">
+            {/* Header */}
+            <div className="p-5 border-b border-neutral-100 flex items-center justify-between">
+              <span className="text-xs font-extrabold uppercase tracking-widest text-[#4e3a24] flex items-center gap-2">
+                <SlidersHorizontal className="w-4 h-4 text-[#8b7355]" />
+                Filters & Refinements
+              </span>
+              <button 
+                onClick={() => setIsMobileFilterOpen(false)}
+                className="p-2 -mr-2 text-neutral-500 hover:text-neutral-800 focus:outline-none cursor-pointer"
+                aria-label="Close Filters"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Filters Scroll Area */}
+            <div className="flex-grow overflow-y-auto p-5 select-none scrollbar-thin bg-white">
+              {renderFiltersContent()}
+            </div>
+            
+            {/* Drawer Actions */}
+            <div className="p-5 border-t border-neutral-100 bg-[#faf9f6] flex gap-3">
+              {activeFiltersCount > 0 && (
+                <button
+                  onClick={() => {
+                    resetFilters();
+                    setIsMobileFilterOpen(false);
+                  }}
+                  className="flex-1 h-10 border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600 rounded-lg text-[10px] font-bold uppercase tracking-widest cursor-pointer"
+                >
+                  Clear All
+                </button>
+              )}
+              <button
+                onClick={() => setIsMobileFilterOpen(false)}
+                className="flex-1 h-10 bg-[#8b7355] hover:bg-[#6e583e] text-white rounded-lg text-[10px] font-bold uppercase tracking-widest cursor-pointer shadow-sm"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

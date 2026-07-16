@@ -285,32 +285,32 @@ const ProductListPage = () => {
   );
 
   const getHeaderDetails = () => {
-    switch (filters.category) {
-      case 'All':
+    switch (filters.category.toLowerCase()) {
+      case 'all':
         return {
           subtitle: "Premium Natural Jewels",
           title: "The Zari & Co. Masterpiece Collection",
           description: "Explore our complete range of certified conflict-free diamonds and gold jewelry."
         };
-      case 'Collections':
+      case 'collections':
         return {
           subtitle: "Editorial Showcase",
           title: "Our Exclusive Signature Collections",
           description: "Discover curated, themed masterpieces designed for your life's special milestones."
         };
-      case 'Try At Home':
+      case 'try at home':
         return {
           subtitle: "Zari & Co. Comfort Service",
           title: "Select & Try At Home",
           description: "Shortlist your favorite designs and our consultants will bring them to your doorstep for a free trial."
         };
-      case 'Bespoke':
+      case 'bespoke':
         return {
           subtitle: "Custom Craftsmanship",
           title: "Bespoke Custom Jewelry",
           description: "Collaborate with our master craftsmen to create unique, hand-engraved jewelry designed for you."
         };
-      case '10+1 Plan':
+      case '10+1 plan':
         return {
           subtitle: "Investment Savings Scheme",
           title: "The 10+1 Jeweller Purchase Plan",
@@ -340,7 +340,7 @@ const ProductListPage = () => {
         />
 
         {/* Dynamic Promotional/Marketing service banners for non-categories */}
-        {filters.category === 'Try At Home' && (
+        {filters.category.toLowerCase() === 'try at home' && (
           <div className="mb-8 bg-gradient-to-r from-[#8b7355]/10 via-[#8b7355]/5 to-transparent border border-[#8b7355]/20 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 shadow-sm select-none">
             <div className="flex-grow space-y-3 text-center md:text-left">
               <span className="inline-block bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">
@@ -371,7 +371,7 @@ const ProductListPage = () => {
           </div>
         )}
 
-        {filters.category === 'Bespoke' && (
+        {filters.category.toLowerCase() === 'bespoke' && (
           <div className="mb-8 bg-gradient-to-r from-[#8b7355]/15 via-[#8b7355]/5 to-transparent border border-[#8b7355]/20 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 shadow-sm select-none">
             <div className="flex-grow space-y-3 text-center md:text-left">
               <span className="inline-block bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">
@@ -388,7 +388,7 @@ const ProductListPage = () => {
           </div>
         )}
 
-        {filters.category === '10+1 Plan' && (
+        {filters.category.toLowerCase() === '10+1 plan' && (
           <div className="mb-8 bg-gradient-to-r from-[#8b7355]/10 via-[#8b7355]/5 to-transparent border border-[#8b7355]/20 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 shadow-sm select-none">
             <div className="flex-grow space-y-3 text-center md:text-left">
               <span className="inline-block bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">

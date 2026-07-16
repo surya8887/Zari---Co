@@ -103,19 +103,23 @@ export const useProductStore = create<ProductState>((set, get) => {
 
     // Category / Top Level category filter
     const nonCategories = ['Collections', 'Try At Home', 'Bespoke', '10+1 Plan'];
-    if (filters.category && filters.category !== 'All' && !nonCategories.includes(filters.category)) {
+    const activeCategoryLower = filters.category?.toLowerCase() || '';
+    const isNonCategory = nonCategories.some(
+      (nc) => nc.toLowerCase() === activeCategoryLower
+    );
+    if (filters.category && activeCategoryLower !== 'all' && !isNonCategory) {
       const selectedCategoryObj = get().categories.find(
-        (c) => c.name.toLowerCase() === filters.category.toLowerCase()
+        (c) => c.name.toLowerCase() === activeCategoryLower
       );
       if (selectedCategoryObj) {
         // Find all subcategories where parentId matches selectedCategoryObj.id
         const subCategoryNames = get().categories
           .filter((c) => (c.parentId || (c as any).parent_id) === selectedCategoryObj.id)
-          .map((c) => c.name);
-        const allowedCategories = [selectedCategoryObj.name, ...subCategoryNames];
-        result = result.filter((p) => allowedCategories.includes(p.category));
+          .map((c) => c.name.toLowerCase());
+        const allowedCategoriesLower = [selectedCategoryObj.name.toLowerCase(), ...subCategoryNames];
+        result = result.filter((p) => allowedCategoriesLower.includes(p.category.toLowerCase()));
       } else {
-        result = result.filter((p) => p.category === filters.category);
+        result = result.filter((p) => p.category.toLowerCase() === activeCategoryLower);
       }
     }
 

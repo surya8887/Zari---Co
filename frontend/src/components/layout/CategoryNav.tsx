@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProductStore } from '@/store/useProductStore';
 import MegaMenu from './MegaMenu';
 
 export const CategoryNav = () => {
   const navigate = useNavigate();
-  const { setCategory, resetFilters } = useProductStore();
+  const { categories: dbCategories, fetchCategories, setCategory, resetFilters } = useProductStore();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const categories = [
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  const defaultCategories = [
     'Rings', 
     'Earrings', 
     'Pendants', 
@@ -20,15 +24,15 @@ export const CategoryNav = () => {
     '10+1 Plan'
   ];
 
+  const categories = dbCategories.length > 0 
+    ? dbCategories.filter(c => !c.parentId && !(c as any).parent_id).map(c => c.name) 
+    : defaultCategories;
+
   const megaMenuCategories = ['Rings', 'Earrings', 'Pendants', 'Bangles', 'Gifts'];
 
   const handleCategoryClick = (cat: string) => {
     resetFilters();
-    if (megaMenuCategories.includes(cat)) {
-      setCategory(cat);
-    } else {
-      setCategory('All');
-    }
+    setCategory(cat);
     navigate('/products');
     setActiveCategory(null);
   };

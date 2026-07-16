@@ -284,6 +284,49 @@ const ProductListPage = () => {
     </>
   );
 
+  const getHeaderDetails = () => {
+    switch (filters.category) {
+      case 'All':
+        return {
+          subtitle: "Premium Natural Jewels",
+          title: "The Zari & Co. Masterpiece Collection",
+          description: "Explore our complete range of certified conflict-free diamonds and gold jewelry."
+        };
+      case 'Collections':
+        return {
+          subtitle: "Editorial Showcase",
+          title: "Our Exclusive Signature Collections",
+          description: "Discover curated, themed masterpieces designed for your life's special milestones."
+        };
+      case 'Try At Home':
+        return {
+          subtitle: "Zari & Co. Comfort Service",
+          title: "Select & Try At Home",
+          description: "Shortlist your favorite designs and our consultants will bring them to your doorstep for a free trial."
+        };
+      case 'Bespoke':
+        return {
+          subtitle: "Custom Craftsmanship",
+          title: "Bespoke Custom Jewelry",
+          description: "Collaborate with our master craftsmen to create unique, hand-engraved jewelry designed for you."
+        };
+      case '10+1 Plan':
+        return {
+          subtitle: "Investment Savings Scheme",
+          title: "The 10+1 Jeweller Purchase Plan",
+          description: "Save monthly for 10 months and get the 11th installment free on Zari & Co. Start today."
+        };
+      default:
+        return {
+          subtitle: "Exquisite Designs",
+          title: `${filters.category} Collection`,
+          description: `Handcrafted premium certified ${filters.category.toLowerCase()} styled for contemporary luxury.`
+        };
+    }
+  };
+
+  const headerDetails = getHeaderDetails();
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
       <Header />
@@ -291,10 +334,76 @@ const ProductListPage = () => {
       <main className="container mx-auto px-4 py-8">
         {/* Luxury editorial header title */}
         <PageHeader
-          subtitle="Premium Natural Jewels"
-          title="The BlueStone Inspired Collection"
-          description="Pure diamonds, gold certifications, and timeless contemporary styles."
+          subtitle={headerDetails.subtitle}
+          title={headerDetails.title}
+          description={headerDetails.description}
         />
+
+        {/* Dynamic Promotional/Marketing service banners for non-categories */}
+        {filters.category === 'Try At Home' && (
+          <div className="mb-8 bg-gradient-to-r from-[#8b7355]/10 via-[#8b7355]/5 to-transparent border border-[#8b7355]/20 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 shadow-sm select-none">
+            <div className="flex-grow space-y-3 text-center md:text-left">
+              <span className="inline-block bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">
+                Luxury Doorstep Service
+              </span>
+              <h3 className="text-xl font-serif font-semibold text-[#4e3a24]">Try Before You Buy</h3>
+              <p className="text-xs text-[#6e583e] max-w-2xl leading-relaxed">
+                Shortlist your favorite jewelry pieces online, and our expert jewelry consultants will bring them to the comfort of your home for a private viewing. 100% free, secure, and with no obligation to purchase.
+              </p>
+              <div className="flex flex-wrap gap-4 pt-2 justify-center md:justify-start">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#4e3a24] uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#8b7355]" />
+                  1. Shortlist Items
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#4e3a24] uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#8b7355]" />
+                  2. Select Time Slot
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#4e3a24] uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#8b7355]" />
+                  3. Try at Home
+                </div>
+              </div>
+            </div>
+            <button className="flex-shrink-0 bg-[#8b7355] hover:bg-[#6e583e] text-white text-[10px] font-bold uppercase tracking-widest px-6 py-3.5 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer">
+              Book Home Trial
+            </button>
+          </div>
+        )}
+
+        {filters.category === 'Bespoke' && (
+          <div className="mb-8 bg-gradient-to-r from-[#8b7355]/15 via-[#8b7355]/5 to-transparent border border-[#8b7355]/20 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 shadow-sm select-none">
+            <div className="flex-grow space-y-3 text-center md:text-left">
+              <span className="inline-block bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">
+                Custom Jewelry Atelier
+              </span>
+              <h3 className="text-xl font-serif font-semibold text-[#4e3a24]">Craft Your Dream Jewelry</h3>
+              <p className="text-xs text-[#6e583e] max-w-2xl leading-relaxed">
+                Work directly with our master craftsmen and award-winning designers to bring your unique vision to life. From initial sketch to certified final masterpiece, we customize every detail.
+              </p>
+            </div>
+            <button className="flex-shrink-0 bg-[#8b7355] hover:bg-[#6e583e] text-white text-[10px] font-bold uppercase tracking-widest px-6 py-3.5 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer">
+              Consult a Designer
+            </button>
+          </div>
+        )}
+
+        {filters.category === '10+1 Plan' && (
+          <div className="mb-8 bg-gradient-to-r from-[#8b7355]/10 via-[#8b7355]/5 to-transparent border border-[#8b7355]/20 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 shadow-sm select-none">
+            <div className="flex-grow space-y-3 text-center md:text-left">
+              <span className="inline-block bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">
+                Savings & Purchase Plan
+              </span>
+              <h3 className="text-xl font-serif font-semibold text-[#4e3a24]">The Zari & Co. 10+1 Scheme</h3>
+              <p className="text-xs text-[#6e583e] max-w-2xl leading-relaxed">
+                Pay 10 monthly installments towards your favorite gold or diamond jewelry, and we will contribute the 11th installment for free. Start planning for your wedding or anniversary today.
+              </p>
+            </div>
+            <button className="flex-shrink-0 bg-[#8b7355] hover:bg-[#6e583e] text-white text-[10px] font-bold uppercase tracking-widest px-6 py-3.5 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer">
+              Enroll / Calculate
+            </button>
+          </div>
+        )}
 
         {/* Mobile Filters Trigger */}
         <div className="lg:hidden mb-6">

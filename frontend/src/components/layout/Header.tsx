@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, User, ShoppingBag, MapPin, Phone, Heart, Menu, X, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
+import { useProductStore } from '@/store/useProductStore';
 import CategoryNav from './CategoryNav';
 import ProfileDropdown from './ProfileDropdown';
 
@@ -12,6 +13,28 @@ const Header = () => {
   const { isAuthenticated } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileSearchQuery, setMobileSearchQuery] = useState('');
+
+  const { categories: dbCategories, fetchCategories, setCategory, resetFilters } = useProductStore();
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  const defaultCategories = [
+    'Rings', 
+    'Earrings', 
+    'Pendants', 
+    'Bangles', 
+    'Gifts', 
+    'Collections', 
+    'Try At Home', 
+    'Bespoke', 
+    '10+1 Plan'
+  ];
+
+  const categories = dbCategories.length > 0 
+    ? dbCategories.filter(c => !c.parentId && !(c as any).parent_id).map(c => c.name) 
+    : defaultCategories;
   
   // Real-Time Zustand subscriptions
   const { items: cartItems, getTotals } = useCartStore();
@@ -215,20 +238,12 @@ const Header = () => {
             <div className="flex-grow overflow-y-auto p-5">
               <span className="block text-[9px] uppercase tracking-widest text-neutral-400 font-extrabold mb-3">Shop Categories</span>
               <ul className="flex flex-col gap-4 font-sans font-bold text-xs uppercase tracking-wider text-[#4e3a24] mb-8">
-                {[
-                  'Rings', 
-                  'Earrings', 
-                  'Pendants', 
-                  'Bangles', 
-                  'Gifts', 
-                  'Collections', 
-                  'Try At Home', 
-                  'Bespoke', 
-                  '10+1 Plan'
-                ].map((item) => (
+                {categories.map((item) => (
                   <li key={item}>
                     <button
                       onClick={() => {
+                        resetFilters();
+                        setCategory(item);
                         setIsMobileMenuOpen(false);
                         navigate('/products');
                       }}

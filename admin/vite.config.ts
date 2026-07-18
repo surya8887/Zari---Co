@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_TINY_API_KEY': JSON.stringify(env.TINY_API_KEY || '')
     },
     server: {
-      port: 4001,
+      port: 3001,
     },
     resolve: {
       alias: {

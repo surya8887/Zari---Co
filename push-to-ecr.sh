@@ -3,12 +3,12 @@
 set -e
 
 REGISTRY="899928294562.dkr.ecr.us-east-1.amazonaws.com"
-REPOSITORY="zari_co"
+REPOSITORY="zario_website"
 REGION="us-east-1"
 VITE_API_URL=${VITE_API_URL:-"https://api.yourdomain.com/api/v1"}
 
 echo "============================================="
-echo "1. Creating ECR Repository '$REPOSITORY' if it does not exist..."
+echo "1. Checking ECR Repository '$REPOSITORY'..."
 echo "============================================="
 if aws ecr describe-repositories --repository-names "$REPOSITORY" --region "$REGION" >/dev/null 2>&1; then
   echo "✔ Repository '$REPOSITORY' already exists."

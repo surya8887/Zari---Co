@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const createAddressSchema = z.object({
   line1: z.string().min(1, "Street address line 1 is required"),
-  line2: z.string().optional(),
+  line2: z.string().nullable().optional(),
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State/Region is required"),
   zipCode: z.string().min(1, "ZIP/Postal code is required"),

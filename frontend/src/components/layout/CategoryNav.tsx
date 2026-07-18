@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProductStore } from '@/store/useProductStore';
 import MegaMenu from './MegaMenu';
 
 export const CategoryNav = () => {
   const navigate = useNavigate();
-  const { setCategory, resetFilters } = useProductStore();
+  const { categories: dbCategories, fetchCategories, setCategory, resetFilters } = useProductStore();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const categories = [
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  const defaultCategories = [
     'Rings', 
     'Earrings', 
     'Pendants', 
@@ -20,15 +24,15 @@ export const CategoryNav = () => {
     '10+1 Plan'
   ];
 
+  const categories = dbCategories.length > 0 
+    ? dbCategories.filter(c => !c.parentId && !(c as any).parent_id).map(c => c.name) 
+    : defaultCategories;
+
   const megaMenuCategories = ['Rings', 'Earrings', 'Pendants', 'Bangles', 'Gifts'];
 
   const handleCategoryClick = (cat: string) => {
     resetFilters();
-    if (megaMenuCategories.includes(cat)) {
-      setCategory(cat);
-    } else {
-      setCategory('All');
-    }
+    setCategory(cat);
     navigate('/products');
     setActiveCategory(null);
   };
@@ -38,8 +42,8 @@ export const CategoryNav = () => {
       className="bg-white border-b border-neutral-100 shadow-sm relative select-none"
       onMouseLeave={() => setActiveCategory(null)}
     >
-      <div className="container mx-auto px-6">
-        <ul className="flex items-center justify-center gap-8 lg:gap-12 py-3.5 text-[11px] font-extrabold uppercase tracking-[2.5px] text-[#4e3a24] overflow-x-auto whitespace-nowrap scrollbar-none">
+      <div className="container mx-auto px-4 md:px-6">
+        <ul className="flex items-center justify-start md:justify-center gap-8 lg:gap-12 py-3.5 text-[11px] font-extrabold uppercase tracking-[2.5px] text-[#4e3a24] overflow-x-auto whitespace-nowrap scrollbar-none px-2 md:px-0">
           {categories.map((item) => {
             const hasMegaMenu = megaMenuCategories.includes(item);
             const isHovered = activeCategory === item;

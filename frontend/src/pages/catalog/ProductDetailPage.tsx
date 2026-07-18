@@ -4,7 +4,7 @@ import Header from '@/components/layout/Header';
 import { useProductStore } from '@/store/useProductStore';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
-import { Star, ShieldCheck, ShoppingBag, Heart, Send, Video, MapPin, Truck, ChevronDown, ChevronUp, RotateCcw, Check, PhoneCall, Award } from 'lucide-react';
+import { Star, ShieldCheck, ShoppingBag, Heart, ArrowLeft, Send, Sparkles, ClipboardList, HeartHandshake, Video, MapPin, Truck, ChevronDown, ChevronUp, RotateCcw, Check, PhoneCall, Award } from 'lucide-react';
 import { toast } from 'sonner';
 
 const ProductDetailPage = () => {
@@ -16,16 +16,15 @@ const ProductDetailPage = () => {
   const { toggleWishlist, isInWishlist } = useWishlistStore();
 
   const [selectedSize, setSelectedSize] = useState<string>('Size 12');
-  const [activeTab, setActiveTab] = useState<'details' | 'specs' | 'purity'>('details');
-
+  const [quantity, setQuantity] = useState<number>(1);
   const [activeImage, setActiveImage] = useState<string>('');
 
-  useEffect(() => {
-    if (selectedProduct) {
-      setActiveImage(selectedProduct.image);
-    }
-  }, [selectedProduct]);
+  // Review Form State
+  const [reviewName, setReviewName] = useState('');
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
 
+  // Customizer / Booking / Pincode states
   const [pincode, setPincode] = useState('');
   const [deliveryMessage, setDeliveryMessage] = useState('');
   const [isCheckingPincode, setIsCheckingPincode] = useState(false);
@@ -36,6 +35,117 @@ const ProductDetailPage = () => {
   const [bookingName, setBookingName] = useState('');
   const [bookingTime, setBookingTime] = useState('');
   const [isBooked, setIsBooked] = useState(false);
+
+  useEffect(() => {
+    const loadProduct = async () => {
+      if (products.length === 0) {
+        await fetchProducts();
+      }
+    };
+    loadProduct();
+  }, [products.length, fetchProducts]);
+
+  useEffect(() => {
+    if (products.length > 0 && slug) {
+      const p = getProductBySlug(slug);
+      if (!p) {
+        toast.error("Masterpiece not found!");
+        navigate('/products');
+      }
+    }
+  }, [slug, products, getProductBySlug, navigate]);
+
+  useEffect(() => {
+    if (selectedProduct) {
+      setActiveImage(selectedProduct.image);
+      setQuantity(1);
+    }
+  }, [selectedProduct]);
+
+  if (!selectedProduct) {
+    return (
+      <div className="min-h-screen bg-[#faf9f6] flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#8b7355] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const p = selectedProduct;
+  const wishlisted = isInWishlist(p.id);
+
+  // Helper to strip HTML tags for a clean brief description
+  const getBriefDescription = (desc: string) => {
+    const detailsPart = desc.split(/~GIA-SPECS~|<!--GIA-SPECS-->/)[0] || desc;
+    const stripHtml = (html: string) => {
+      return html
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&times;/g, '×')
+        .replace(/&amp;/g, '&')
+        .trim();
+    };
+    const cleanText = stripHtml(detailsPart);
+    let result = cleanText.replace(/^Product Description:?\s*/i, '');
+    const keyFeaturesIndex = result.search(/Key Features:?/i);
+    if (keyFeaturesIndex !== -1) {
+      result = result.substring(0, keyFeaturesIndex).trim();
+    }
+    return result;
+  };
+
+  // Helper to remove redundant headers from the parsed sections
+  const cleanHtml = (html: string, type: 'details' | 'specs' | 'care') => {
+    let cleaned = html.trim();
+    cleaned = cleaned.replace(/^(<br\s*\/?>|&nbsp;|\s)+/i, '');
+    cleaned = cleaned.replace(/(<br\s*\/?>|&nbsp;|\s)+$/i, '');
+    
+    if (type === 'details') {
+      cleaned = cleaned.replace(/^<h3>Product Description:?<\/h3>/i, '');
+      cleaned = cleaned.replace(/^<h2>Product Description:?<\/h2>/i, '');
+    } else if (type === 'specs') {
+      cleaned = cleaned.replace(/^<p><strong>Specifications:?<\/strong><\/p>/i, '');
+      cleaned = cleaned.replace(/^<h2>Specifications:?<\/h2>/i, '');
+    } else if (type === 'care') {
+      cleaned = cleaned.replace(/^<h2>Care &amp; Preservation Guidance:?<\/h2>/i, '');
+      cleaned = cleaned.replace(/^<h2>Care & Preservation Guidance:?<\/h2>/i, '');
+    }
+    
+    cleaned = cleaned.replace(/^(<br\s*\/?>|&nbsp;|\s)+/i, '');
+    cleaned = cleaned.replace(/(<br\s*\/?>|&nbsp;|\s)+$/i, '');
+    return cleaned;
+  };
+
+  // Parse the sections from description
+  const parseDescription = (desc: string) => {
+    let details = '';
+    let specs = '';
+    let care = '';
+
+    const parts = desc.split(/~GIA-SPECS~|~CARE-GUIDES~|<!--GIA-SPECS-->|<!--CARE-GUIDES-->/);
+
+    if (parts.length >= 3) {
+      details = parts[0] || '';
+      specs = parts[1] || '';
+      care = parts[2] || '';
+    } else if (parts.length === 2) {
+      details = parts[0] || '';
+      if (desc.includes('GIA-SPECS') || desc.includes('~GIA-SPECS~')) {
+        specs = parts[1] || '';
+      } else {
+        care = parts[1] || '';
+      }
+    } else {
+      details = desc || '';
+    }
+
+    return { 
+      detailsHtml: cleanHtml(details, 'details'), 
+      specsHtml: cleanHtml(specs, 'specs'), 
+      careHtml: cleanHtml(care, 'care') 
+    };
+  };
+
+  const { detailsHtml, specsHtml, careHtml } = parseDescription(p.description);
 
   const handleCheckPincode = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,94 +176,10 @@ const ProductDetailPage = () => {
     toast.success("Video Call Scheduled! We will contact you soon. ✦");
   };
 
-  // Review Form State
-  const [reviewName, setReviewName] = useState('');
-  const [reviewRating, setReviewRating] = useState(5);
-  const [reviewComment, setReviewComment] = useState('');
-
-  useEffect(() => {
-    const loadProduct = async () => {
-      if (products.length === 0) {
-        await fetchProducts();
-      }
-    };
-    loadProduct();
-  }, [products.length, fetchProducts]);
-
-  useEffect(() => {
-    if (products.length > 0 && slug) {
-      const p = getProductBySlug(slug);
-      if (!p) {
-        toast.error("Masterpiece not found!");
-        navigate('/products');
-      }
-    }
-  }, [slug, products, getProductBySlug, navigate]);
-
-  if (!selectedProduct) {
-    return (
-      <div className="min-h-screen bg-[#faf9f6] flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-[#8b7355] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  const p = selectedProduct;
-  const wishlisted = isInWishlist(p.id);
-
-
-  // Split description if it contains HTML comments from rich text editor
-  const desc = p.description || '';
-  const hasGiaSpecs = desc.includes('<!--GIA-SPECS-->');
-  const hasCareGuides = desc.includes('<!--CARE-GUIDES-->');
-
-  let storyHtml = desc;
-  let specsHtml = '';
-  let careHtml = '';
-
-  if (hasGiaSpecs && hasCareGuides) {
-    const parts = desc.split('<!--GIA-SPECS-->');
-    storyHtml = parts[0];
-    const rest = parts[1].split('<!--CARE-GUIDES-->');
-    specsHtml = rest[0];
-    careHtml = rest[1];
-  } else if (hasGiaSpecs) {
-    const parts = desc.split('<!--GIA-SPECS-->');
-    storyHtml = parts[0];
-    specsHtml = parts[1];
-  } else if (hasCareGuides) {
-    const parts = desc.split('<!--CARE-GUIDES-->');
-    storyHtml = parts[0];
-    careHtml = parts[1];
-  }
-
-  // Helper to extract clean text from rich HTML
-  const getCleanPreview = (html: string) => {
-    try {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
-      let text = doc.body.textContent || "";
-      const titleLower = p.name.toLowerCase();
-      const textLower = text.toLowerCase();
-      if (textLower.startsWith(titleLower)) {
-        text = text.substring(p.name.length).trim();
-      }
-      if (text.toLowerCase().startsWith("product story")) {
-        text = text.substring("product story".length).trim();
-      }
-      return text;
-    } catch (e) {
-      return html.replace(/<[^>]*>/g, ""); // simple fallback
-    }
-  };
-
-  const storyPreview = getCleanPreview(storyHtml);
-  const shortDescription = storyPreview.length > 200 ? storyPreview.slice(0, 197) + '...' : storyPreview;
-
   const handleAddToBag = () => {
-    addItem(p, 1, selectedSize);
+    addItem(p, quantity, selectedSize);
     toast.success(`${p.name} added to your bag! ✨`, {
-      description: `Size: ${selectedSize} | Free Insured Shipping.`,
+      description: `Quantity: ${quantity} | Size: ${selectedSize} | Free Insured Shipping.`,
     });
   };
 
@@ -191,91 +217,35 @@ const ProductDetailPage = () => {
       <Header />
 
       <main className="container mx-auto px-6 py-10">
-        {/* Breadcrumbs Trail */}
-        <div className="flex items-center gap-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#8b7355]/60 mb-6 select-none">
-          <Link to="/" className="hover:text-[#8b7355]">Home</Link>
-          <span>/</span>
-          <Link to="/products" className="hover:text-[#8b7355]">Jewellery</Link>
-          <span>/</span>
-          <Link to={`/products`} className="hover:text-[#8b7355]">{p.category}</Link>
-          <span>/</span>
-          <span className="text-[#8b7355] truncate max-w-[150px]">{p.name}</span>
-        </div>
+        {/* Back Link */}
+        <Link 
+          to="/products"
+          className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#8b7355] hover:text-[#6e583e] mb-8 select-none"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back to Collection
+        </Link>
 
         {/* Core Product Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
           
-          {/* Left Column: Image Showcase & Trust Marks */}
+          {/* Left Column: Image Showcase */}
           <div className="relative select-none">
             {/* Visual Frame */}
-            <div className="relative aspect-square bg-white border border-[#8b7355]/15 rounded-3xl p-6 shadow-sm overflow-hidden flex items-center justify-center">
+            <div className="aspect-square bg-white border border-[#8b7355]/15 rounded-3xl p-6 shadow-sm overflow-hidden flex items-center justify-center">
               <img
                 src={activeImage || p.image}
                 alt={p.name}
                 className="w-full h-full object-cover rounded-2xl hover:scale-105 transition-transform duration-500"
               />
-
-              {/* BIS Hallmark Floating Tag inside image frame */}
-              <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl border border-emerald-500/20 shadow-md text-[10px] text-emerald-800 font-extrabold uppercase tracking-widest flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 animate-pulse" />
-                <div>
-                  <span className="block text-[7px] text-neutral-400 font-bold tracking-normal uppercase leading-none mb-0.5">Assured Authenticity</span>
-                  <span>BIS 916 Hallmarked</span>
-                </div>
-              </div>
             </div>
 
-            {/* Alternative Product Photos Gallery */}
-            <div className="flex gap-3 mt-4 overflow-x-auto pb-1 select-none">
-              {p.images && p.images.map((imgUrl, idx) => {
-                const isSelected = activeImage === imgUrl;
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => setActiveImage(imgUrl)}
-                    className={`w-16 h-16 rounded-2xl overflow-hidden border bg-white cursor-pointer transition-all duration-200 flex-shrink-0 p-1 ${
-                      isSelected
-                        ? 'border-[#8b7355] shadow-[0_0_8px_rgba(139,115,85,0.25)] scale-[1.03]'
-                        : 'border-[#8b7355]/15 hover:border-[#8b7355]/50'
-                    }`}
-                  >
-                    <img
-                      src={imgUrl}
-                      alt={`Alternative photo ${idx + 1}`}
-                      className="w-full h-full object-cover rounded-xl"
-                    />
-                  </button>
-                );
-              })}
-
-              {/* BlueStone-Style Mock VIDEO Play Card */}
-              <button
-                onClick={() => setIsVideoOpen(true)}
-                className="w-16 h-16 rounded-2xl border border-[#8b7355]/15 bg-neutral-50 hover:bg-[#8b7355]/5 cursor-pointer transition-all duration-200 flex-shrink-0 flex flex-col items-center justify-center gap-1 p-1 text-[#8b7355]"
-              >
-                <Video className="w-5 h-5 animate-pulse" />
-                <span className="text-[8px] font-extrabold uppercase tracking-widest">VIDEO</span>
-              </button>
-            </div>
-
-            {/* BlueStone-Style Certified Trust Logos */}
-            <div className="mt-6 pt-4 border-t border-[#8b7355]/10 flex items-center justify-between select-none">
-              <span className="text-[8px] font-extrabold tracking-widest uppercase text-neutral-400">Certified By:</span>
-              <div className="flex items-center gap-6">
-                <div className="flex flex-col items-center">
-                  <span className="text-[9px] font-extrabold text-[#4e3a24] tracking-tighter leading-none">BIS</span>
-                  <span className="text-[6px] uppercase tracking-widest text-[#8b7355] font-bold">Hallmark</span>
-                </div>
-                <div className="h-6 w-px bg-neutral-200" />
-                <div className="flex flex-col items-center">
-                  <span className="text-[9px] font-extrabold text-[#4e3a24] tracking-tighter leading-none">SGL</span>
-                  <span className="text-[6px] uppercase tracking-widest text-[#8b7355] font-bold">Labs</span>
-                </div>
-                <div className="h-6 w-px bg-neutral-200" />
-                <div className="flex flex-col items-center">
-                  <span className="text-[9px] font-extrabold text-[#4e3a24] tracking-tighter leading-none">GSI</span>
-                  <span className="text-[6px] uppercase tracking-widest text-[#8b7355] font-bold">Certified</span>
-                </div>
+            {/*BIS Hallmark Floating Tag */}
+            <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl border border-emerald-500/20 shadow-md text-[10px] text-emerald-800 font-extrabold uppercase tracking-widest flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 animate-pulse" />
+              <div>
+                <span className="block text-[7px] text-neutral-400 font-bold tracking-normal uppercase leading-none mb-0.5">Assured Authenticity</span>
+                <span>BIS 916 Hallmarked</span>
               </div>
             </div>
           </div>
@@ -289,16 +259,16 @@ const ProductDetailPage = () => {
               </span>
 
               {/* Title */}
-              <h1 className="text-3xl font-serif text-[#4e3a24] font-extrabold italic leading-tight mb-2">
+              <h1 className="text-3xl font-serif text-[#4e3a24] font-extrabold italic leading-tight mb-4">
                 {p.name}
               </h1>
 
               {/* Stars summary */}
-              <div className="flex items-center gap-2 mb-4 select-none">
+              <div className="flex items-center gap-2 mb-6 select-none">
                 <div className="flex text-amber-500">
                   <Star className="w-3.5 h-3.5 fill-current" />
                 </div>
-                <span className="text-[11px] font-extrabold text-neutral-500">
+                <span className="text-[11px] font-extrabold text-[#4e3a24]">
                   {p.rating} Stars ({p.reviewsCount} Customer Reviews)
                 </span>
                 <span className="text-neutral-300">|</span>
@@ -306,26 +276,15 @@ const ProductDetailPage = () => {
               </div>
 
               {/* Pricing Display */}
-              <div className="mb-4">
-                <div className="flex items-baseline gap-4 mb-0.5">
-                  <span className="text-[#8b7355] font-serif font-bold text-3xl">
-                    ₹{p.price.toLocaleString('en-IN')}
-                  </span>
-                  <span className="text-neutral-400 text-sm line-through tracking-wider">
-                    ₹{p.originalPrice.toLocaleString('en-IN')}
-                  </span>
-                  <span className="text-[10px] text-[#8b7355] font-extrabold uppercase tracking-wider bg-[#8b7355]/10 px-2.5 py-1 rounded">
-                    Save ₹{(p.originalPrice - p.price).toLocaleString('en-IN')} (20% OFF)
-                  </span>
-                </div>
-                <span className="text-[10px] text-neutral-400 block select-none">MRP incl. of all taxes</span>
-              </div>
-
-              {/* Promo Offer Banner */}
-              <div className="flex items-center gap-2 bg-[#8b7355]/5 border border-[#8b7355]/15 p-3 rounded-xl mb-4 select-none animate-pulse">
-                <Award className="w-4 h-4 text-[#8b7355] flex-shrink-0" />
-                <span className="text-[9px] text-[#4e3a24] font-extrabold uppercase tracking-wide">
-                  10% OFF on Making Charges: Use code <strong className="text-[#8b7355]">SUMMER10</strong> | Free Insured Shipping
+              <div className="flex items-baseline gap-4 mb-6">
+                <span className="text-[#8b7355] font-serif font-bold text-3xl">
+                  ₹{p.price.toLocaleString('en-IN')}
+                </span>
+                <span className="text-neutral-400 text-sm line-through tracking-wider">
+                  ₹{p.originalPrice.toLocaleString('en-IN')}
+                </span>
+                <span className="text-xs text-[#8b7355] font-extrabold uppercase tracking-wider bg-[#8b7355]/10 px-2.5 py-1 rounded">
+                  Save ₹{(p.originalPrice - p.price).toLocaleString('en-IN')}
                 </span>
               </div>
 
@@ -342,8 +301,8 @@ const ProductDetailPage = () => {
               </div>
 
               {/* Brief Description */}
-              <p className="text-xs font-sans tracking-wide text-neutral-500 leading-relaxed mb-6 border-b border-neutral-100 pb-4">
-                {shortDescription || `Diamond and gold ${p.category.toLowerCase()} design in ${p.metalType} featuring ${p.diamondWeight} diamonds.`}
+              <p className="text-xs font-sans tracking-wide text-neutral-600 leading-relaxed mb-6">
+                {getBriefDescription(p.description)}
               </p>
 
               {/* Interactive Pincode Delivery Check */}
@@ -375,7 +334,7 @@ const ProductDetailPage = () => {
                     <span>{deliveryMessage}</span>
                   </div>
                 ) : (
-                  <span className="text-[9px] text-neutral-400">Provide pincode for insured delivery dates & store trails!</span>
+                  <span className="text-[9px] text-neutral-400">Provide pincode for insured delivery dates & store trials!</span>
                 )}
               </div>
 
@@ -435,7 +394,7 @@ const ProductDetailPage = () => {
                 )}
               </div>
 
-              {/* Sizing dropdown select */}
+              {/* Sizing matrix if Ring */}
               {(p.category?.toLowerCase() === 'rings' || p.category?.toLowerCase() === 'ring') && (
                 <div className="mb-6 select-none">
                   <div className="flex items-center justify-between mb-2">
@@ -510,99 +469,132 @@ const ProductDetailPage = () => {
           </div>
         </div>
 
-        {/* Specifications Tab Drawers */}
-        <section className="mt-16 bg-white border border-[#8b7355]/10 rounded-3xl p-8 shadow-sm select-none">
-          <div className="flex border-b border-neutral-100 gap-8 mb-6 text-xs font-extrabold uppercase tracking-widest">
-            {[
-              { id: 'details', label: 'Product Details' },
-              { id: 'specs', label: 'Specifications' },
-              { id: 'purity', label: 'Purity & Certifications' },
-            ].map((tb) => (
-              <button
-                key={tb.id}
-                onClick={() => setActiveTab(tb.id as any)}
-                className={`pb-3 relative cursor-pointer ${
-                  activeTab === tb.id ? 'text-[#8b7355]' : 'text-neutral-400 hover:text-neutral-600'
-                }`}
-              >
-                {tb.label}
-                {activeTab === tb.id && (
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#8b7355]" />
-                )}
-              </button>
-            ))}
-          </div>
-
-          {/* Tab content renders */}
-          {activeTab === 'details' && (
-            <div 
-              className="prose prose-sm max-w-none text-xs font-sans text-neutral-600 leading-relaxed max-w-2xl"
-              dangerouslySetInnerHTML={{ __html: storyHtml }}
-            />
-          )}
-
-          {activeTab === 'specs' && (
-            specsHtml ? (
-              <div 
-                className="prose prose-sm max-w-none text-xs font-sans text-neutral-600"
-                dangerouslySetInnerHTML={{ __html: specsHtml }}
-              />
-            ) : (
-              <div className="grid grid-cols-2 gap-y-4 max-w-xl text-xs font-sans">
-                <div className="text-neutral-400">Unique Sku Code</div>
-                <div className="font-semibold text-neutral-800">{p.sku}</div>
-                
-                <div className="text-neutral-400">Metal Composition</div>
-                <div className="font-semibold text-neutral-800">{p.metalType}</div>
-
-                <div className="text-neutral-400">Diamond Carat Weight</div>
-                <div className="font-semibold text-neutral-800">{p.diamondWeight}</div>
-
-                <div className="text-neutral-400">Assurance Certificate</div>
-                <div className="font-semibold text-neutral-800">{p.certification}</div>
+        {/* Product Details, Specifications & Care (3-Column Grid) */}
+        <section className="mt-12 sm:mt-16 select-none">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            
+            {/* Column 1: Product Details */}
+            <div className="bg-gradient-to-br from-white to-[#faf9f6]/30 border border-[#8b7355]/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-sm flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2.5 bg-[#8b7355]/10 rounded-xl text-[#8b7355]">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg text-[#4e3a24] font-extrabold italic">
+                    Product Details
+                  </h3>
+                  <p className="text-[9px] uppercase tracking-wider font-extrabold text-neutral-400">
+                    Story & Design Concept
+                  </p>
+                </div>
               </div>
-            )
-          )}
-
-          {activeTab === 'purity' && (
-            <div className="text-xs text-neutral-600 leading-relaxed font-sans max-w-2xl">
-              {careHtml ? (
-                <div 
-                  className="prose prose-sm max-w-none text-xs font-sans text-neutral-600"
-                  dangerouslySetInnerHTML={{ __html: careHtml }}
-                />
-              ) : (
-                <>
-                  <div className="flex items-start gap-3 mb-4">
-                    <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-extrabold uppercase tracking-wider text-[#4e3a24] mb-1">
-                        BIS 916 Gold Certified
-                      </h4>
-                      <p>
-                        Every gold item is certified and hallmarked by the Bureau of Indian Standards (BIS), assuring 22 Karat or 18 Karat gold purity values.
-                      </p>
-                    </div>
+              <div className="w-12 h-[1px] bg-[#8b7355]/30 mt-2 mb-6" />
+              <div className="prose-jewelry flex-grow">
+                {detailsHtml ? (
+                  <div dangerouslySetInnerHTML={{ __html: detailsHtml }} />
+                ) : (
+                  <div className="text-xs text-neutral-600 leading-relaxed font-sans">
+                    <p className="mb-3 font-semibold text-[#4e3a24]">This fine jewelry creation represents decades of master craftsmanship.</p>
+                    <p className="text-[#4e3a24]/80">Designed for special moments and everyday luxury alike, it blends timeless visual structures with comfortable modern bands.</p>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-extrabold uppercase tracking-wider text-[#4e3a24] mb-1">
-                        Conflict-Free Natural Diamonds
-                      </h4>
-                      <p>
-                        All diamonds set in Zari & Co creations are strictly conflict-free and natural stones certified by international diamond grading agencies (GIA & SGL).
-                      </p>
-                    </div>
-                  </div>
-                </>
-              )}
+                )}
+              </div>
             </div>
-          )}
+
+            {/* Column 2: Specifications */}
+            <div className="bg-gradient-to-br from-white to-[#faf9f6]/30 border border-[#8b7355]/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-sm flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2.5 bg-[#8b7355]/10 rounded-xl text-[#8b7355]">
+                  <ClipboardList className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg text-[#4e3a24] font-extrabold italic">
+                    Specifications
+                  </h3>
+                  <p className="text-[9px] uppercase tracking-wider font-extrabold text-neutral-400">
+                    Material & Metrology
+                  </p>
+                </div>
+              </div>
+              <div className="w-12 h-[1px] bg-[#8b7355]/30 mt-2 mb-6" />
+              <div className="prose-jewelry flex-grow overflow-x-auto">
+                {specsHtml ? (
+                  <div dangerouslySetInnerHTML={{ __html: specsHtml }} />
+                ) : (
+                  <table className="w-full text-left border-collapse my-4 text-xs border border-[#8b7355]/20 rounded-xl overflow-hidden shadow-sm">
+                    <tbody>
+                      <tr>
+                        <td className="font-extrabold uppercase tracking-wider text-[9px] bg-[#faf9f6] text-[#8b7355] px-4 py-3 border-b border-[#8b7355]/20 w-1/3">SKU</td>
+                        <td className="px-4 py-3 border-b border-neutral-100 text-[#4e3a24]/80">{p.sku}</td>
+                      </tr>
+                      <tr>
+                        <td className="font-extrabold uppercase tracking-wider text-[9px] bg-[#faf9f6] text-[#8b7355] px-4 py-3 border-b border-[#8b7355]/20">Metal</td>
+                        <td className="px-4 py-3 border-b border-neutral-100 text-[#4e3a24]/80">{p.metalType}</td>
+                      </tr>
+                      <tr>
+                        <td className="font-extrabold uppercase tracking-wider text-[9px] bg-[#faf9f6] text-[#8b7355] px-4 py-3 border-b border-[#8b7355]/20">Diamonds</td>
+                        <td className="px-4 py-3 border-b border-neutral-100 text-[#4e3a24]/80">{p.diamondWeight}</td>
+                      </tr>
+                      <tr>
+                        <td className="font-extrabold uppercase tracking-wider text-[9px] bg-[#faf9f6] text-[#8b7355] px-4 py-3 border-b border-neutral-100">Certification</td>
+                        <td className="px-4 py-3 border-b border-neutral-100 text-[#4e3a24]/80">{p.certification}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+
+            {/* Column 3: Care & Preservation */}
+            <div className="bg-gradient-to-br from-white to-[#faf9f6]/30 border border-[#8b7355]/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-sm flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2.5 bg-[#8b7355]/10 rounded-xl text-[#8b7355]">
+                  <HeartHandshake className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg text-[#4e3a24] font-extrabold italic">
+                    Care & Preservation
+                  </h3>
+                  <p className="text-[9px] uppercase tracking-wider font-extrabold text-neutral-400">
+                    Maintenance & Longevity
+                  </p>
+                </div>
+              </div>
+              <div className="w-12 h-[1px] bg-[#8b7355]/30 mt-2 mb-6" />
+              <div className="prose-jewelry flex-grow">
+                {careHtml ? (
+                  <div dangerouslySetInnerHTML={{ __html: careHtml }} />
+                ) : (
+                  <div className="text-xs text-neutral-600 leading-relaxed font-sans">
+                    <p className="mb-3 font-semibold text-[#4e3a24]">Preserve the brilliance of your jewelry with proper care:</p>
+                    <ul className="list-none pl-0 space-y-2.5">
+                      <li className="relative pl-5 text-[#4e3a24]/80">
+                        <span className="absolute left-0 top-[1px] text-[#8b7355] text-[9px]">✦</span>
+                        Store in a dry, soft-lined jewelry box or pouch.
+                      </li>
+                      <li className="relative pl-5 text-[#4e3a24]/80">
+                        <span className="absolute left-0 top-[1px] text-[#8b7355] text-[9px]">✦</span>
+                        Avoid direct contact with perfumes, hairsprays, and lotions.
+                      </li>
+                      <li className="relative pl-5 text-[#4e3a24]/80">
+                        <span className="absolute left-0 top-[1px] text-[#8b7355] text-[9px]">✦</span>
+                        Clean gently with a soft microfiber jewelry polishing cloth.
+                      </li>
+                      <li className="relative pl-5 text-[#4e3a24]/80">
+                        <span className="absolute left-0 top-[1px] text-[#8b7355] text-[9px]">✦</span>
+                        Remove your jewelry before swimming, bathing, or doing strenuous activities.
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </div>
         </section>
 
         {/* Customer Review Section */}
-        <section className="mt-12 bg-white border border-[#8b7355]/10 rounded-3xl p-8 shadow-sm">
+        <section className="mt-10 sm:mt-12 bg-white border border-[#8b7355]/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-sm">
           <h3 className="text-lg font-serif text-[#4e3a24] font-extrabold italic mb-6">
             Customer Reviews ({p.reviewsCount})
           </h3>

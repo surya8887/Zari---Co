@@ -54,7 +54,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = () => {
                   {currentPage.replace("-", " ")}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Aurélia Jewels premium inventory control and collection manager.
+                  Zari & Co. premium vault inventory and collection manager.
                 </p>
               </div>
               <button 
@@ -77,7 +77,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = () => {
                   Inventory & Stock
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Aurélia Jewels premium inventory control and collection manager.
+                  Zari & Co. premium vault inventory and stock manager.
                 </p>
               </div>
               <button 
@@ -283,7 +283,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = () => {
             <div>
               <h2 className="text-2xl font-bold tracking-tight text-foreground font-serif">System Settings</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Configure Aurelia Jewels boutique, payout schemes, branding parameters, and APIs.
+                Configure Zari & Co. boutique parameters, payout schemes, and administrative settings.
               </p>
             </div>
 
@@ -295,7 +295,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = () => {
                     <label className="text-xs font-semibold text-muted-foreground">Boutique House Name</label>
                     <input 
                       type="text" 
-                      defaultValue="Aurélia Jewels Boutique" 
+                      defaultValue="Zari & Co. Fine Jewellery Boutique" 
                       className="w-full px-3 py-2 text-xs border border-border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none focus:border-primary/50"
                     />
                   </div>
@@ -303,7 +303,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = () => {
                     <label className="text-xs font-semibold text-muted-foreground">Notification Email</label>
                     <input 
                       type="email" 
-                      defaultValue="admin@aureliajewels.com" 
+                      defaultValue="admin@zariandco.com" 
                       className="w-full px-3 py-2 text-xs border border-border bg-[#0d0f14]/50 rounded-lg text-foreground focus:outline-none focus:border-primary/50"
                     />
                   </div>

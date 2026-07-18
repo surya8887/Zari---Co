@@ -50,6 +50,7 @@ export interface Product {
 interface ProductState {
   products: Product[];
   filteredProducts: Product[];
+  categories: { id: string; name: string; slug: string; parentId?: string | null }[];
   selectedProduct: Product | null;
   isLoading: boolean;
   filters: {
@@ -82,6 +83,7 @@ interface ProductState {
   addReview: (productId: string, review: Omit<ProductReview, 'id' | 'createdAt'>) => void;
   resetFilters: () => void;
   fetchProducts: () => Promise<void>;
+  fetchCategories: () => Promise<void>;
 }
 
 export const useProductStore = create<ProductState>((set, get) => {
@@ -100,8 +102,25 @@ export const useProductStore = create<ProductState>((set, get) => {
     }
 
     // Category / Top Level category filter
-    if (filters.category && filters.category !== 'All') {
-      result = result.filter((p) => p.category === filters.category);
+    const nonCategories = ['Collections', 'Try At Home', 'Bespoke', '10+1 Plan'];
+    const activeCategoryLower = filters.category?.toLowerCase() || '';
+    const isNonCategory = nonCategories.some(
+      (nc) => nc.toLowerCase() === activeCategoryLower
+    );
+    if (filters.category && activeCategoryLower !== 'all' && !isNonCategory) {
+      const selectedCategoryObj = get().categories.find(
+        (c) => c.name.toLowerCase() === activeCategoryLower
+      );
+      if (selectedCategoryObj) {
+        // Find all subcategories where parentId matches selectedCategoryObj.id
+        const subCategoryNames = get().categories
+          .filter((c) => (c.parentId || (c as any).parent_id) === selectedCategoryObj.id)
+          .map((c) => c.name.toLowerCase());
+        const allowedCategoriesLower = [selectedCategoryObj.name.toLowerCase(), ...subCategoryNames];
+        result = result.filter((p) => allowedCategoriesLower.includes(p.category.toLowerCase()));
+      } else {
+        result = result.filter((p) => p.category.toLowerCase() === activeCategoryLower);
+      }
     }
 
     // Price range filter
@@ -109,7 +128,13 @@ export const useProductStore = create<ProductState>((set, get) => {
 
     // Combinable Product Types filter
     if (filters.productTypes.length > 0) {
-      result = result.filter((p) => filters.productTypes.includes(p.productType));
+      result = result.filter((p) =>
+        filters.productTypes.some(
+          (type) =>
+            p.productType.toLowerCase().includes(type.toLowerCase()) ||
+            type.toLowerCase().includes(p.productType.toLowerCase())
+        )
+      );
     }
 
     // Combinable Metals filter
@@ -155,9 +180,8 @@ export const useProductStore = create<ProductState>((set, get) => {
 
     const totalPages = Math.max(1, Math.ceil(result.length / pagination.limit));
 
-    // Slice pagination
-    const startIdx = (pagination.page - 1) * pagination.limit;
-    const paginated = result.slice(startIdx, startIdx + pagination.limit);
+    // Slice for infinite scroll: show all products from start up to current page's limit
+    const paginated = result.slice(0, pagination.page * pagination.limit);
 
     return {
       filteredProducts: paginated,
@@ -171,6 +195,7 @@ export const useProductStore = create<ProductState>((set, get) => {
   return {
     products: [],
     filteredProducts: [],
+    categories: [],
     selectedProduct: null,
     isLoading: false,
     filters: {
@@ -344,6 +369,11 @@ export const useProductStore = create<ProductState>((set, get) => {
     fetchProducts: async () => {
       set({ isLoading: true });
       try {
+        // Pre-fetch categories if not loaded yet to keep UI categories consistent
+        if (get().categories.length === 0) {
+          await get().fetchCategories();
+        }
+
         const { data } = await api.get('/catalog/product?limit=100');
         const dbProducts = data.data.products || [];
         const mapped = dbProducts.map(mapBackendProductToFrontend);
@@ -365,11 +395,25 @@ export const useProductStore = create<ProductState>((set, get) => {
         set({ isLoading: false });
       }
     },
+
+    fetchCategories: async () => {
+      try {
+        const { data } = await api.get('/catalog/category?limit=100');
+        const dbCategories = data.data?.categories || [];
+        set({ categories: dbCategories });
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    },
   };
 });
 
 const mapBackendProductToFrontend = (p: any): Product => {
-  const primaryImg = p.images?.find((img: any) => img.isPrimary || img.is_primary)?.imageUrl || p.images?.[0]?.imageUrl || '/images/gold_diamond_ring.png';
+  const primaryImg = p.images?.find((img: any) => img.isPrimary || img.is_primary)?.imageUrl || 
+                     p.images?.find((img: any) => img.isPrimary || img.is_primary)?.image_url || 
+                     p.images?.[0]?.imageUrl || 
+                     p.images?.[0]?.image_url || 
+                     '/images/gold_diamond_ring.png';
   const allImgs = p.images?.map((img: any) => img.imageUrl || img.image_url) || [primaryImg];
   
   const defaultVariant = p.variants?.find((v: any) => v.name === 'Default' || v.name === 'default') || p.variants?.[0];

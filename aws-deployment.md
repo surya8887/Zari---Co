@@ -163,30 +163,30 @@ ECS needs permissions to pull images from ECR and read secrets from AWS Secrets 
 ## Step 5: Push Containers to Amazon ECR
 
 1. Go to **Amazon ECR Console** -> **Create Repository** (Private).
-   - Create one repository named `zari_co` to house all the tagged service images.
+   - Create one repository named `zario_website` to house all the tagged service images.
 2. **Authenticate Local Terminal to ECR**:
    Run this command in your local machine's terminal:
    ```bash
-   aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 899928294562.dkr.ecr.us-east-1.amazonaws.com
+   aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 899928294562.dkr.ecr.ap-south-1.amazonaws.com
    ```
 3. **Build & Push Backend**:
    ```bash
    docker build -t zari-co-backend ./backend
-   docker tag zari-co-backend:latest 899928294562.dkr.ecr.us-east-1.amazonaws.com/zari_co:backend
-   docker push 899928294562.dkr.ecr.us-east-1.amazonaws.com/zari_co:backend
+   docker tag zari-co-backend:latest 899928294562.dkr.ecr.ap-south-1.amazonaws.com/zario_website:backend
+   docker push 899928294562.dkr.ecr.ap-south-1.amazonaws.com/zario_website:backend
    ```
 4. **Build & Push Frontend (Injecting Production URL)**:
    Since Vite embeds env vars during compile-time, pass the URL of your load balancer API endpoint (e.g. `https://api.yourdomain.com/api/v1` or `https://yourdomain.com/api/v1`):
    ```bash
    docker build --build-arg VITE_API_URL=https://api.yourdomain.com/api/v1 -t zari-co-frontend ./frontend
-   docker tag zari-co-frontend:latest 899928294562.dkr.ecr.us-east-1.amazonaws.com/zari_co:frontend
-   docker push 899928294562.dkr.ecr.us-east-1.amazonaws.com/zari_co:frontend
+   docker tag zari-co-frontend:latest 899928294562.dkr.ecr.ap-south-1.amazonaws.com/zario_website:frontend
+   docker push 899928294562.dkr.ecr.ap-south-1.amazonaws.com/zario_website:frontend
    ```
 5. **Build & Push Admin (Injecting Production URL)**:
    ```bash
    docker build --build-arg VITE_API_URL=https://api.yourdomain.com/api/v1 -t zari-co-admin ./admin
-   docker tag zari-co-admin:latest 899928294562.dkr.ecr.us-east-1.amazonaws.com/zari_co:admin
-   docker push 899928294562.dkr.ecr.us-east-1.amazonaws.com/zari_co:admin
+   docker tag zari-co-admin:latest 899928294562.dkr.ecr.ap-south-1.amazonaws.com/zario_website:admin
+   docker push 899928294562.dkr.ecr.ap-south-1.amazonaws.com/zario_website:admin
    ```
 
 ---
@@ -256,7 +256,7 @@ Create a Task Definition for each container.
 - **Task Role**: Select `zari-co-ecs-execution-role` (or none if task does not call AWS services).
 - **Container Details**:
   - **Name**: `backend`
-  - **Image URI**: `899928294562.dkr.ecr.us-east-1.amazonaws.com/zari_co:backend`
+  - **Image URI**: `899928294562.dkr.ecr.ap-south-1.amazonaws.com/zario_website:backend`
   - **Port mappings**: Container Port `5000` | Protocol `TCP` | App Protocol `HTTP`.
   - **Environment variables (Static)**:
     - `PORT`: `5000`
@@ -277,7 +277,7 @@ Create a Task Definition for each container.
 - **Task Size**: CPU = `0.25 vCPU`, Memory = `0.5 GB`.
 - **Container Details**:
   - **Name**: `frontend`
-  - **Image URI**: `899928294562.dkr.ecr.us-east-1.amazonaws.com/zari_co:frontend`
+  - **Image URI**: `899928294562.dkr.ecr.ap-south-1.amazonaws.com/zario_website:frontend`
   - **Port mappings**: Container Port `3000` | Protocol `TCP`.
   - **Log Configuration**: Enable CloudWatch.
 
@@ -287,7 +287,7 @@ Create a Task Definition for each container.
 - **Task Size**: CPU = `0.25 vCPU`, Memory = `0.5 GB`.
 - **Container Details**:
   - **Name**: `admin`
-  - **Image URI**: `899928294562.dkr.ecr.us-east-1.amazonaws.com/zari_co:admin`
+  - **Image URI**: `899928294562.dkr.ecr.ap-south-1.amazonaws.com/zario_website:admin`
   - **Port mappings**: Container Port `3001` | Protocol `TCP`.
   - **Log Configuration**: Enable CloudWatch.
 

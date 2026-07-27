@@ -2,9 +2,9 @@
 # Enable exit on error
 set -e
 
-REGISTRY="899928294562.dkr.ecr.us-east-1.amazonaws.com"
+REGISTRY="899928294562.dkr.ecr.ap-south-1.amazonaws.com"
 REPOSITORY="zario_website"
-REGION="us-east-1"
+REGION="ap-south-1"
 VITE_API_URL=${VITE_API_URL:-"https://api.yourdomain.com/api/v1"}
 
 echo "============================================="

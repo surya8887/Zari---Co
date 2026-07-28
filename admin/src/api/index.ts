@@ -374,6 +374,25 @@ export const api = {
     });
   },
 
+  async googleLogin(idToken: string): Promise<any> {
+    return fetchJson<any>("/auth/google/login", {
+      method: "POST",
+      body: JSON.stringify({ idToken })
+    });
+  },
+
+  // User Operations (SuperAdmin)
+  async getAllUsers(page = 1, limit = 50): Promise<{ users: any[], pagination: any }> {
+    return fetchJson<{ users: any[], pagination: any }>(`/users?page=${page}&limit=${limit}`);
+  },
+
+  async updateUserRole(id: string, role: "user" | "admin" | "superadmin"): Promise<any> {
+    return fetchJson<any>(`/users/${id}/role`, {
+      method: "PATCH",
+      body: JSON.stringify({ role })
+    });
+  },
+
   // Inventory Endpoints
   async getInventory(params?: {
     page?: number;

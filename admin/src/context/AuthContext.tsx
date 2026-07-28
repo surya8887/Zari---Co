@@ -22,6 +22,7 @@ interface AuthContextType {
     password: string;
     phone?: string;
   }) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
   loading: boolean;
 }
 
@@ -83,6 +84,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginWithGoogle = async (idToken: string) => {
+    setLoading(true);
+    try {
+      const response = await api.googleLogin(idToken);
+      const userData = response.user;
+
+      if (!userData) {
+        throw new Error("Invalid response format from authentication node.");
+      }
+
+      if (!["admin", "superadmin"].includes(userData.role)) {
+        throw new Error("Access Denied: You do not possess administrator credentials.");
+      }
+
+      setUser(userData);
+      localStorage.setItem("zari_admin_user", JSON.stringify(userData));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async () => {
     setLoading(true);
     try {
@@ -97,7 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, register, loginWithGoogle, loading }}>
       {children}
     </AuthContext.Provider>
   );

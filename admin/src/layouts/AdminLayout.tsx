@@ -6,6 +6,7 @@ import Dashboard from "@/pages/Dashboard";
 import Orders from "@/pages/Orders";
 import Products from "@/pages/Products";
 import { Inventory } from "@/pages/Inventory";
+import { Users } from "@/pages/Users";
 import { useAuth } from "@/hooks/useAuth";
 import Login from "@/pages/Login";
 import { 
@@ -40,6 +41,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = () => {
   // State-Based Router Views
   const renderPageView = () => {
     switch (currentPage) {
+      case "users":
+        return <Users />;
+
       case "dashboard":
         return <Dashboard />;
       

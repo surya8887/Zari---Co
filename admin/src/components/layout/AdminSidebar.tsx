@@ -9,13 +9,16 @@ import {
   Settings, 
   MessageSquare,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from "lucide-react";
 import { useAppStore } from "@/store";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 export const AdminSidebar: React.FC = () => {
   const { currentPage, setCurrentPage } = useAppStore();
+  const { user } = useAuth();
   
   // Sidebar states for collapsible menus
   const [isProductsOpen, setIsProductsOpen] = useState(true);
@@ -225,6 +228,16 @@ export const AdminSidebar: React.FC = () => {
           </div>
 
           {/* Settings */}
+          {user?.role === "superadmin" && (
+            <button 
+              onClick={() => navigateTo("users", "System Users")}
+              className={`w-full text-left cursor-pointer ${getActiveStyle("users")}`}
+            >
+              <Shield size={18} />
+              System Users
+            </button>
+          )}
+
           <button 
             onClick={() => navigateTo("settings", "Dashboard Settings")}
             className={`w-full text-left cursor-pointer ${getActiveStyle("settings")}`}

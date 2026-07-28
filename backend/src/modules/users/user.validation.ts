@@ -36,8 +36,7 @@ export const updateUserRoleValidation = z.object({
   }),
   body: z.object({
     role: z.enum(["user", "admin", "superadmin"], {
-      required_error: "Role is required",
-      invalid_type_error: "Role must be 'user', 'admin', or 'superadmin'",
+      error: "Role must be 'user', 'admin', or 'superadmin'",
     }),
   }),
 });

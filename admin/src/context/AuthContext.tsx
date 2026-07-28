@@ -49,8 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error("Invalid response format from authentication node.");
       }
 
-      // For local development convenience, we permit role: "admin", "superadmin", or "user" to explore the administration console
-      if (!["admin", "superadmin", "user"].includes(userData.role)) {
+      if (!["admin", "superadmin"].includes(userData.role)) {
         throw new Error("Access Denied: You do not possess administrator credentials.");
       }
 

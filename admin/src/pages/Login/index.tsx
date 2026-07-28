@@ -1,13 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { BrandHeader } from "./components/BrandHeader";
-import { ModeToggleTabs } from "./components/ModeToggleTabs";
 import { LoginForm } from "./components/LoginForm";
-import { RegisterForm } from "./components/RegisterForm";
 
 const Login: React.FC = () => {
-  const { login, register } = useAuth();
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const { login } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#07080a] relative overflow-hidden font-sans p-4 font-normal select-none">
@@ -19,21 +16,10 @@ const Login: React.FC = () => {
       <div className="w-full max-w-md bg-[#101216]/65 border border-border/80 p-8 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-md relative z-10 space-y-6">
         
         {/* Brand Logo & Header */}
-        <BrandHeader mode={mode} />
-
-        {/* Mode Toggle Tabs */}
-        <ModeToggleTabs 
-          mode={mode} 
-          isSubmitting={false} 
-          onModeChange={setMode} 
-        />
+        <BrandHeader />
 
         {/* Credentials Form */}
-        {mode === "login" ? (
-          <LoginForm onLogin={login} />
-        ) : (
-          <RegisterForm onRegister={register} />
-        )}
+        <LoginForm onLogin={login} />
       </div>
     </div>
   );

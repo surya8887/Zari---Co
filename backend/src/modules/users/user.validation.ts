@@ -26,3 +26,18 @@ export const getUserByIdValidation = z.object({
     id: z.string().uuid("Invalid user ID format (must be a valid UUID)"),
   }),
 });
+
+/**
+ * @desc Validation for updating a user's role (params & body)
+ */
+export const updateUserRoleValidation = z.object({
+  params: z.object({
+    id: z.string().uuid("Invalid user ID format (must be a valid UUID)"),
+  }),
+  body: z.object({
+    role: z.enum(["user", "admin", "superadmin"], {
+      required_error: "Role is required",
+      invalid_type_error: "Role must be 'user', 'admin', or 'superadmin'",
+    }),
+  }),
+});

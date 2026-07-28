@@ -84,3 +84,34 @@ export const deleteUserById = async (id: string) => {
 
   return deletedUser;
 };
+
+/**
+ * @desc Update a user's role (SuperAdmin only)
+ * @param {string} id - User UUID
+ * @param {string} role - New role ("user", "admin", "superadmin")
+ * @returns {Promise<Object>}
+ */
+export const updateUserRole = async (id: string, role: string) => {
+  const userExists = await prisma.user.findFirst({
+    where: { id, deletedAt: null },
+  });
+
+  if (!userExists) {
+    throw new ApiError(404, "User not found or deleted");
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id },
+    data: { role: role as any }, // Assuming prisma enum maps from string or we cast to any
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      updatedAt: true,
+    },
+  });
+
+  return updatedUser;
+};

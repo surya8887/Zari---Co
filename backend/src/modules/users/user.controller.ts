@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import * as userService from "./user.service.js";
 import ApiResponse from "../../shared/exceptions/apiResponse.js";
-import { getAllUsersValidation, getUserByIdValidation } from "./user.validation.js";
+import { getAllUsersValidation, getUserByIdValidation, updateUserRoleValidation } from "./user.validation.js";
 
 /**
  * @desc Get all users controller
@@ -51,4 +51,25 @@ export const deleteUserById = asyncHandler(async (req: Request, res: Response) =
   return res
     .status(200)
     .json(new ApiResponse(200, user, "User deleted successfully"));
+});
+
+/**
+ * @desc Update user role
+ * @route PATCH /api/v1/users/:id/role
+ * @access Private/SuperAdmin
+ */
+export const updateUserRole = asyncHandler(async (req: Request, res: Response) => {
+  const { params, body } = updateUserRoleValidation.parse({ 
+    params: req.params, 
+    body: req.body 
+  });
+  
+  const { id } = params;
+  const { role } = body;
+  
+  const updatedUser = await userService.updateUserRole(id, role);
+  
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedUser, "User role updated successfully"));
 });

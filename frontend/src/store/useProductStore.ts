@@ -294,8 +294,6 @@ export const useProductStore = create<ProductState>((set, get) => {
       const lower = slug.toLowerCase();
       const p = get().products.find(
         (prod) => prod.slug.toLowerCase() === lower || prod.id.toLowerCase() === lower
-      ) || FALLBACK_PRODUCTS.find(
-        (prod) => prod.slug.toLowerCase() === lower || prod.id.toLowerCase() === lower
       ) || null;
       set({ selectedProduct: p });
       return p;
@@ -375,7 +373,6 @@ export const useProductStore = create<ProductState>((set, get) => {
     fetchProducts: async () => {
       set({ isLoading: true });
       try {
-        // Pre-fetch categories if not loaded yet to keep UI categories consistent
         if (get().categories.length === 0) {
           await get().fetchCategories();
         }
@@ -383,17 +380,14 @@ export const useProductStore = create<ProductState>((set, get) => {
         const { data } = await api.get('/catalog/product?limit=100');
         const dbProducts = data?.data?.products || data?.data || data?.products || [];
         const mapped = Array.isArray(dbProducts) ? dbProducts.map(mapBackendProductToFrontend) : [];
-        
-        // Merge mapped backend products with fallback list to guarantee a rich catalog UI
-        const finalProducts = mapped.length > 0 ? mapped : FALLBACK_PRODUCTS;
 
         set((state) => {
-          const { filteredProducts, pagination } = applyFilters(finalProducts, state.filters, {
+          const { filteredProducts, pagination } = applyFilters(mapped, state.filters, {
             ...state.pagination,
-            totalPages: Math.max(1, Math.ceil(finalProducts.length / state.pagination.limit))
+            totalPages: Math.max(1, Math.ceil(mapped.length / state.pagination.limit))
           });
           return {
-            products: finalProducts,
+            products: mapped,
             filteredProducts,
             pagination,
             isLoading: false
@@ -401,12 +395,10 @@ export const useProductStore = create<ProductState>((set, get) => {
         });
       } catch (error) {
         console.error("Failed to fetch products from backend API:", error);
-        // On network failure or cold start timeout, fallback seamlessly
-        const fallback = FALLBACK_PRODUCTS;
         set((state) => {
-          const { filteredProducts, pagination } = applyFilters(fallback, state.filters, state.pagination);
+          const { filteredProducts, pagination } = applyFilters([], state.filters, state.pagination);
           return {
-            products: fallback,
+            products: [],
             filteredProducts,
             pagination,
             isLoading: false
@@ -426,20 +418,6 @@ export const useProductStore = create<ProductState>((set, get) => {
     },
   };
 });
-
-const normalizeCategoryName = (catName?: string): 'Rings' | 'Earrings' | 'Pendants' | 'Bangles' | 'Gifts' | 'Necklaces' | 'Bracelets' | 'Chains' => {
-  if (!catName) return 'Rings';
-  const lower = catName.trim().toLowerCase();
-  if (lower.includes('ring')) return 'Rings';
-  if (lower.includes('earring')) return 'Earrings';
-  if (lower.includes('pendant')) return 'Pendants';
-  if (lower.includes('bangle')) return 'Bangles';
-  if (lower.includes('necklace')) return 'Necklaces';
-  if (lower.includes('bracelet')) return 'Bracelets';
-  if (lower.includes('chain')) return 'Chains';
-  if (lower.includes('gift')) return 'Gifts';
-  return 'Rings';
-};
 
 const mapBackendProductToFrontend = (p: any): Product => {
   const primaryImg = p.images?.find((img: any) => img.isPrimary || img.is_primary)?.imageUrl || 
@@ -463,14 +441,15 @@ const mapBackendProductToFrontend = (p: any): Product => {
     createdAt: r.createdAt ? new Date(r.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
   })) || [];
 
-  const normCat = normalizeCategoryName(p.category?.name);
+  const rawCat = p.category?.name || 'Rings';
+  const catName = rawCat.trim().charAt(0).toUpperCase() + rawCat.trim().slice(1).toLowerCase();
 
   return {
     id: p.id,
     name: p.name,
     slug: p.slug,
     description: p.description ? p.description.replace(/<[^>]*>?/gm, '') : 'Exquisite luxury jewelry piece.',
-    category: normCat,
+    category: catName as any,
     price: priceVal,
     originalPrice: origPriceVal,
     image: primaryImg,
@@ -489,8 +468,7 @@ const mapBackendProductToFrontend = (p: any): Product => {
       stock: v.inventory?.quantity || 10,
       sku: v.sku
     })) || [],
-    // Filtering metadata
-    productType: attrs.productType || normCat,
+    productType: attrs.productType || catName,
     metal: attrs.metal || 'Gold',
     gender: attrs.gender || 'Women',
     offers: attrs.offers || ['New Arrival'],
@@ -499,108 +477,3 @@ const mapBackendProductToFrontend = (p: any): Product => {
     design: attrs.design || 'Solitaire'
   };
 };
-
-export const FALLBACK_PRODUCTS: Product[] = [
-  {
-    id: 'fb-solitaire-ring',
-    name: 'Celeste Solitaire Diamond Ring',
-    slug: 'ring',
-    description: 'Designed for those who appreciate refined luxury, this ring embodies modern elegance with timeless craftsmanship. Crafted in 18K solid yellow gold with a certified natural solitaire diamond.',
-    category: 'Rings',
-    price: 49999,
-    originalPrice: 59999,
-    image: '/images/gold_diamond_ring.png',
-    images: ['/images/gold_diamond_ring.png'],
-    metalType: '18K Solid Gold',
-    diamondWeight: '0.75 Carat',
-    certification: 'GIA & BIS 916 Certified',
-    rating: 4.9,
-    reviewsCount: 18,
-    reviews: [
-      { id: 'r1', userName: 'Ananya Sharma', rating: 5, comment: 'Breathtaking clarity and craftsmanship. Exceeded all expectations!', createdAt: '2026-07-20' }
-    ],
-    sku: 'ZNR-RNG-001',
-    productType: 'Rings',
-    metal: 'Gold',
-    gender: 'Women',
-    offers: ['New Arrival', 'Best Seller'],
-    occasion: ['Engagement', 'Daily Wear'],
-    style: 'Classic',
-    design: 'Solitaire'
-  },
-  {
-    id: 'fb-solitaire-earrings',
-    name: 'Marquise Diamond Stud Earrings',
-    slug: 'marquise-diamond-stud-earrings',
-    description: 'Handcrafted marquise solitaire studs in 18k white gold. Designed to catch light with unmatched brilliance.',
-    category: 'Earrings',
-    price: 34999,
-    originalPrice: 42999,
-    image: '/images/diamond_earrings.png',
-    images: ['/images/diamond_earrings.png'],
-    metalType: '18K White Gold',
-    diamondWeight: '0.50 Carat',
-    certification: 'IGI & BIS 916 Certified',
-    rating: 4.8,
-    reviewsCount: 12,
-    reviews: [],
-    sku: 'ZNR-EAR-002',
-    productType: 'Earrings',
-    metal: 'Diamond',
-    gender: 'Women',
-    offers: ['New Arrival'],
-    occasion: ['Party Wear', 'Anniversary'],
-    style: 'Modern',
-    design: 'Solitaire'
-  },
-  {
-    id: 'fb-gold-pendant',
-    name: 'Znira Heritage Gold Pendant',
-    slug: 'znira-heritage-gold-pendant',
-    description: 'An ethereal solid gold pendant with delicate floral hand-carving.',
-    category: 'Pendants',
-    price: 28999,
-    originalPrice: 34999,
-    image: '/images/gold_diamond_ring.png',
-    images: ['/images/gold_diamond_ring.png'],
-    metalType: '22K Solid Gold',
-    diamondWeight: '0.25 Carat',
-    certification: 'BIS 916 Hallmarked',
-    rating: 4.9,
-    reviewsCount: 15,
-    reviews: [],
-    sku: 'ZNR-PND-003',
-    productType: 'Pendants',
-    metal: 'Gold',
-    gender: 'Women',
-    offers: ['Best Seller'],
-    occasion: ['Daily Wear', 'Gifting'],
-    style: 'Traditional',
-    design: 'Floral'
-  },
-  {
-    id: 'fb-festive-bangles',
-    name: 'Festive Stacked Diamond Bangles',
-    slug: 'festive-stacked-diamond-bangles',
-    description: 'Pair of precision-set diamond bangles in 18k rose gold.',
-    category: 'Bangles',
-    price: 89999,
-    originalPrice: 105000,
-    image: '/images/luxury_jewelry_model.png',
-    images: ['/images/luxury_jewelry_model.png'],
-    metalType: '18K Rose Gold',
-    diamondWeight: '1.20 Carat',
-    certification: 'GIA & BIS 916 Certified',
-    rating: 5.0,
-    reviewsCount: 9,
-    reviews: [],
-    sku: 'ZNR-BNG-004',
-    productType: 'Bangles',
-    metal: 'Rose Gold',
-    gender: 'Women',
-    offers: ['New Arrival'],
-    occasion: ['Wedding', 'Party Wear'],
-    style: 'Luxury',
-    design: 'Geometric'
-  }
-];

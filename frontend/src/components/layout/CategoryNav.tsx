@@ -18,25 +18,12 @@ export const CategoryNav = () => {
     return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
   };
 
-  const defaultCategories = [
-    'Rings', 
-    'Earrings', 
-    'Pendants', 
-    'Bangles', 
-    'Gifts', 
-    'Collections', 
-    'Try At Home', 
-    'Bespoke', 
-    '10+1 Plan'
-  ];
+  // Extract top-level categories dynamically strictly from backend API response
+  const rawCategories = dbCategories.length > 0
+    ? dbCategories.filter(c => !c.parentId && !(c as any).parent_id).map(c => formatCategoryName(c.name))
+    : dbCategories.map(c => formatCategoryName(c.name));
 
-  // Extract top-level categories dynamically from backend API response & merge with default categories
-  const backendCategoryNames = dbCategories
-    .filter(c => !c.parentId && !(c as any).parent_id)
-    .map(c => formatCategoryName(c.name));
-
-  // Merge default categories with backend categories so navbar is always full and rich
-  const categories = Array.from(new Set([...defaultCategories, ...backendCategoryNames]));
+  const categories = Array.from(new Set(rawCategories));
 
   const handleCategoryClick = (cat: string) => {
     resetFilters();

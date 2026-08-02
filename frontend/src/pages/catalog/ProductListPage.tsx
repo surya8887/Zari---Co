@@ -36,9 +36,9 @@ const ProductListPage = () => {
     isLoading,
   } = useProductStore();
 
-  const defaultProductTypes = ['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Bangles', 'Pendants', 'Chains'];
-  const dbProductTypes = categories.map(c => c.name.charAt(0).toUpperCase() + c.name.slice(1).toLowerCase());
-  const dynamicProductTypes = Array.from(new Set([...defaultProductTypes, ...dbProductTypes]));
+  const dynamicProductTypes = Array.from(
+    new Set(categories.map((c) => c.name.trim().charAt(0).toUpperCase() + c.name.trim().slice(1).toLowerCase()))
+  );
 
   const { addItem } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();

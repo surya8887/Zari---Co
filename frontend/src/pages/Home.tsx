@@ -71,26 +71,13 @@ const Home = () => {
     return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
   };
 
-  const defaultCategories = [
-    { name: 'Rings', image: '/images/gold_diamond_ring.png' },
-    { name: 'Earrings', image: '/images/gold_drop_earrings.png' },
-    { name: 'Necklaces', image: '/images/gold_necklace.png' },
-    { name: 'Bangles', image: '/images/gold_bangles.png' },
-    { name: 'Pendants', image: '/images/gold_necklace.png' },
-  ];
-
-  const dbCatsFormatted = dbCategories
+  const categoriesToDisplay = dbCategories
     .filter((c: any) => !c.parentId && !(c as any).parent_id)
     .map((c: any) => ({
       name: formatCatName(c.name),
       image: getCategoryImage(c.name)
-    }));
-
-  const categoriesToDisplay = Array.from(
-    new Map(
-      [...defaultCategories, ...dbCatsFormatted].map((item) => [item.name.toLowerCase(), item])
-    ).values()
-  );
+    }))
+    .filter((v: { name: string; image: string }, i: number, a: { name: string; image: string }[]) => a.findIndex((t: { name: string; image: string }) => t.name === v.name) === i);
 
   const handleCategoryClick = (catName: string) => {
     resetFilters();

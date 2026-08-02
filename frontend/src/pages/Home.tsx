@@ -20,6 +20,16 @@ const InstagramIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) =>
   </svg>
 );
 
+const FacebookIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg 
+    className={className} 
+    viewBox="0 0 24 24" 
+    fill="currentColor"
+  >
+    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+  </svg>
+);
+
 const Home = () => {
   return (
     <div className="min-h-screen bg-[#faf9f6] text-[#2c221e]">
@@ -164,13 +174,22 @@ const Home = () => {
                 <span>📞 Helpline: <a href="tel:+918178028397" className="text-amber-200 hover:underline font-bold">+91 8178028397</a></span>
               </div>
               
-              {/* Instagram Official Handle */}
-              <div className="mt-2">
+              {/* Social Handles */}
+              <div className="mt-2 flex flex-col gap-2">
+                <a 
+                  href="https://www.facebook.com/share/18ZHtiKtag/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1877F2]/10 border border-[#1877F2]/20 text-[#1877F2] hover:bg-[#1877F2]/20 text-[10px] font-extrabold tracking-wider transition-all duration-300 group w-fit"
+                >
+                  <FacebookIcon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                  <span>Znira & Co. on Facebook</span>
+                </a>
                 <a 
                   href="https://www.instagram.com/znira.co?igsh=MTBwMGQzdWZ6bzFzYg=="
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-purple-600/10 border border-amber-200/20 text-[#e1306c] hover:text-rose-400 text-[10px] font-extrabold tracking-wider transition-all duration-300 group"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-purple-600/10 border border-amber-200/20 text-[#e1306c] hover:text-rose-400 text-[10px] font-extrabold tracking-wider transition-all duration-300 group w-fit"
                 >
                   <InstagramIcon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                   <span>Follow @znira.co on Instagram</span>

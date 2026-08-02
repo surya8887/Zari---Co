@@ -203,7 +203,7 @@ const Home = () => {
                 Our Collections
               </h4>
               <ul className="flex flex-col gap-2.5 text-[11px] text-[#e0deda] font-medium tracking-wider">
-                <li><a href="#" className="hover:text-amber-200 transition-colors">Aurelia Gold Collection</a></li>
+                <li><a href="#" className="hover:text-amber-200 transition-colors">Znira Gold Collection</a></li>
                 <li><a href="#" className="hover:text-amber-200 transition-colors">Marquise Solitaires</a></li>
                 <li><a href="#" className="hover:text-amber-200 transition-colors">Heritage Drop Earrings</a></li>
                 <li><a href="#" className="hover:text-amber-200 transition-colors">Festive Stacked Bangles</a></li>

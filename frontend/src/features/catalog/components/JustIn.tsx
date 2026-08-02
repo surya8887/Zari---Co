@@ -77,11 +77,11 @@ const JustIn = () => {
               <Link 
                 to={`/products/${prod.slug}`}
                 key={prod.id} 
-                className="group bg-white border border-[#8b7355]/10 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-[#8b7355]/30 transition-all duration-500 flex flex-col justify-between relative overflow-hidden"
+                className="group bg-white border border-[#8b7355]/15 rounded-3xl p-4 shadow-sm hover:shadow-2xl hover:shadow-[#8b7355]/10 hover:border-[#8b7355]/40 transition-all duration-500 flex flex-col justify-between relative overflow-hidden"
               >
                 {/* Product Label Badge */}
-                <div className="absolute top-6 left-6 z-10">
-                  <span className="bg-[#8b7355] text-white text-[8px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded shadow-sm">
+                <div className="absolute top-5 left-5 z-10">
+                  <span className="bg-[#8b7355] text-white text-[8px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full shadow-sm">
                     {label}
                   </span>
                 </div>
@@ -90,39 +90,39 @@ const JustIn = () => {
                 <button 
                   type="button"
                   onClick={(e) => handleToggleWishlist(e, prod)}
-                  className="absolute top-6 right-6 z-10 p-2 bg-white/80 hover:bg-white text-neutral-400 hover:text-red-500 rounded-full shadow-sm hover:scale-110 active:scale-95 transition-all cursor-pointer animate-none"
+                  className="absolute top-5 right-5 z-10 p-2 bg-white/90 backdrop-blur-md text-neutral-400 hover:text-red-500 rounded-full shadow-md hover:scale-110 active:scale-90 transition-all cursor-pointer border border-[#8b7355]/15"
                 >
-                  <Heart className={`w-3.5 h-3.5 transition-colors ${isWish ? 'fill-red-500 text-red-500' : 'text-neutral-400'}`} />
+                  <Heart className={`w-4 h-4 transition-all duration-300 ${isWish ? 'fill-red-500 text-red-500 scale-110' : 'text-neutral-400 hover:text-red-500'}`} />
                 </button>
 
                 {/* Product Image Frame */}
-                <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-[#faf9f6] mb-5 border border-[#8b7355]/5">
+                <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-[#faf9f6] mb-4 border border-[#8b7355]/5">
                   <img
                     src={prod.image}
                     alt={prod.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/5 transition-colors duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
                   {/* Certified Hallmark Seal Overlay */}
-                  <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded border border-emerald-500/20 text-[7px] text-emerald-800 font-extrabold uppercase tracking-widest flex items-center gap-1">
-                    <ShieldCheck className="w-2.5 h-2.5 text-emerald-600" />
-                    <span>BIS Hallmarked</span>
+                  <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full border border-emerald-500/20 text-[7px] text-emerald-800 font-extrabold uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                    <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                    <span>BIS 916 Assured</span>
                   </div>
                 </div>
 
                 {/* Product Details Section */}
                 <div className="text-center flex flex-col items-center">
-                  <span className="text-[9px] uppercase tracking-[2px] font-extrabold text-[#8b7355] mb-1.5">
+                  <span className="text-[9px] uppercase tracking-[2.5px] font-extrabold text-[#8b7355] mb-1">
                     {prod.category}
                   </span>
-                  <h3 className="text-sm font-semibold text-neutral-800 tracking-wide line-clamp-1 group-hover:text-[#8b7355] transition-colors duration-300">
+                  <h3 className="text-sm font-bold text-neutral-800 tracking-wide line-clamp-1 group-hover:text-[#8b7355] transition-colors duration-300">
                     {prod.name}
                   </h3>
                   
                   {/* Price Display */}
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="text-[#8b7355] font-serif font-bold text-base">
+                    <span className="text-[#8b7355] font-serif font-extrabold text-base">
                       ₹{prod.price.toLocaleString('en-IN')}
                     </span>
                     <span className="text-neutral-400 text-xs line-through tracking-wider">
@@ -131,11 +131,11 @@ const JustIn = () => {
                   </div>
                 </div>
 
-                {/* Quick Add Button (Luxury overlay effect) */}
+                {/* Quick Add Button */}
                 <button 
                   type="button"
                   onClick={(e) => handleAddToBag(e, prod)}
-                  className="w-full h-10 mt-5 border border-[#8b7355]/20 hover:border-[#8b7355] hover:bg-[#8b7355] text-[#8b7355] hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
+                  className="w-full h-9.5 mt-4 bg-[#8b7355] hover:bg-[#6e583e] text-white rounded-xl text-[9.5px] font-extrabold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-[#8b7355]/15 active:scale-[0.97]"
                 >
                   <ShoppingCart className="w-3.5 h-3.5" />
                   <span>Add To Bag</span>

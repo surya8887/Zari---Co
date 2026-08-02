@@ -252,4 +252,25 @@
   .prose-jewelry tr:last-child td {
     @apply border-b-0;
   }
+
+  /* Luxury Modern Design Utilities */
+  .gold-gradient-text {
+    @apply bg-gradient-to-r from-amber-200 via-amber-300 to-amber-500 bg-clip-text text-transparent;
+  }
+
+  .gold-border-gradient {
+    border-image: linear-gradient(to right, #d97706, #f59e0b, #b45309) 1;
+  }
+
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-[#8b7355]/15 shadow-lg shadow-[#8b7355]/5;
+  }
+
+  .glass-dark-card {
+    @apply bg-neutral-950/70 backdrop-blur-xl border border-[#8b7355]/30 shadow-2xl shadow-black/50;
+  }
+
+  .gold-glow-hover {
+    @apply transition-all duration-500 hover:shadow-[0_8px_30px_rgb(217,119,6,0.18)] hover:border-[#8b7355]/40;
+  }
 }

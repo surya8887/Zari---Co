@@ -67,7 +67,7 @@ const mapBackendOrderToFrontend = (ord: any): Order => {
 
   return {
     id: ord.id,
-    orderNumber: `ZARI-2026-${ord.id.slice(-4).toUpperCase()}`,
+    orderNumber: `ZNIRA-2026-${ord.id.slice(-4).toUpperCase()}`,
     status: capitalizeStatus(ord.status) as any,
     createdAt: new Date(ord.createdAt).toISOString().replace('T', ' ').substring(0, 16),
     paymentMethod: ord.paymentMethod || 'Credit Card',

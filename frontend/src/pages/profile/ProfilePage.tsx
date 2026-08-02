@@ -150,13 +150,13 @@ const ProfilePage = () => {
             </div>
 
             {/* Sidebar Tabs */}
-            <div className="flex flex-col gap-1.5 text-xs font-extrabold uppercase tracking-wider">
+            <div className="flex flex-row overflow-x-auto lg:flex-col gap-2 pb-2 lg:pb-0 whitespace-nowrap scrollbar-none text-xs font-extrabold uppercase tracking-wider">
               {[
-                { id: 'dashboard', label: 'Dashboard Overview', icon: <User className="w-4 h-4" /> },
-                { id: 'details', label: 'Personal Details', icon: <Edit2 className="w-4 h-4" /> },
-                { id: 'addresses', label: 'Address Manager', icon: <MapPin className="w-4 h-4" /> },
-                { id: 'orders', label: 'Order History', icon: <ClipboardList className="w-4 h-4" /> },
-                { id: 'preferences', label: 'Preferences & Notifications', icon: <Bell className="w-4 h-4" /> },
+                { id: 'dashboard', label: 'Dashboard Overview', icon: <User className="w-4 h-4 flex-shrink-0" /> },
+                { id: 'details', label: 'Personal Details', icon: <Edit2 className="w-4 h-4 flex-shrink-0" /> },
+                { id: 'addresses', label: 'Address Manager', icon: <MapPin className="w-4 h-4 flex-shrink-0" /> },
+                { id: 'orders', label: 'Order History', icon: <ClipboardList className="w-4 h-4 flex-shrink-0" /> },
+                { id: 'preferences', label: 'Preferences & Notifications', icon: <Bell className="w-4 h-4 flex-shrink-0" /> },
               ].map((tab) => {
                 const active = activeTab === tab.id;
                 return (
@@ -164,14 +164,14 @@ const ProfilePage = () => {
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id as ActiveTab)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-left cursor-pointer transition-all duration-300 ${
+                    className={`flex items-center gap-2.5 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl border text-left cursor-pointer transition-all duration-300 flex-shrink-0 ${
                       active
-                        ? 'bg-blue-50 text-blue-700 font-extrabold border-l-4 border-blue-600 border-slate-200'
-                        : 'border-transparent text-slate-400 hover:bg-slate-50 hover:text-blue-600'
+                        ? 'bg-blue-50 text-blue-700 font-extrabold border-l-4 border-blue-600 border-slate-200 shadow-sm'
+                        : 'border-slate-100 text-slate-500 hover:bg-slate-50 hover:text-blue-600'
                     }`}
                   >
                     {tab.icon}
-                    <span>{tab.label}</span>
+                    <span className="whitespace-nowrap">{tab.label}</span>
                   </button>
                 );
               })}
@@ -186,7 +186,7 @@ const ProfilePage = () => {
               <div className="flex flex-col gap-6">
                 
                 {/* Stats Cards Row */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   <StatsCard title="Total Orders" value={`${orders.length} Placed`} />
                   <StatsCard title="Saved Wishlist" value={`${wishlistItems.length} Gems`} />
                   <StatsCard 

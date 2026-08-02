@@ -8,6 +8,22 @@ import { useProductStore } from '@/store/useProductStore';
 import CategoryNav from './CategoryNav';
 import ProfileDropdown from './ProfileDropdown';
 
+const InstagramIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg 
+    className={className} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+  >
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
+
 const Header = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -74,6 +90,16 @@ const Header = () => {
           </div>
 
           <div className="flex items-center gap-6">
+            <a 
+              href="https://www.instagram.com/znira.co?igsh=MTBwMGQzdWZ6bzFzYg==" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="flex items-center gap-1.5 text-[#e1306c] hover:opacity-80 transition-opacity font-extrabold"
+              title="Follow Znira & Co on Instagram"
+            >
+              <InstagramIcon className="w-3.5 h-3.5" />
+              <span>@znira.co</span>
+            </a>
             <a href="#" className="hover:text-[#8b7355] transition-colors">Our Legacy</a>
             <a href="#" className="hover:text-[#8b7355] transition-colors">Book Consultation</a>
           </div>
@@ -97,7 +123,7 @@ const Header = () => {
             <Link to="/" className="flex-shrink-0 flex items-center group">
               <img 
                 src="/logo.png" 
-                alt="Zari & Co Logo" 
+                alt="Znira & Co Logo" 
                 className="h-10 sm:h-12 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]" 
               />
             </Link>
@@ -194,7 +220,7 @@ const Header = () => {
             <div className="p-5 border-b border-neutral-100 flex items-center justify-between">
               <img 
                 src="/logo.png" 
-                alt="Zari & Co" 
+                alt="Znira & Co" 
                 className="h-10 w-auto object-contain" 
               />
               <button 
@@ -220,7 +246,7 @@ const Header = () => {
               >
                 <input
                   type="text"
-                  placeholder="Search Zari & Co..."
+                  placeholder="Search Znira & Co..."
                   value={mobileSearchQuery}
                   onChange={(e) => setMobileSearchQuery(e.target.value)}
                   className="w-full bg-[#faf9f6] border border-[#8b7355]/20 rounded-xl py-2 pl-4 pr-10 text-xs tracking-wider text-neutral-800 placeholder-neutral-400 focus:outline-none focus:border-[#8b7355]"
@@ -269,6 +295,17 @@ const Header = () => {
                     <a href="tel:+1800123456" className="flex items-center gap-2.5 hover:text-[#8b7355]">
                       <Phone className="w-4 h-4 text-[#8b7355]/70" />
                       <span>Contact Us</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a 
+                      href="https://www.instagram.com/znira.co?igsh=MTBwMGQzdWZ6bzFzYg==" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex items-center gap-2.5 text-[#e1306c] hover:opacity-80 transition-opacity font-extrabold"
+                    >
+                      <InstagramIcon className="w-4 h-4 text-[#e1306c]" />
+                      <span>Instagram (@znira.co)</span>
                     </a>
                   </li>
                   <li>

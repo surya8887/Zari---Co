@@ -289,7 +289,7 @@ const ProductListPage = () => {
       case 'all':
         return {
           subtitle: "Premium Natural Jewels",
-          title: "The Zari & Co. Masterpiece Collection",
+          title: "The Znira & Co. Masterpiece Collection",
           description: "Explore our complete range of certified conflict-free diamonds and gold jewelry."
         };
       case 'collections':
@@ -300,7 +300,7 @@ const ProductListPage = () => {
         };
       case 'try at home':
         return {
-          subtitle: "Zari & Co. Comfort Service",
+          subtitle: "Znira & Co. Comfort Service",
           title: "Select & Try At Home",
           description: "Shortlist your favorite designs and our consultants will bring them to your doorstep for a free trial."
         };
@@ -314,7 +314,7 @@ const ProductListPage = () => {
         return {
           subtitle: "Investment Savings Scheme",
           title: "The 10+1 Jeweller Purchase Plan",
-          description: "Save monthly for 10 months and get the 11th installment free on Zari & Co. Start today."
+          description: "Save monthly for 10 months and get the 11th installment free on Znira & Co. Start today."
         };
       default:
         return {
@@ -394,7 +394,7 @@ const ProductListPage = () => {
               <span className="inline-block bg-[#8b7355]/10 text-[#8b7355] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">
                 Savings & Purchase Plan
               </span>
-              <h3 className="text-xl font-serif font-semibold text-[#4e3a24]">The Zari & Co. 10+1 Scheme</h3>
+              <h3 className="text-xl font-serif font-semibold text-[#4e3a24]">The Znira & Co. 10+1 Scheme</h3>
               <p className="text-xs text-[#6e583e] max-w-2xl leading-relaxed">
                 Pay 10 monthly installments towards your favorite gold or diamond jewelry, and we will contribute the 11th installment for free. Start planning for your wedding or anniversary today.
               </p>

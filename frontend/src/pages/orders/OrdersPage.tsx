@@ -46,7 +46,7 @@ const OrdersPage = () => {
               No Orders Found
             </h3>
             <p className="text-xs text-neutral-400 max-w-xs mb-6">
-              You haven't placed any jewelry orders with Zari & Co yet.
+              You haven't placed any jewelry orders with Znira & Co yet.
             </p>
             <Link
               to="/products"

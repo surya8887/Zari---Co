@@ -417,7 +417,7 @@ const ProductDetailPage = () => {
             </div>
 
             {/* BlueStone-Style Action Buttons Buy triggers */}
-            <div className="flex flex-col md:flex-row gap-4 select-none">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 select-none">
               <button
                 onClick={handleAddToBag}
                 className="flex-grow h-12 bg-[#8b7355] hover:bg-[#6e583e] text-white rounded-xl text-xs font-extrabold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-[0.98]"
@@ -436,13 +436,15 @@ const ProductDetailPage = () => {
 
               <button
                 onClick={handleToggleWishlist}
-                className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-all cursor-pointer flex-shrink-0 ${
+                className={`h-12 w-full sm:w-12 rounded-xl border flex items-center justify-center gap-2 transition-all cursor-pointer flex-shrink-0 ${
                   wishlisted
                     ? 'border-red-500 bg-red-50 text-red-500 shadow-sm'
                     : 'border-[#8b7355]/20 bg-white text-neutral-400 hover:text-red-500 hover:border-red-200'
                 }`}
+                title="Wishlist Item"
               >
-                <Heart className={`w-5 h-5 ${wishlisted ? 'fill-current' : ''}`} />
+                <Heart className={`w-5 h-5 ${wishlisted ? 'fill-current text-red-500' : ''}`} />
+                <span className="sm:hidden text-xs font-bold uppercase tracking-wider text-neutral-700">Wishlist</span>
               </button>
             </div>
 
@@ -701,7 +703,7 @@ const ProductDetailPage = () => {
             
             <h3 className="text-lg font-serif text-[#4e3a24] font-extrabold italic mb-4 flex items-center gap-2">
               <Video className="w-5 h-5 text-[#8b7355]" />
-              Experience Zari & Co Masterpieces
+              Experience Znira & Co Masterpieces
             </h3>
 
             {/* Simulated Live Video Player */}

@@ -5,7 +5,7 @@ const Hero = () => {
       <div className="absolute inset-0">
         <img
           src="/images/luxury_jewelry_model.png"
-          alt="Zari & Co Luxury Campaign"
+          alt="Znira & Co Luxury Campaign"
           className="w-full h-full object-cover object-top opacity-90 scale-100 hover:scale-[1.02] transition-transform duration-[12000ms] ease-out"
         />
         {/* Soft elegant shadow overlay */}
@@ -24,10 +24,9 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Brand Text Overlay (Top Right) */}
-        <div className="absolute top-10 right-6 lg:right-12 text-right opacity-80 hidden md:block select-none">
-          <h2 className="text-4xl font-serif tracking-[0.2em] text-amber-100 font-extrabold uppercase">ZARI</h2>
-          <p className="text-[9px] tracking-[0.4em] text-neutral-300 uppercase -mt-1 font-bold">& CO</p>
+        {/* Brand Text/Logo Overlay (Top Right) */}
+        <div className="absolute top-10 right-6 lg:right-12 text-right opacity-90 hidden md:block select-none">
+          <img src="/logo-white.png" alt="Znira & Co" className="h-12 w-auto object-contain" />
         </div>
 
         {/* Central Left Content Card (Luxury Glassmorphism with gold border) */}

@@ -1,4 +1,4 @@
-# Zari & Co - Frontend
+# Znira & Co - Frontend
 
 A professional, state-of-the-art React application built with TypeScript, Vite, and Tailwind CSS. Designed with a luxurious, high-end visual aesthetic and structured using a scalable, feature-composition architecture for production environments.
 

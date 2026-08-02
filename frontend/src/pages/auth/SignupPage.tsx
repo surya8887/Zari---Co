@@ -84,7 +84,7 @@ export default function SignupPage() {
     setIsSubmitting(false);
 
     if (authResult && authResult.success) {
-      toast.success("Account created successfully! Welcome to Zari & Co.");
+      toast.success("Account created successfully! Welcome to Znira & Co.");
     } else {
       toast.error(authResult?.error || "Registration failed. Please check the details entered.");
     }
@@ -104,9 +104,7 @@ export default function SignupPage() {
 
         <div className="relative z-10 text-center px-12 max-w-lg flex flex-col items-center">
           <div className="h-24 w-auto mb-6 flex items-center justify-center">
-            <span className="text-[#b09d81] font-serif italic text-4xl tracking-[0.2em] font-extrabold uppercase">
-              Zari & Co
-            </span>
+            <img src="/logo-white.png" alt="Znira & Co" className="h-16 w-auto object-contain" />
           </div>
           <div className="w-12 h-px bg-[#b09d81]/60 mb-6" />
           <h2 className="text-[#fdfdfd] font-serif text-3xl italic tracking-wide mb-4 text-center leading-relaxed">
@@ -116,7 +114,7 @@ export default function SignupPage() {
             Experience the exquisite touch of premium, hand-crafted artisan jewelry.
           </p>
           <div className="absolute bottom-10 text-[9px] uppercase tracking-[0.3em] text-[#b09d81]/50">
-            © 2026 Zari & Co. Fine Jewelry
+            © 2026 Znira & Co. Fine Jewelry
           </div>
         </div>
       </div>
@@ -124,9 +122,7 @@ export default function SignupPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
         <div className="w-full max-w-md flex flex-col items-center">
           <div className="flex lg:hidden flex-col items-center mb-8">
-            <span className="text-[#b09d81] font-serif italic text-3xl tracking-[0.2em] font-extrabold uppercase">
-              Zari & Co
-            </span>
+            <img src="/logo.png" alt="Znira & Co" className="h-12 w-auto object-contain mb-1" />
             <div className="w-8 h-px bg-[#b09d81]/60 mt-2" />
           </div>
 

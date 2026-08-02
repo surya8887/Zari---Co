@@ -139,7 +139,7 @@ export const useCartStore = create<CartState>()(
       },
     }),
     {
-      name: 'zari-cart-storage',
+      name: 'znira-cart-storage',
     }
   )
 );

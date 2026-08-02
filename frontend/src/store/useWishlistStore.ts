@@ -34,7 +34,7 @@ export const useWishlistStore = create<WishlistState>()(
       },
     }),
     {
-      name: 'zari-wishlist-storage',
+      name: 'znira-wishlist-storage',
     }
   )
 );

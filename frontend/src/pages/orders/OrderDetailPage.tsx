@@ -105,7 +105,7 @@ const OrderDetailPage = () => {
               <div className="text-xs">
                 <h4 className="font-extrabold uppercase tracking-wider text-emerald-800 mb-1">BIS 916 Assured Quality Guarantee</h4>
                 <p className="text-neutral-500 leading-relaxed">
-                  Zari & Co guarantees that every diamond and solid gold masterpiece item included in this purchase receipt is certified, BIS Hallmarked, and fully backed by our lifetime exchange guidelines.
+                  Znira & Co guarantees that every diamond and solid gold masterpiece item included in this purchase receipt is certified, BIS Hallmarked, and fully backed by our lifetime exchange guidelines.
                 </p>
               </div>
             </div>

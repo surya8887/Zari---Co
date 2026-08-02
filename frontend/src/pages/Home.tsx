@@ -4,6 +4,22 @@ import JustIn from '@/features/catalog/components/JustIn';
 import FloatingActions from '@/components/common/FloatingActions';
 import { ShieldCheck, RefreshCw, Truck, Award, Star } from 'lucide-react';
 
+const InstagramIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg 
+    className={className} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+  >
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
+
 const Home = () => {
   return (
     <div className="min-h-screen bg-[#faf9f6] text-[#2c221e]">
@@ -74,7 +90,7 @@ const Home = () => {
             </h3>
             <div className="w-16 h-px bg-[#8b7355]/50 mx-auto mb-8" />
             <p className="text-sm font-sans tracking-wide text-neutral-600 leading-relaxed mb-6 max-w-2xl mx-auto">
-              For over three decades, Zari & Co has stood as a beacon of artisanal excellence and purity. 
+              For over three decades, Znira & Co has stood as a beacon of artisanal excellence and purity. 
               Each creation in our collection is hand-carved by master craftsmen who have kept the age-old heritage 
               of Indian gold smithery alive. 
             </p>
@@ -87,7 +103,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* 3. The Zari Promise (Trust credentials grid) */}
+        {/* 3. The Znira Promise (Trust credentials grid) */}
         <section className="py-16 bg-[#faf9f6] border-t border-b border-[#8b7355]/10 select-none">
           <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -136,15 +152,28 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
             {/* Column 1: Brand Info */}
             <div className="flex flex-col gap-4">
-              <h2 className="text-xl font-serif tracking-[0.2em] text-amber-100 font-extrabold uppercase select-none">
-                ZARI & CO
-              </h2>
+              <div className="flex items-center gap-2">
+                <img src="/logo-white.png" alt="Znira & Co" className="h-10 w-auto object-contain" />
+              </div>
               <div className="w-12 h-0.5 bg-[#8b7355]/50" />
               <p className="text-[11px] text-neutral-400 tracking-wider leading-relaxed">
                 Creators of fine, hand-crafted artisan jewelry. We deliver brilliance and purity across the globe.
               </p>
               <div className="text-[10px] text-neutral-500 tracking-wide font-sans mt-2">
                 🇮🇳 Proudly Crafted in India
+              </div>
+              
+              {/* Instagram Official Handle */}
+              <div className="mt-2">
+                <a 
+                  href="https://www.instagram.com/znira.co?igsh=MTBwMGQzdWZ6bzFzYg=="
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-purple-600/10 border border-amber-200/20 text-[#e1306c] hover:text-rose-400 text-[10px] font-extrabold tracking-wider transition-all duration-300 group"
+                >
+                  <InstagramIcon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                  <span>Follow @znira.co on Instagram</span>
+                </a>
               </div>
             </div>
 
@@ -200,7 +229,7 @@ const Home = () => {
           {/* Sub-Footer */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 select-none">
             <p className="text-[10px] text-neutral-500 tracking-[2px] uppercase">
-              © 2026 Zari & Co. Fine Jewelry. All Rights Reserved.
+              © 2026 Znira & Co. Fine Jewelry. All Rights Reserved.
             </p>
             <div className="flex gap-6 text-[10px] text-neutral-400 uppercase tracking-widest">
               <a href="#" className="hover:text-amber-200 transition-colors">Privacy Policy</a>

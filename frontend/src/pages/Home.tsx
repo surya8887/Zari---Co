@@ -159,8 +159,9 @@ const Home = () => {
               <p className="text-[11px] text-neutral-400 tracking-wider leading-relaxed">
                 Creators of fine, hand-crafted artisan jewelry. We deliver brilliance and purity across the globe.
               </p>
-              <div className="text-[10px] text-neutral-500 tracking-wide font-sans mt-2">
-                🇮🇳 Proudly Crafted in India
+              <div className="text-[10px] text-neutral-400 tracking-wide font-sans mt-2 flex flex-col gap-1">
+                <span>🇮🇳 Proudly Crafted in India</span>
+                <span>📞 Helpline: <a href="tel:+918178028397" className="text-amber-200 hover:underline font-bold">+91 8178028397</a></span>
               </div>
               
               {/* Instagram Official Handle */}

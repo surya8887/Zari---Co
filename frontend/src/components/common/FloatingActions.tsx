@@ -1,5 +1,5 @@
 
-import { MessageSquare, Phone } from 'lucide-react';
+import { Phone } from 'lucide-react';
 
 const InstagramIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg 
@@ -33,20 +33,23 @@ const FloatingActions = () => {
 
       {/* WhatsApp Link Icon */}
       <a 
-        href="#" 
+        href="https://wa.me/918178028397?text=Hello%20Znira%20%26%20Co!" 
+        target="_blank"
+        rel="noopener noreferrer"
         className="w-11 h-11 sm:w-12 sm:h-12 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-xl transform hover:scale-110 active:scale-95 transition-all duration-300"
-        title="WhatsApp Us"
+        title="WhatsApp Us (+91 8178028397)"
       >
         <Phone className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
       </a>
 
-      {/* Chat Icon */}
-      <button 
-        className="w-11 h-11 sm:w-12 sm:h-12 bg-[#00A884] text-white rounded-full flex items-center justify-center shadow-xl transform hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer"
-        title="Live Chat"
+      {/* Call Direct Action */}
+      <a
+        href="tel:+918178028397"
+        className="w-11 h-11 sm:w-12 sm:h-12 bg-[#8b7355] text-white rounded-full flex items-center justify-center shadow-xl transform hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer"
+        title="Call +91 8178028397"
       >
-        <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
-      </button>
+        <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
+      </a>
     </div>
   );
 };

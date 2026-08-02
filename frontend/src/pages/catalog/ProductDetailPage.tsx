@@ -466,7 +466,7 @@ const ProductDetailPage = () => {
 
             {/* Helpline / Question note */}
             <span className="text-[8.5px] font-bold text-neutral-400 text-center select-none block mt-2">
-              Any Questions? Please feel free to reach our luxury advisors at: <strong className="text-[#8b7355]">1800 419 0066</strong>
+              Any Questions? Please feel free to reach our luxury advisors at: <a href="tel:+918178028397" className="text-[#8b7355] font-extrabold hover:underline">+91 8178028397</a>
             </span>
           </div>
         </div>

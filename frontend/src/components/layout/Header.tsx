@@ -79,9 +79,9 @@ const Header = () => {
               <MapPin className="w-3.5 h-3.5 text-[#8b7355]" />
               <span>Find A Store</span>
             </a>
-            <a href="tel:+1800123456" className="flex items-center gap-1.5 hover:text-[#8b7355] transition-colors">
+            <a href="tel:+918178028397" className="flex items-center gap-1.5 hover:text-[#8b7355] transition-colors">
               <Phone className="w-3.5 h-3.5 text-[#8b7355]" />
-              <span>Contact Us</span>
+              <span>+91 8178028397</span>
             </a>
           </div>
 
@@ -292,9 +292,9 @@ const Header = () => {
                     </a>
                   </li>
                   <li>
-                    <a href="tel:+1800123456" className="flex items-center gap-2.5 hover:text-[#8b7355]">
+                    <a href="tel:+918178028397" className="flex items-center gap-2.5 hover:text-[#8b7355]">
                       <Phone className="w-4 h-4 text-[#8b7355]/70" />
-                      <span>Contact Us</span>
+                      <span>Contact (+91 8178028397)</span>
                     </a>
                   </li>
                   <li>

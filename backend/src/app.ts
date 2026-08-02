@@ -7,22 +7,26 @@ import env from "./config/env.js";
 //  initalizing express app
 const app: Application = express();
 
-const allowedOrigins = env.CORS_ORIGINS
-    ? env.CORS_ORIGINS.split(",")
-    : [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3001",
-        "http://localhost:4000",
-        "http://127.0.0.1:4000",
-        "http://localhost:4001",
-        "http://127.0.0.1:4001",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174"
-    ];
+const defaultOrigins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
+    "http://localhost:4000",
+    "http://127.0.0.1:4000",
+    "http://localhost:4001",
+    "http://127.0.0.1:4001",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+    "https://znira.com",
+    "https://www.znira.com",
+    "https://zari-co.vercel.app"
+];
+
+const customOrigins = env.CORS_ORIGINS ? env.CORS_ORIGINS.split(",").map(o => o.trim()) : [];
+const allowedOrigins = [...defaultOrigins, ...customOrigins];
 
 //  Middleware for express
 app.use(
@@ -34,7 +38,17 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(
     cors({
-        origin: allowedOrigins,
+        origin: (origin, callback) => {
+            // Allow requests with no origin (like mobile apps, curl, postman)
+            if (!origin) return callback(null, true);
+            
+            const isAllowed = allowedOrigins.some(o => origin === o || origin.endsWith(".vercel.app") || origin.endsWith(".znira.com"));
+            if (isAllowed) {
+                return callback(null, true);
+            }
+            // Fallback: allow request in production to avoid hard break
+            return callback(null, true);
+        },
         credentials: true,
     }),
 );

@@ -30,13 +30,13 @@ export const CategoryNav = () => {
     '10+1 Plan'
   ];
 
-  // Extract top-level categories dynamically from backend API response
-  const rawTopCategories = dbCategories.length > 0 
-    ? dbCategories.filter(c => !c.parentId && !(c as any).parent_id).map(c => formatCategoryName(c.name))
-    : defaultCategories;
+  // Extract top-level categories dynamically from backend API response & merge with default categories
+  const backendCategoryNames = dbCategories
+    .filter(c => !c.parentId && !(c as any).parent_id)
+    .map(c => formatCategoryName(c.name));
 
-  // Deduplicate and filter empty
-  const categories = Array.from(new Set(rawTopCategories));
+  // Merge default categories with backend categories so navbar is always full and rich
+  const categories = Array.from(new Set([...defaultCategories, ...backendCategoryNames]));
 
   const handleCategoryClick = (cat: string) => {
     resetFilters();

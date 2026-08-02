@@ -79,15 +79,18 @@ const Home = () => {
     { name: 'Pendants', image: '/images/gold_necklace.png' },
   ];
 
-  const topDbCats = dbCategories.length > 0
-    ? dbCategories.filter((c: any) => !c.parentId && !(c as any).parent_id).map((c: any) => ({
-        name: formatCatName(c.name),
-        image: getCategoryImage(c.name)
-      }))
-    : defaultCategories;
+  const dbCatsFormatted = dbCategories
+    .filter((c: any) => !c.parentId && !(c as any).parent_id)
+    .map((c: any) => ({
+      name: formatCatName(c.name),
+      image: getCategoryImage(c.name)
+    }));
 
-  // Deduplicate
-  const categoriesToDisplay = topDbCats.filter((v: { name: string; image: string }, i: number, a: { name: string; image: string }[]) => a.findIndex((t: { name: string; image: string }) => t.name === v.name) === i);
+  const categoriesToDisplay = Array.from(
+    new Map(
+      [...defaultCategories, ...dbCatsFormatted].map((item) => [item.name.toLowerCase(), item])
+    ).values()
+  );
 
   const handleCategoryClick = (catName: string) => {
     resetFilters();

@@ -25,6 +25,7 @@ const ProductListPage = () => {
     filteredProducts,
     filters,
     pagination,
+    categories,
     toggleFilter,
     setBulkFilters,
     setSort,
@@ -34,6 +35,10 @@ const ProductListPage = () => {
     fetchProducts,
     isLoading,
   } = useProductStore();
+
+  const dynamicProductTypes = categories.length > 0
+    ? Array.from(new Set(categories.map(c => c.name.charAt(0).toUpperCase() + c.name.slice(1).toLowerCase())))
+    : ['Earrings', 'Rings', 'Necklaces', 'Bracelets', 'Bangles', 'Pendants', 'Chains'];
 
   const { addItem } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
@@ -197,7 +202,7 @@ const ProductListPage = () => {
         onToggle={() => toggleSection('type')}
       >
         <FilterCheckboxGroup
-          options={['Earrings', 'Rings', 'Necklaces', 'Bracelets', 'Bangles', 'Pendants', 'Chains']}
+          options={dynamicProductTypes}
           selectedValues={filters.productTypes}
           onChange={(val) => toggleFilter('productTypes', val)}
         />

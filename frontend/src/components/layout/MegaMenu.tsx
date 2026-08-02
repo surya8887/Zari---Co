@@ -103,10 +103,21 @@ const CATEGORY_CONFIGS: Record<string, MenuConfig> = {
 
 export const MegaMenu = ({ category, onClose }: MegaMenuProps) => {
   const navigate = useNavigate();
-  const { setBulkFilters, resetFilters } = useProductStore();
+  const { categories: dbCategories, setBulkFilters, resetFilters } = useProductStore();
 
-  const config = CATEGORY_CONFIGS[category];
-  if (!config) return null;
+  const config = CATEGORY_CONFIGS[category] || CATEGORY_CONFIGS['Rings'];
+
+  // Find top level category matching this name
+  const parentCat = dbCategories.find(
+    (c) => c.name.toLowerCase() === category.toLowerCase()
+  );
+
+  // Dynamically extract backend subcategories whose parentId matches parentCat.id
+  const backendSubcategories = parentCat 
+    ? dbCategories.filter((c) => (c.parentId || (c as any).parent_id) === parentCat.id).map((c) => c.name)
+    : [];
+
+  const displayTypes = backendSubcategories.length > 0 ? backendSubcategories : config.popularTypes;
 
   const handleTypeClick = (type: string) => {
     resetFilters();
@@ -182,10 +193,10 @@ export const MegaMenu = ({ category, onClose }: MegaMenuProps) => {
       onMouseLeave={onClose}
     >
       <div className="container mx-auto px-12 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* Col 1: Popular Types */}
+        {/* Col 1: Popular Types & Subcategories */}
         <MegaMenuColumn
           title="Popular Styles"
-          items={config.popularTypes.map((type) => ({
+          items={displayTypes.map((type) => ({
             label: type,
             onClick: () => handleTypeClick(type),
           }))}

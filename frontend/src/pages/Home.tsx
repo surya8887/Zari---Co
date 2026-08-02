@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+import { useProductStore } from '@/store/useProductStore';
 import Header from '@/components/layout/Header';
 import Hero from '@/features/catalog/components/Hero';
 import JustIn from '@/features/catalog/components/JustIn';
@@ -51,6 +53,48 @@ const XIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
 );
 
 const Home = () => {
+  const navigate = useNavigate();
+  const { categories: dbCategories, setCategory, resetFilters } = useProductStore();
+
+  const getCategoryImage = (name: string) => {
+    const lower = name.toLowerCase();
+    if (lower.includes('earring')) return '/images/gold_drop_earrings.png';
+    if (lower.includes('necklace')) return '/images/gold_necklace.png';
+    if (lower.includes('bangle')) return '/images/gold_bangles.png';
+    if (lower.includes('pendant')) return '/images/gold_necklace.png';
+    return '/images/gold_diamond_ring.png';
+  };
+
+  const formatCatName = (name: string) => {
+    if (!name) return '';
+    const clean = name.trim();
+    return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
+  };
+
+  const defaultCategories = [
+    { name: 'Rings', image: '/images/gold_diamond_ring.png' },
+    { name: 'Earrings', image: '/images/gold_drop_earrings.png' },
+    { name: 'Necklaces', image: '/images/gold_necklace.png' },
+    { name: 'Bangles', image: '/images/gold_bangles.png' },
+    { name: 'Pendants', image: '/images/gold_necklace.png' },
+  ];
+
+  const topDbCats = dbCategories.length > 0
+    ? dbCategories.filter((c: any) => !c.parentId && !(c as any).parent_id).map((c: any) => ({
+        name: formatCatName(c.name),
+        image: getCategoryImage(c.name)
+      }))
+    : defaultCategories;
+
+  // Deduplicate
+  const categoriesToDisplay = topDbCats.filter((v: { name: string; image: string }, i: number, a: { name: string; image: string }[]) => a.findIndex((t: { name: string; image: string }) => t.name === v.name) === i);
+
+  const handleCategoryClick = (catName: string) => {
+    resetFilters();
+    setCategory(catName);
+    navigate('/products');
+  };
+
   return (
     <div className="min-h-screen bg-[#faf9f6] text-[#2c221e]">
       {/* Header with Navigation */}
@@ -74,14 +118,12 @@ const Home = () => {
             </div>
 
             <div className="flex flex-wrap justify-center gap-6 sm:gap-10 md:gap-14">
-              {[
-                { name: 'Rings', image: '/images/gold_diamond_ring.png' },
-                { name: 'Earrings', image: '/images/gold_drop_earrings.png' },
-                { name: 'Necklaces', image: '/images/gold_necklace.png' },
-                { name: 'Bangles', image: '/images/gold_bangles.png' },
-                { name: 'Pendants', image: '/images/gold_necklace.png' },
-              ].map((cat, idx) => (
-                <div key={idx} className="flex flex-col items-center group cursor-pointer">
+              {categoriesToDisplay.map((cat: { name: string; image: string }, idx: number) => (
+                <div 
+                  key={idx} 
+                  onClick={() => handleCategoryClick(cat.name)}
+                  className="flex flex-col items-center group cursor-pointer"
+                >
                   <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border border-[#8b7355]/15 p-1 bg-[#faf9f6] shadow-sm hover:shadow-md hover:border-[#8b7355] transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
                     <img 
                       src={cat.image} 

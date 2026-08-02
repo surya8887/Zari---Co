@@ -12,6 +12,12 @@ export const CategoryNav = () => {
     fetchCategories();
   }, [fetchCategories]);
 
+  const formatCategoryName = (name: string) => {
+    if (!name) return '';
+    const clean = name.trim();
+    return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
+  };
+
   const defaultCategories = [
     'Rings', 
     'Earrings', 
@@ -24,11 +30,13 @@ export const CategoryNav = () => {
     '10+1 Plan'
   ];
 
-  const categories = dbCategories.length > 0 
-    ? dbCategories.filter(c => !c.parentId && !(c as any).parent_id).map(c => c.name) 
+  // Extract top-level categories dynamically from backend API response
+  const rawTopCategories = dbCategories.length > 0 
+    ? dbCategories.filter(c => !c.parentId && !(c as any).parent_id).map(c => formatCategoryName(c.name))
     : defaultCategories;
 
-  const megaMenuCategories = ['Rings', 'Earrings', 'Pendants', 'Bangles', 'Gifts'];
+  // Deduplicate and filter empty
+  const categories = Array.from(new Set(rawTopCategories));
 
   const handleCategoryClick = (cat: string) => {
     resetFilters();
@@ -45,20 +53,13 @@ export const CategoryNav = () => {
       <div className="container mx-auto px-4 md:px-6">
         <ul className="flex items-center justify-start md:justify-center gap-8 lg:gap-12 py-3.5 text-[11px] font-extrabold uppercase tracking-[2.5px] text-[#4e3a24] overflow-x-auto whitespace-nowrap scrollbar-none px-2 md:px-0">
           {categories.map((item) => {
-            const hasMegaMenu = megaMenuCategories.includes(item);
             const isHovered = activeCategory === item;
 
             return (
               <li 
                 key={item} 
                 className="relative group"
-                onMouseEnter={() => {
-                  if (hasMegaMenu) {
-                    setActiveCategory(item);
-                  } else {
-                    setActiveCategory(null);
-                  }
-                }}
+                onMouseEnter={() => setActiveCategory(item)}
               >
                 <button
                   type="button"
@@ -81,7 +82,7 @@ export const CategoryNav = () => {
       </div>
 
       {/* Render the dropdown MegaMenu overlay absolutely positioned beneath the navbar */}
-      {activeCategory && megaMenuCategories.includes(activeCategory) && (
+      {activeCategory && (
         <MegaMenu 
           category={activeCategory} 
           onClose={() => setActiveCategory(null)} 

@@ -30,6 +30,26 @@ const FacebookIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => 
   </svg>
 );
 
+const YoutubeIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg 
+    className={className} 
+    viewBox="0 0 24 24" 
+    fill="currentColor"
+  >
+    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+  </svg>
+);
+
+const XIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg 
+    className={className} 
+    viewBox="0 0 24 24" 
+    fill="currentColor"
+  >
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+  </svg>
+);
+
 const Home = () => {
   return (
     <div className="min-h-screen bg-[#faf9f6] text-[#2c221e]">
@@ -157,43 +177,21 @@ const Home = () => {
       </main>
 
       {/* Footer (Luxurious, detailed layout) */}
-      <footer className="bg-[#1f1613] text-[#faf9f6] border-t border-[#8b7355]/20 py-16">
+      <footer className="bg-[#1a1210] text-[#faf9f6] border-t border-[#8b7355]/20 pt-16 pb-12">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 lg:gap-12 mb-12 items-start">
             {/* Column 1: Brand Info */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2">
                 <img src="/logo-white.png" alt="Znira & Co" className="h-10 w-auto object-contain" />
               </div>
-              <div className="w-12 h-0.5 bg-[#8b7355]/50" />
+              <div className="w-10 h-0.5 bg-[#8b7355]/60 my-1" />
               <p className="text-[11px] text-neutral-400 tracking-wider leading-relaxed">
                 Creators of fine, hand-crafted artisan jewelry. We deliver brilliance and purity across the globe.
               </p>
-              <div className="text-[10px] text-neutral-400 tracking-wide font-sans mt-2 flex flex-col gap-1">
+              <div className="text-[10px] text-neutral-400 tracking-wide font-sans mt-1 flex flex-col gap-1.5">
                 <span>🇮🇳 Proudly Crafted in India</span>
                 <span>📞 Helpline: <a href="tel:+918178028397" className="text-amber-200 hover:underline font-bold">+91 8178028397</a></span>
-              </div>
-              
-              {/* Social Handles */}
-              <div className="mt-2 flex flex-col gap-2">
-                <a 
-                  href="https://www.facebook.com/share/18ZHtiKtag/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1877F2]/10 border border-[#1877F2]/20 text-[#1877F2] hover:bg-[#1877F2]/20 text-[10px] font-extrabold tracking-wider transition-all duration-300 group w-fit"
-                >
-                  <FacebookIcon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                  <span>Znira & Co. on Facebook</span>
-                </a>
-                <a 
-                  href="https://www.instagram.com/znira.co?igsh=MTBwMGQzdWZ6bzFzYg=="
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-purple-600/10 border border-amber-200/20 text-[#e1306c] hover:text-rose-400 text-[10px] font-extrabold tracking-wider transition-all duration-300 group w-fit"
-                >
-                  <InstagramIcon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                  <span>Follow @znira.co on Instagram</span>
-                </a>
               </div>
             </div>
 
@@ -202,7 +200,7 @@ const Home = () => {
               <h4 className="text-[11px] font-extrabold uppercase tracking-[2.5px] text-amber-100 mb-5">
                 Our Collections
               </h4>
-              <ul className="flex flex-col gap-2.5 text-[11px] text-[#e0deda] font-medium tracking-wider">
+              <ul className="flex flex-col gap-3 text-[11px] text-[#e0deda] font-medium tracking-wider">
                 <li><a href="#" className="hover:text-amber-200 transition-colors">Znira Gold Collection</a></li>
                 <li><a href="#" className="hover:text-amber-200 transition-colors">Marquise Solitaires</a></li>
                 <li><a href="#" className="hover:text-amber-200 transition-colors">Heritage Drop Earrings</a></li>
@@ -215,7 +213,7 @@ const Home = () => {
               <h4 className="text-[11px] font-extrabold uppercase tracking-[2.5px] text-amber-100 mb-5">
                 Customer Services
               </h4>
-              <ul className="flex flex-col gap-2.5 text-[11px] text-[#e0deda] font-medium tracking-wider">
+              <ul className="flex flex-col gap-3 text-[11px] text-[#e0deda] font-medium tracking-wider">
                 <li><a href="#" className="hover:text-amber-200 transition-colors">Lifetime Exchange & Buyback</a></li>
                 <li><a href="#" className="hover:text-amber-200 transition-colors">Safe & Insured Shipping</a></li>
                 <li><a href="#" className="hover:text-amber-200 transition-colors">Gold Rate Calculator</a></li>
@@ -223,23 +221,63 @@ const Home = () => {
               </ul>
             </div>
 
-            {/* Column 4: Newsletter */}
+            {/* Column 4: Newsletter & Social Channels */}
             <div>
               <h4 className="text-[11px] font-extrabold uppercase tracking-[2.5px] text-amber-100 mb-5">
                 The Inner Circle
               </h4>
               <p className="text-[11px] text-neutral-400 tracking-wider mb-4 leading-relaxed">
-                Join our newsletter to receive exclusive launches, collection sneak peeks, and gold updates.
+                Subscribe for exclusive launches, collection sneak peeks, and gold rate updates.
               </p>
-              <div className="flex h-9 rounded overflow-hidden border border-[#8b7355]/30">
+              <div className="flex h-9 rounded-lg overflow-hidden border border-[#8b7355]/30 mb-5 focus-within:border-amber-300/60 transition-colors">
                 <input 
                   type="email" 
                   placeholder="Enter your email" 
-                  className="bg-[#2c221e] border-none text-xs px-4 text-white placeholder-neutral-500 focus:outline-none w-full"
+                  className="bg-[#261d1a] border-none text-xs px-3.5 text-white placeholder-neutral-500 focus:outline-none w-full"
                 />
-                <button className="bg-[#8b7355] hover:bg-[#6e583e] text-white text-[10px] font-extrabold uppercase tracking-widest px-4 transition-colors duration-300 cursor-pointer">
+                <button className="bg-[#8b7355] hover:bg-[#6e583e] text-white text-[10px] font-extrabold uppercase tracking-widest px-4 transition-colors duration-300 cursor-pointer shrink-0">
                   Join
                 </button>
+              </div>
+
+              {/* Social Icons Row */}
+              <div className="flex items-center gap-3">
+                <a 
+                  href="https://x.com/znira4o" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-full bg-neutral-800/80 border border-neutral-700 text-white hover:bg-neutral-700 hover:text-white flex items-center justify-center transition-all duration-300"
+                  title="Follow on X"
+                >
+                  <XIcon className="w-4 h-4" />
+                </a>
+                <a 
+                  href="https://www.youtube.com/@znira001" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-full bg-[#FF0000]/10 border border-[#FF0000]/30 text-[#FF0000] hover:bg-[#FF0000] hover:text-white flex items-center justify-center transition-all duration-300"
+                  title="Subscribe on YouTube"
+                >
+                  <YoutubeIcon className="w-4 h-4" />
+                </a>
+                <a 
+                  href="https://www.facebook.com/share/18ZHtiKtag/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-full bg-[#1877F2]/10 border border-[#1877F2]/30 text-[#1877F2] hover:bg-[#1877F2] hover:text-white flex items-center justify-center transition-all duration-300"
+                  title="Follow on Facebook"
+                >
+                  <FacebookIcon className="w-4 h-4" />
+                </a>
+                <a 
+                  href="https://www.instagram.com/znira.co?igsh=MTBwMGQzdWZ6bzFzYg==" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500/10 to-rose-500/10 border border-rose-500/30 text-[#e1306c] hover:bg-gradient-to-tr hover:from-amber-500 hover:to-rose-500 hover:text-white flex items-center justify-center transition-all duration-300"
+                  title="Follow on Instagram"
+                >
+                  <InstagramIcon className="w-4 h-4" />
+                </a>
               </div>
             </div>
           </div>
